@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>AgroLink | Architect Mode</title>
+    <title>Vendor Dashboard</title>
 </head>
-<body style="background: black; color: #00ff41; font-family: monospace;">
-    <h1>SYSTEM STATUS: ONLINE</h1>
-    <p>Welcome, Junior Developer. The architecture is ready.</p>
+<body style="background: black; color: #00ff41; font-family: monospace; padding: 20px;">
+    <h1>MARKETPLACE ARCHITECT v1.0</h1>
+    <hr>
+    
+    <h3>Add New Product</h3>
+    <form action="/add" method="POST">
+        <input type="text" name="p_name" placeholder="Product Name" required>
+        <input type="number" name="p_price" placeholder="Price" required>
+        <button type="submit" style="background: #00ff41; color: black;">UPLOAD</button>
+    </form>
+
+    <hr>
+    <h3>Current Inventory</h3>
+    <ul>
+        {% for p in products %}
+            <li>{{ p.name }} - ${{ p.price }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
