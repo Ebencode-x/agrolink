@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AgroLink | Edit Protocol</title>
+</head>
+<body style="background: black; color: #00ff41; font-family: monospace; padding: 50px;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ffff00; padding-bottom: 10px;">
+        <h1 style="color: #ffff00;">>>> UPDATE_NODE_DATA: node_0x{{ product.id }}</h1>
+        <a href="/" style="color: #888; text-decoration: none; border: 1px solid #444; padding: 5px;">[BACK_TO_DASHBOARD]</a>
+    </div>
+    
+    <div style="border: 1px solid #00ff41; padding: 30px; background: #050505; display: inline-block; margin-top: 30px;">
+        <form method="POST">
+            <p style="color: #888;">FIELD: PRODUCT_NAME</p>
+            <input type="text" name="p_name" value="{{ product.name }}" required 
+                   style="background: #000; color: #00ff41; border: 1px solid #00ff41; padding: 10px; width: 350px; font-family: monospace;">
+            
+            <p style="color: #888; margin-top: 20px;">FIELD: PRICE_VALUE</p>
+            <input type="text" name="p_price" value="{{ product.price }}" required 
+                   style="background: #000; color: #ffff00; border: 1px solid #ffff00; padding: 10px; width: 350px; font-family: monospace;">
+            
+            <div style="margin-top: 30px;">
+                <button type="submit" style="background: #00ff41; color: black; border: none; padding: 12px 25px; cursor: pointer; font-weight: bold; font-family: monospace;">
+                    COMMIT_CHANGES
+                </button>
+                <a href="/" style="color: #ff3131; text-decoration: none; margin-left: 20px; font-size: 13px;">[ABORT_PROTOCOL]</a>
+            </div>
+        </form>
+    </div>
+
+    <footer style="margin-top: 50px; color: #444; font-size: 10px;">
+        EDIT_MODE: ACTIVE | NODE_ACCESS: AUTHORIZED | SESSION: {{ session['username'] }}
+    </footer>
+</body>
+</html>
