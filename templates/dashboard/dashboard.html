@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — AgroLink Tanzania{% endblock %}
+{% block content %}
+<div style="min-height:calc(100vh - 70px);padding:3rem clamp(1rem,5vw,4rem);max-width:1400px;margin:0 auto">
+  <div style="margin-bottom:3rem">
+    <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem">Dashboard yako</div>
+    <h1 style="font-family:var(--font-display);font-size:2rem;font-weight:800">Karibu, {{ current_user.full_name.split()[0] }}! 👋</h1>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem;margin-bottom:3rem">
+    {% for icon,label,value,color in [('sprout','Mazao Yangu',crops|length,'var(--emerald-bright)'),('store','Orodha Zangu',listings|length,'var(--amber-warm)'),('map-pin','Mkoa Wangu',current_user.region or 'Haujaweka','var(--sky-cool)'),('shield-check','Aina ya Akaunti',current_user.role|title,'var(--emerald-glow)')] %}
+    <div class="glass" style="padding:1.5rem;border-radius:var(--radius-md)">
+      <i data-lucide="{{ icon }}" style="width:28px;height:28px;color:{{ color }};margin-bottom:0.75rem"></i>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.25rem">{{ label }}</div>
+      <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800">{{ value }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+    <div class="glass" style="padding:2rem;border-radius:var(--radius-md)">
+      <h2 style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px">
+        <i data-lucide="store" style="width:18px;height:18px;color:var(--emerald-bright)"></i>Orodha Zangu
+      </h2>
+      {% if listings %}
+        {% for l in listings[:5] %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid var(--glass-border)">
+          <div><div style="font-weight:600;font-size:0.9rem">{{ l.crop_name }}</div><div style="font-size:0.75rem;color:var(--text-muted)">{{ l.region }} • TZS {{ "{:,.0f}".format(l.price_tzs) }}/kg</div></div>
+          <span style="background:rgba(16,185,129,0.15);color:var(--emerald-glow);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.72rem">{{ 'Inapatikana' if l.is_available else 'Imeisha' }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--text-muted);font-size:0.9rem">Huna orodha bado.</p>
+      {% endif %}
+    </div>
+    <div class="glass" style="padding:2rem;border-radius:var(--radius-md)">
+      <h2 style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px">
+        <i data-lucide="sprout" style="width:18px;height:18px;color:var(--emerald-bright)"></i>Mazao Yangu
+      </h2>
+      {% if crops %}
+        {% for c in crops[:5] %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0;border-bottom:1px solid var(--glass-border)">
+          <div><div style="font-weight:600;font-size:0.9rem">{{ c.name_sw }}</div><div style="font-size:0.75rem;color:var(--text-muted)">{{ c.category|title }} • {{ c.region }}</div></div>
+          <span style="background:rgba(14,165,233,0.15);color:var(--sky-pale);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.72rem">{{ c.season or 'Wakati wowote' }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:var(--text-muted);font-size:0.9rem">Huna mazao bado.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

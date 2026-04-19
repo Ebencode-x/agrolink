@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Soko — AgroLink Tanzania{% endblock %}
+{% block content %}
+<div style="min-height:calc(100vh - 70px);padding:3rem clamp(1rem,5vw,4rem);max-width:1400px;margin:0 auto">
+  <div style="margin-bottom:3rem">
+    <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem">Soko la AgroLink</div>
+    <h1 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;margin-bottom:1rem">Orodha Zote za Mazao</h1>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem">
+    {% if listings %}
+      {% for l in listings %}
+      <div class="glass" style="padding:1.5rem;border-radius:var(--radius-md)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:1rem">
+          <span style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.3rem 0.8rem;border-radius:50px;font-size:0.78rem;font-weight:600">{{ l.crop_name }}</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:4px"><i data-lucide="map-pin" style="width:12px;height:12px"></i>{{ l.region }}</span>
+        </div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.5rem">{{ l.title }}</div>
+        <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
+          <div><div style="font-size:0.72rem;color:var(--text-muted)">Kiasi</div><div style="font-family:var(--font-display);font-weight:700;color:var(--amber-warm)">{{ "{:,.0f}".format(l.quantity_kg) }} kg</div></div>
+          <div><div style="font-size:0.72rem;color:var(--text-muted)">Bei</div><div style="font-family:var(--font-display);font-weight:700;color:var(--amber-warm)">TZS {{ "{:,.0f}".format(l.price_tzs) }}/kg</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);color:var(--emerald-bright);padding:0.5rem 1rem;border-radius:50px;font-size:0.82rem;font-weight:600;margin-top:1rem;width:fit-content">
+          <i data-lucide="phone" style="width:14px;height:14px"></i>{{ l.contact }}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-muted)">
+        <p>Hakuna orodha kwa sasa.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
