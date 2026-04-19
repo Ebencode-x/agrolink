@@ -8,7 +8,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from dotenv import load_dotenv
-from flask_wtf.csrf import CSRFProtect
+
 
 load_dotenv()
 
@@ -32,7 +32,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = "Tafadhali ingia kwanza."
 CORS(app)
-csrf = CSRFProtect(app)
+
 
 # ── Models ──────────────────────────────────────────────────────────────────
 
