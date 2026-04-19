@@ -1,12 +1,218 @@
 {% extends "base.html" %}
 {% block title %}Kuhusu — AgroLink Tanzania{% endblock %}
+
+{% block extra_head %}
+<style>
+  .about-hero{min-height:60vh;display:flex;align-items:center;justify-content:center;padding:4rem clamp(1rem,5vw,4rem);position:relative;overflow:hidden}
+  .about-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(16,185,129,0.15) 0%,transparent 70%)}
+  .about-grid{display:grid;grid-template-columns:1fr 1.8fr;gap:4rem;align-items:center;max-width:1100px;width:100%}
+  .avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:1.5rem}
+  .avatar-circle{width:220px;height:220px;border-radius:50%;background:linear-gradient(135deg,rgba(16,185,129,0.25),rgba(6,78,59,0.8));border:2px solid rgba(16,185,129,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(16,185,129,0.2)}
+  .avatar-circle::before{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(16,185,129,0.1),transparent 60%);animation:rotate-glow 8s linear infinite}
+  @keyframes rotate-glow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .avatar-initials{font-family:var(--font-display);font-size:4rem;font-weight:800;background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative;z-index:1}
+  .avatar-placeholder{font-size:0.75rem;color:var(--text-muted);position:relative;z-index:1;text-align:center;padding:0 1rem}
+  .status-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--emerald-glow);padding:0.4rem 1rem;border-radius:50px;font-size:0.8rem;font-weight:600}
+  .live-dot{width:8px;height:8px;background:var(--emerald-bright);border-radius:50%;animation:pulse-dot 2s ease-in-out infinite}
+  @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+  .about-name{font-family:var(--font-display);font-size:2.5rem;font-weight:800;line-height:1.1;margin-bottom:0.5rem}
+  .about-role{font-size:1rem;color:var(--emerald-bright);font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px}
+  .about-bio{font-size:0.95rem;color:var(--text-secondary);line-height:1.9;margin-bottom:2rem}
+  .cert-section{margin-bottom:2rem}
+  .cert-title{font-size:0.78rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.75rem}
+  .cert-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem}
+  .cert-card{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:10px;padding:0.6rem 0.8rem;font-size:0.78rem;color:var(--text-secondary);transition:all var(--transition)}
+  .cert-card:hover{background:rgba(255,255,255,0.08);border-color:rgba(16,185,129,0.3);color:var(--text-primary)}
+  .cert-card i{flex-shrink:0}
+  .links-section{display:flex;flex-wrap:wrap;gap:0.75rem}
+  .profile-link{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.4rem;border-radius:50px;font-size:0.875rem;font-weight:600;text-decoration:none;transition:all var(--transition)}
+  .link-github{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary)}
+  .link-github:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px)}
+  .link-linkedin{background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#93c5fd}
+  .link-linkedin:hover{background:rgba(10,102,194,0.25);transform:translateY(-2px)}
+  .link-credly{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:var(--amber-light)}
+  .link-credly:hover{background:rgba(245,158,11,0.2);transform:translateY(-2px)}
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:4rem auto;max-width:1100px;padding:0 clamp(1rem,5vw,4rem)}
+  .stat-card{padding:2rem;border-radius:var(--radius-md);text-align:center}
+  .stat-card-value{font-family:var(--font-display);font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem}
+  .stat-card-label{font-size:0.85rem;color:var(--text-secondary)}
+  .mission-section{padding:4rem clamp(1rem,5vw,4rem);max-width:1100px;margin:0 auto}
+  .mission-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:2.5rem}
+  .mission-card{padding:2rem;border-radius:var(--radius-md);position:relative;overflow:hidden}
+  .mission-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--emerald-bright),var(--amber-warm))}
+  .mission-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+  .tech-section{padding:4rem clamp(1rem,5vw,4rem);max-width:1100px;margin:0 auto}
+  .tech-grid{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.5rem}
+  .tech-badge{display:inline-flex;align-items:center;gap:6px;padding:0.5rem 1rem;border-radius:50px;font-size:0.82rem;font-weight:600;border:1px solid}
+  .tech-python{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd}
+  .tech-flask{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--emerald-glow)}
+  .tech-pg{background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.3);color:var(--sky-pale)}
+  .tech-html{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--amber-light)}
+  .tech-git{background:rgba(244,63,94,0.1);border-color:rgba(244,63,94,0.3);color:#fda4af}
+  .tech-cisco{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:#c4b5fd}
+  .cta-section{padding:4rem clamp(1rem,5vw,4rem);text-align:center}
+  .cta-card{max-width:700px;margin:0 auto;padding:3rem;border-radius:var(--radius-lg);position:relative;overflow:hidden}
+  .cta-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(16,185,129,0.1),transparent 70%)}
+  @media(max-width:768px){
+    .about-grid{grid-template-columns:1fr!important;text-align:center}
+    .about-role{justify-content:center}
+    .links-section{justify-content:center}
+    .cert-grid{grid-template-columns:1fr!important}
+    .stats-row{grid-template-columns:1fr!important}
+    .avatar-circle{width:160px;height:160px}
+    .avatar-initials{font-size:3rem}
+    .about-name{font-size:1.8rem}
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:2rem">
-  <div class="glass" style="max-width:600px;width:100%;padding:3rem;border-radius:var(--radius-lg);text-align:center">
-    <div style="font-size:3rem;margin-bottom:1rem">🌾</div>
-    <h1 style="font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:1rem">Kuhusu AgroLink Tanzania</h1>
-    <p style="color:var(--text-secondary);line-height:1.8;margin-bottom:2rem">AgroLink Tanzania ni jukwaa la kisasa la kilimo lililoundwa na Ebenezer Richard Masanja — mwanafunzi wa ICT kutoka MUST Mbeya.</p>
-    <a href="/" class="btn btn-primary" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none"><i data-lucide="home" style="width:18px;height:18px"></i>Rudi Nyumbani</a>
+
+<!-- HERO -->
+<div class="about-hero">
+  <div class="about-grid">
+    <div class="avatar-wrap reveal">
+      <div class="avatar-circle">
+        <div class="avatar-initials">ERM</div>
+        <div class="avatar-placeholder">Picha inakuja hivi karibuni</div>
+      </div>
+      <div class="status-badge">
+        <div class="live-dot"></div>
+        Anajenga AgroLink TZ
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem">Msanidi Mkuu</div>
+      <div class="about-name">Ebenezer Richard<br/>Masanja</div>
+      <div class="about-role">
+        <i data-lucide="graduation-cap" style="width:18px;height:18px"></i>
+        ICT Student — MUST Mbeya · Full-Stack Developer
+      </div>
+      <p class="about-bio">
+        Mimi ni mwanafunzi wa mwaka wa kwanza wa ICT katika Chuo Kikuu cha Mbeya cha Sayansi na Teknolojia (MUST). Nina shauku kubwa ya kujenga mifumo ya teknolojia inayosuluhisha matatizo ya kweli kwa jamii ya Tanzania. AgroLink Tanzania ni mradi wangu wa kwanza wa uzalishaji — ukichanganya ujuzi wa Python, Flask, PostgreSQL, usalama wa mtandao, na muundo wa kisasa wa UI ili kuleta thamani ya kweli kwa wakulima wa Tanzania.
+      </p>
+
+      <div class="cert-section">
+        <div class="cert-title">Vyeti vya Kitaalamu</div>
+        <div class="cert-grid">
+          <div class="cert-card">
+            <i data-lucide="award" style="width:15px;height:15px;color:var(--amber-warm)"></i>
+            freeCodeCamp — Responsive Web Design
+          </div>
+          <div class="cert-card">
+            <i data-lucide="shield" style="width:15px;height:15px;color:var(--sky-cool)"></i>
+            Cisco — Cybersecurity
+          </div>
+          <div class="cert-card">
+            <i data-lucide="shield-check" style="width:15px;height:15px;color:var(--sky-cool)"></i>
+            Cisco — Endpoint Security
+          </div>
+          <div class="cert-card">
+            <i data-lucide="network" style="width:15px;height:15px;color:var(--sky-cool)"></i>
+            Cisco — Network Defense
+          </div>
+        </div>
+      </div>
+
+      <div class="links-section">
+        <a href="https://github.com/Ebencode-x" target="_blank" rel="noopener" class="profile-link link-github">
+          <i data-lucide="github" style="width:18px;height:18px"></i>GitHub
+        </a>
+        <a href="https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399" target="_blank" rel="noopener" class="profile-link link-linkedin">
+          <i data-lucide="linkedin" style="width:18px;height:18px"></i>LinkedIn
+        </a>
+        <a href="https://www.credly.com/earner/dashboard" target="_blank" rel="noopener" class="profile-link link-credly">
+          <i data-lucide="award" style="width:18px;height:18px"></i>Credly — Vyeti
+        </a>
+      </div>
+    </div>
   </div>
 </div>
+
+<!-- STATS -->
+<div class="stats-row">
+  {% for value,label,icon,color in [
+    ('1st Year','Mwanafunzi wa ICT — MUST','graduation-cap','var(--emerald-bright)'),
+    ('3+','Vyeti vya Cisco & freeCodeCamp','award','var(--amber-warm)'),
+    ('2026','Mwaka wa Uzinduzi wa AgroLink TZ','rocket','var(--sky-cool)')
+  ] %}
+  <div class="stat-card glass reveal">
+    <i data-lucide="{{ icon }}" style="width:32px;height:32px;color:{{ color }};margin-bottom:1rem"></i>
+    <div class="stat-card-value">{{ value }}</div>
+    <div class="stat-card-label">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- MISSION -->
+<div class="mission-section">
+  <div style="text-align:center" class="reveal">
+    <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem">Dhamira Yetu</div>
+    <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:1rem">Kwa Nini AgroLink Tanzania?</h2>
+    <p style="color:var(--text-secondary);max-width:600px;margin:0 auto;line-height:1.8">Tanzania ina wakulima zaidi ya milioni 30. Wengi hawana upatikanaji wa bei za soko za kweli, hali ya hewa sahihi, au njia ya kuunganika na wanunuzi. AgroLink inabadilisha hilo.</p>
+  </div>
+  <div class="mission-grid">
+    {% for icon,color,title,desc in [
+      ('target','var(--emerald-bright)','Dhamira','Kuunganisha wakulima wa Tanzania na teknolojia ya kisasa ili waongeze mapato na ufanisi wa kilimo.'),
+      ('eye','var(--amber-warm)','Maono','Tanzania kuwa nchi inayoongoza Afrika Mashariki katika kilimo cha dijitali ifikapo mwaka 2030.'),
+      ('heart','var(--rose-alert)','Thamani','Uwazi, uaminifu, na huduma kwa wakulima ndogo ndogo ambao ndio nguzo ya uchumi wa Tanzania.')
+    ] %}
+    <div class="mission-card glass reveal">
+      <div class="mission-icon" style="background:rgba(16,185,129,0.1)">
+        <i data-lucide="{{ icon }}" style="width:24px;height:24px;color:{{ color }}"></i>
+      </div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:1.1rem;margin-bottom:0.75rem">{{ title }}</div>
+      <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.7">{{ desc }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- TECH STACK -->
+<div class="tech-section">
+  <div class="reveal">
+    <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem">Teknolojia Zinazotumika</div>
+    <h2 style="font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:0.5rem">Stack ya AgroLink</h2>
+    <p style="color:var(--text-secondary);line-height:1.8">Mfumo huu umejengwa kwa teknolojia za kisasa za uzalishaji — zote zilizochaguliwa kwa makusudi ya utendaji, usalama, na urahisi wa matengenezo.</p>
+  </div>
+  <div class="tech-grid">
+    {% for badge,cls,icon in [
+      ('Python 3.11','tech-python','code-2'),
+      ('Flask 3.0','tech-flask','zap'),
+      ('PostgreSQL','tech-pg','database'),
+      ('SQLAlchemy','tech-pg','layers'),
+      ('HTML5 / CSS3','tech-html','layout'),
+      ('Jinja2','tech-flask','file-code'),
+      ('Git & GitHub','tech-git','git-branch'),
+      ('Render','tech-flask','cloud'),
+      ('Gunicorn','tech-pg','server'),
+      ('OpenWeatherMap API','tech-html','cloud-sun'),
+      ('Cisco Security','tech-cisco','shield-check'),
+      ('Lucide Icons','tech-html','sparkles')
+    ] %}
+    <span class="tech-badge {{ cls }}">
+      <i data-lucide="{{ icon }}" style="width:14px;height:14px"></i>{{ badge }}
+    </span>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="cta-card glass-strong reveal">
+    <div style="font-size:2.5rem;margin-bottom:1rem">🌾</div>
+    <h2 style="font-family:var(--font-display);font-size:1.8rem;font-weight:800;margin-bottom:1rem">Jiunge na AgroLink Tanzania</h2>
+    <p style="color:var(--text-secondary);line-height:1.8;margin-bottom:2rem;max-width:500px;margin-left:auto;margin-right:auto">Tukiwa pamoja tunaweza kuleta mabadiliko ya kweli kwa kilimo cha Tanzania. Jiunge leo — bure kabisa.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/register" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none;transition:all var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35)">
+        <i data-lucide="user-plus" style="width:18px;height:18px"></i>Jiunge Bure
+      </a>
+      <a href="/" style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none;transition:all var(--transition)">
+        <i data-lucide="home" style="width:18px;height:18px"></i>Rudi Nyumbani
+      </a>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
