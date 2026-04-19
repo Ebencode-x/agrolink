@@ -140,3 +140,35 @@
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>
+<style>
+@media(max-width:768px){
+  .hero{grid-template-columns:1fr!important;padding:2rem 1rem!important;min-height:auto!important}
+  .hero-visual{order:-1}
+  .hero-stats{gap:1rem!important}
+  .stat-value{font-size:1.4rem!important}
+  .weather-temp{font-size:2.5rem!important}
+  .features-grid{grid-template-columns:1fr!important}
+  .listings-grid{grid-template-columns:1fr!important}
+  .about-grid{grid-template-columns:1fr!important}
+  .auth-layout{grid-template-columns:1fr!important}
+  .auth-visual{display:none!important}
+  .register-container{grid-template-columns:1fr!important}
+  .register-sidebar{display:none!important}
+  .form-row{grid-template-columns:1fr!important}
+  .hero-title{font-size:2.2rem!important}
+  .hero-actions{flex-direction:column!important}
+  .hero-actions a{width:100%!important;justify-content:center!important}
+  .nav-links{display:none!important}
+  .nav-links.open{display:flex!important}
+  .nav-hamburger{display:flex!important}
+  .nav-user span{display:none!important}
+}
+@media(max-width:480px){
+  .hero-title{font-size:1.8rem!important}
+  .weather-temp{font-size:2rem!important}
+  .section-title{font-size:1.6rem!important}
+  .auth-form-box{padding:0 0.5rem!important}
+  .auth-card{padding:1.5rem!important}
+  .register-form-card{padding:1.5rem 1rem!important}
+}
+</style>
