@@ -3,7 +3,7 @@ Werkzeug==3.0.3
 Flask-SQLAlchemy==3.1.1
 SQLAlchemy==2.0.31
 Flask-Migrate==4.0.7
-psycopg2-binary==2.9.9
+psycopg[binary]==3.2.4
 Flask-Login==0.6.3
 Flask-Bcrypt==1.0.1
 Flask-WTF==1.2.1
