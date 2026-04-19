@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Ingia — AgroLink Tanzania{% endblock %}
+{% block extra_head %}
+<style>
+  .auth-layout{min-height:calc(100vh - 70px);display:grid;grid-template-columns:1fr 1fr}
+  .auth-visual{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(2rem,5vw,5rem);overflow:hidden}
+  .auth-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 30% 40%,rgba(16,185,129,0.2) 0%,transparent 70%),linear-gradient(180deg,rgba(6,78,59,0.3) 0%,rgba(2,20,12,0.6) 100%)}
+  .auth-visual::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(16,185,129,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.06) 1px,transparent 1px);background-size:48px 48px}
+  .auth-visual-content{position:relative;z-index:1}
+  .auth-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--emerald-glow);padding:0.35rem 0.9rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2rem}
+  .auth-visual-title{font-family:var(--font-display);font-size:clamp(2rem,3.5vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1.25rem}
+  .auth-visual-title .glow{background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .auth-visual-subtitle{font-size:1rem;color:var(--text-secondary);line-height:1.7;max-width:420px;margin-bottom:3rem}
+  .auth-stat-card{display:flex;align-items:center;gap:1rem;background:var(--glass-bg);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:0.85rem 1.2rem;min-width:260px;margin-bottom:0.75rem}
+  .auth-stat-card:nth-child(2){margin-left:2rem}
+  .auth-stat-card:nth-child(3){margin-left:1rem}
+  .stat-icon-wrap{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .stat-icon-wrap.green{background:rgba(16,185,129,0.2);color:var(--emerald-bright)}
+  .stat-icon-wrap.amber{background:rgba(245,158,11,0.2);color:var(--amber-warm)}
+  .stat-icon-wrap.sky{background:rgba(14,165,233,0.2);color:var(--sky-cool)}
+  .auth-form-panel{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:clamp(2rem,4vw,4rem);background:rgba(2,20,12,0.35);border-left:1px solid var(--glass-border)}
+  .auth-form-box{width:100%;max-width:420px}
+  .auth-form-logo{width:60px;height:60px;background:linear-gradient(135deg,var(--emerald-bright),var(--amber-warm));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1.25rem;box-shadow:0 8px 32px rgba(16,185,129,0.35)}
+  .auth-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.13);border-radius:var(--radius-lg);padding:2.25rem;box-shadow:0 16px 56px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.1);animation:card-in 0.5s cubic-bezier(0.4,0,0.2,1) both}
+  @keyframes card-in{from{opacity:0;transform:translateY(20px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .auth-form{display:flex;flex-direction:column;gap:1.25rem}
+  .btn-submit{width:100%;justify-content:center;padding:0.9rem;font-size:1rem;margin-top:0.5rem;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;border:none;border-radius:50px;font-family:var(--font-display);font-weight:600;cursor:pointer;transition:all var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35)}
+  .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(16,185,129,0.5)}
+  .btn-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .auth-divider{display:flex;align-items:center;gap:1rem;margin:1rem 0;color:var(--text-muted);font-size:0.8rem}
+  .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--glass-border)}
+  .auth-switch{text-align:center;margin-top:1.5rem;font-size:0.875rem;color:var(--text-secondary)}
+  .auth-switch a{color:var(--emerald-bright);font-weight:600;text-decoration:none;transition:color var(--transition)}
+  .auth-switch a:hover{color:var(--emerald-glow)}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .server-error{background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:10px;padding:0.75rem 1rem;font-size:0.85rem;color:#fda4af;display:none;align-items:center;gap:8px}
+  @media(max-width:860px){.auth-layout{grid-template-columns:1fr}.auth-visual{display:none}.auth-form-panel{background:transparent;border-left:none}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-layout">
+  <div class="auth-visual">
+    <div class="auth-visual-content">
+      <div class="auth-eyebrow"><i data-lucide="shield-check" style="width:13px;height:13px"></i>Salama & Haraka</div>
+      <h1 class="auth-visual-title">Karibu Tena<br/>kwenye <span class="glow">AgroLink</span><br/>Tanzania</h1>
+      <p class="auth-visual-subtitle">Ingia kwenye akaunti yako upate bei za soko, hali ya hewa, na mazungumzo na wakulima wengine wa Tanzania.</p>
+      <div>
+        <div class="auth-stat-card"><div class="stat-icon-wrap green"><i data-lucide="users" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem">10,000+</div><div style="font-size:0.75rem;color:var(--text-muted)">Wakulima Wamejiandikisha</div></div></div>
+        <div class="auth-stat-card"><div class="stat-icon-wrap amber"><i data-lucide="trending-up" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem">Bei za Moja kwa Moja</div><div style="font-size:0.75rem;color:var(--text-muted)">Masoko 25+ Tanzania</div></div></div>
+        <div class="auth-stat-card"><div class="stat-icon-wrap sky"><i data-lucide="cloud-sun" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem">Hali ya Hewa ya Leo</div><div style="font-size:0.75rem;color:var(--text-muted)">Mji Wako — Wakati Halisi</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="auth-form-box">
+      <div style="text-align:center;margin-bottom:2.5rem">
+        <div class="auth-form-logo">🌾</div>
+        <h2 style="font-family:var(--font-display);font-size:1.75rem;font-weight:800;margin-bottom:0.4rem">Ingia</h2>
+        <p style="font-size:0.88rem;color:var(--text-secondary)">Tumia namba ya simu na nywila yako</p>
+      </div>
+      <div class="auth-card">
+        <form class="auth-form" id="login-form" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <div class="form-group">
+            <label class="form-label"><i data-lucide="phone" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:4px"></i>Namba ya Simu</label>
+            <div class="input-wrapper">
+              <div class="input-icon"><i data-lucide="phone" style="width:16px;height:16px"></i></div>
+              <input type="tel" id="phone" name="phone" class="form-input" placeholder="+255 712 000 000" autocomplete="tel" inputmode="tel" required/>
+            </div>
+            <span class="form-error" id="phone-error"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label"><i data-lucide="lock" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:4px"></i>Nywila</label>
+            <div class="input-wrapper">
+              <div class="input-icon"><i data-lucide="lock" style="width:16px;height:16px"></i></div>
+              <input type="password" id="password" name="password" class="form-input" placeholder="Nywila yako" autocomplete="current-password" required/>
+              <button type="button" class="input-suffix" onclick="togglePwd('password',this)"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+            </div>
+            <span class="form-error" id="password-error"></span>
+          </div>
+          <div style="text-align:right;font-size:0.78rem"><a href="#" style="color:var(--text-muted);text-decoration:none;transition:color var(--transition)">Umesahau nywila?</a></div>
+          <div class="server-error" id="form-error"><i data-lucide="x-circle" style="width:16px;height:16px;flex-shrink:0"></i><span id="form-error-msg"></span></div>
+          <button type="submit" class="btn-submit" id="submit-btn">
+            <div class="spinner" id="spinner"></div>
+            <i data-lucide="log-in" style="width:18px;height:18px" id="submit-icon"></i>
+            <span id="submit-text">Ingia</span>
+          </button>
+        </form>
+        <div class="auth-divider">au</div>
+        <div style="text-align:center;font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:6px">
+          <i data-lucide="shield" style="width:13px;height:13px;color:var(--emerald-bright)"></i>
+          Data yako inalindwa — Cisco Security Standards
+        </div>
+      </div>
+      <p class="auth-switch">Huna akaunti? <a href="{{ url_for('register') }}">Jiunge bure hapa &rarr;</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function togglePwd(id,btn){
+  const inp=document.getElementById(id);
+  const vis=inp.type==='text';
+  inp.type=vis?'password':'text';
+  btn.innerHTML=vis?'<i data-lucide="eye" style="width:16px;height:16px"></i>':'<i data-lucide="eye-off" style="width:16px;height:16px"></i>';
+  lucide.createIcons();
+}
+function showErr(id,msg){const f=document.getElementById(id);const e=document.getElementById(id+'-error');if(f)f.classList.add('error');if(e)e.textContent=msg}
+function clearErrs(){document.querySelectorAll('.form-input').forEach(f=>f.classList.remove('error'));document.querySelectorAll('.form-error').forEach(e=>e.textContent='');document.getElementById('form-error').style.display='none'}
+function setLoading(on){
+  document.getElementById('submit-btn').disabled=on;
+  document.getElementById('spinner').style.display=on?'block':'none';
+  document.getElementById('submit-icon').style.display=on?'none':'block';
+  document.getElementById('submit-text').textContent=on?'Inaangalia...':'Ingia';
+}
+document.getElementById('login-form').addEventListener('submit',async e=>{
+  e.preventDefault();clearErrs();
+  const phone=document.getElementById('phone').value.trim();
+  const password=document.getElementById('password').value;
+  let valid=true;
+  if(!phone){showErr('phone','Tafadhali ingiza namba ya simu.');valid=false}
+  if(!password){showErr('password','Tafadhali ingiza nywila.');valid=false}
+  if(!valid)return;
+  setLoading(true);
+  try{
+    const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password})});
+    const data=await res.json();
+    if(res.ok){
+      document.getElementById('submit-text').textContent='Umeingia! ✓';
+      setTimeout(()=>{window.location.href=data.role==='admin'?'/dashboard':'/'},800);
+    }else{
+      const err=document.getElementById('form-error');
+      document.getElementById('form-error-msg').textContent=data.error||'Hitilafu. Jaribu tena.';
+      err.style.display='flex';lucide.createIcons();setLoading(false);
+    }
+  }catch{
+    document.getElementById('form-error-msg').textContent='Hitilafu ya mtandao.';
+    document.getElementById('form-error').style.display='flex';setLoading(false);
+  }
+});
+</script>
+{% endblock %}

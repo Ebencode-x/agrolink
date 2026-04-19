@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+{% block title %}AgroLink Tanzania — Jukwaa la Kilimo la Kisasa 🌾{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hero{min-height:calc(100vh - 70px);display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;padding:4rem clamp(1rem,5vw,4rem);max-width:1400px;margin:0 auto}
+  .hero-content{animation:slide-up 0.8s cubic-bezier(0.4,0,0.2,1) both}
+  @keyframes slide-up{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--emerald-glow);padding:0.35rem 1rem;border-radius:50px;font-size:0.8rem;font-weight:700;margin-bottom:1.5rem;letter-spacing:0.05em;animation:pulse-badge 3s ease-in-out infinite}
+  @keyframes pulse-badge{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+  .hero-title{font-family:var(--font-display);font-size:clamp(2.5rem,5vw,4.2rem);font-weight:800;line-height:1.1;margin-bottom:1.5rem}
+  .hero-title .accent{background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero-subtitle{font-size:1.1rem;color:var(--text-secondary);line-height:1.7;margin-bottom:2.5rem;max-width:480px}
+  .hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:600;font-size:0.95rem;text-decoration:none;border:none;cursor:pointer;transition:transform var(--transition),box-shadow var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(16,185,129,0.5)}
+  .btn-ghost{display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);backdrop-filter:blur(10px);color:var(--text-primary);padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:500;font-size:0.95rem;text-decoration:none;border:1px solid var(--glass-border);cursor:pointer;transition:all var(--transition)}
+  .btn-ghost:hover{background:rgba(255,255,255,0.12);transform:translateY(-1px)}
+  .hero-stats{display:flex;gap:2rem;margin-top:3rem;padding-top:2.5rem;border-top:1px solid var(--glass-border)}
+  .stat-value{font-family:var(--font-display);font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .stat-label{font-size:0.78rem;color:var(--text-muted);margin-top:2px}
+  .hero-visual{animation:slide-up 0.8s 0.2s cubic-bezier(0.4,0,0.2,1) both;display:flex;flex-direction:column;gap:1.5rem}
+  .weather-card{padding:2rem;border-radius:var(--radius-lg);position:relative;overflow:hidden}
+  .weather-card::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(14,165,233,0.2),transparent 70%);border-radius:50%}
+  .weather-temp{font-family:var(--font-display);font-size:4rem;font-weight:800;line-height:1;color:var(--sky-pale)}
+  .weather-detail{display:flex;align-items:center;gap:6px;font-size:0.85rem;color:var(--text-secondary)}
+  .live-dot{width:8px;height:8px;background:var(--emerald-bright);border-radius:50%;animation:pulse-dot 2s ease-in-out infinite}
+  @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.7)}}
+  .price-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.7rem;border-radius:10px;background:rgba(255,255,255,0.04);transition:background var(--transition)}
+  .price-item:hover{background:rgba(255,255,255,0.08)}
+  .price-value{font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--emerald-glow)}
+  section{padding:5rem clamp(1rem,5vw,4rem);max-width:1400px;margin:0 auto}
+  .section-eyebrow{font-size:0.78rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem}
+  .section-title{font-family:var(--font-display);font-size:clamp(1.8rem,3vw,2.8rem);font-weight:800;line-height:1.2;margin-bottom:1rem}
+  .section-subtitle{font-size:1.05rem;color:var(--text-secondary);max-width:560px;margin:0 auto;line-height:1.7}
+  .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+  .feature-card{padding:2rem;border-radius:var(--radius-md);transition:transform var(--transition);position:relative;overflow:hidden}
+  .feature-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius-md);background:linear-gradient(135deg,rgba(16,185,129,0.08) 0%,transparent 60%);opacity:0;transition:opacity var(--transition)}
+  .feature-card:hover{transform:translateY(-4px)}
+  .feature-card:hover::before{opacity:1}
+  .feature-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(16,185,129,0.05));border:1px solid rgba(16,185,129,0.25);color:var(--emerald-bright)}
+  .feature-icon.amber{background:linear-gradient(135deg,rgba(245,158,11,0.2),rgba(245,158,11,0.05));border-color:rgba(245,158,11,0.25);color:var(--amber-warm)}
+  .feature-icon.sky{background:linear-gradient(135deg,rgba(14,165,233,0.2),rgba(14,165,233,0.05));border-color:rgba(14,165,233,0.25);color:var(--sky-cool)}
+  .feature-title{font-family:var(--font-display);font-weight:700;font-size:1.05rem;margin-bottom:0.6rem}
+  .feature-desc{font-size:0.88rem;color:var(--text-secondary);line-height:1.65}
+  .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+  .listing-card{padding:1.5rem;border-radius:var(--radius-md);transition:transform var(--transition);cursor:pointer}
+  .listing-card:hover{transform:translateY(-3px)}
+  .listing-crop-badge{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.3rem 0.8rem;border-radius:50px;font-size:0.78rem;font-weight:600}
+  .listing-meta-value{font-family:var(--font-display);font-weight:700;font-size:0.95rem;color:var(--amber-warm)}
+  .listing-contact-btn{display:flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);color:var(--emerald-bright);padding:0.5rem 1rem;border-radius:50px;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all var(--transition);margin-top:1rem;width:fit-content}
+  .listing-contact-btn:hover{background:rgba(16,185,129,0.2)}
+  .weather-input{flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:50px;padding:0.7rem 1.2rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;outline:none;transition:border-color var(--transition)}
+  .weather-input:focus{border-color:var(--emerald-bright)}
+  .weather-input::placeholder{color:var(--text-muted)}
+  .weather-btn{background:linear-gradient(135deg,var(--emerald-bright),#059669);border:none;border-radius:50px;padding:0.7rem 1.4rem;color:white;font-family:var(--font-display);font-weight:600;font-size:0.875rem;cursor:pointer;transition:all var(--transition);display:flex;align-items:center;gap:6px}
+  .weather-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,0.4)}
+  .about-avatar{width:100%;aspect-ratio:1;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(6,78,59,0.8));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;border:1px solid var(--glass-border);position:relative;overflow:hidden;max-width:340px}
+  .about-avatar::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(16,185,129,0.1),transparent 60%);animation:rotate-glow 8s linear infinite}
+  @keyframes rotate-glow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+  .avatar-initials{font-family:var(--font-display);font-size:3.5rem;font-weight:800;background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;position:relative}
+  .cert-chip{background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.25);color:var(--sky-pale);padding:0.3rem 0.8rem;border-radius:50px;font-size:0.78rem;font-weight:600}
+  .social-link{display:inline-flex;align-items:center;gap:8px;padding:0.65rem 1.2rem;border-radius:50px;font-size:0.85rem;font-weight:600;text-decoration:none;transition:all var(--transition)}
+  .social-link.linkedin{background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#93c5fd}
+  .social-link.github{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary)}
+  .social-link:hover{transform:translateY(-2px);filter:brightness(1.15)}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;min-height:auto;padding-top:3rem}.hero-visual{order:-1}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width:1400px;margin:0 auto">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i data-lucide="leaf" style="width:14px;height:14px"></i>
+        Jukwaa la Kwanza la Kilimo — Tanzania
+      </div>
+      <h1 class="hero-title">
+        Kilimo cha Kisasa<br/>kwa Wakulima wa<br/>
+        <span class="accent">Tanzania 🇹🇿</span>
+      </h1>
+      <p class="hero-subtitle">AgroLink Tanzania inaunganisha wakulima, mawakala, na masoko kwa teknolojia ya hali ya juu. Pata bei za soko, hali ya hewa, na mashauri ya kilimo — mahali pamoja.</p>
+      <div class="hero-actions">
+        <a href="#soko" class="btn-primary"><i data-lucide="store" style="width:18px;height:18px"></i>Angalia Soko</a>
+        <a href="#huduma" class="btn-ghost"><i data-lucide="arrow-down" style="width:18px;height:18px"></i>Jifunze Zaidi</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><div class="stat-value">10K+</div><div class="stat-label">Wakulima</div></div>
+        <div class="stat"><div class="stat-value">25+</div><div class="stat-label">Mikoa</div></div>
+        <div class="stat"><div class="stat-value">50+</div><div class="stat-label">Aina za Mazao</div></div>
+        <div class="stat"><div class="stat-value">24/7</div><div class="stat-label">Msaada</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="glass-strong weather-card">
+        <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-secondary);margin-bottom:1rem">
+          <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--emerald-bright)"></i>
+          <span id="weather-city-name">Mbeya, Tanzania</span>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:1rem;margin-bottom:1rem">
+          <div class="weather-temp" id="weather-temp">--°C</div>
+          <div style="font-size:1rem;color:var(--text-secondary);padding-bottom:0.3rem;text-transform:capitalize" id="weather-desc">Inapakia...</div>
+        </div>
+        <div style="display:flex;gap:1.5rem">
+          <div class="weather-detail"><i data-lucide="droplets" style="width:15px;height:15px;color:var(--sky-cool)"></i><span id="weather-humidity">--%</span></div>
+          <div class="weather-detail"><i data-lucide="wind" style="width:15px;height:15px;color:var(--sky-cool)"></i><span id="weather-wind">-- m/s</span></div>
+          <div class="weather-detail"><i data-lucide="thermometer" style="width:15px;height:15px;color:var(--amber-warm)"></i><span id="weather-feels">--°C</span></div>
+        </div>
+      </div>
+      <div class="glass" style="padding:1.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+          <div style="display:flex;align-items:center;gap:6px;font-family:var(--font-display);font-weight:600;font-size:0.9rem">
+            <div class="live-dot"></div>Bei za Soko Leo
+          </div>
+          <span style="font-size:0.75rem;color:var(--text-muted)">TZS/kg</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.7rem">
+          {% if listings %}
+            {% for l in listings[:4] %}
+            <div class="price-item">
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem">
+                <i data-lucide="sprout" style="width:14px;height:14px;color:var(--emerald-bright)"></i>
+                {{ l.crop_name }}
+              </div>
+              <div><span class="price-value">{{ "{:,.0f}".format(l.price_tzs) }}</span><span style="font-size:0.72rem;color:var(--text-muted)">/kg</span></div>
+            </div>
+            {% endfor %}
+          {% else %}
+            {% for item in [('Mahindi','🌽','850'),('Mpunga','🍚','1,200'),('Viazi','🥔','600'),('Kahawa','☕','4,500')] %}
+            <div class="price-item">
+              <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem"><span>{{ item[1] }}</span>{{ item[0] }}</div>
+              <div><span class="price-value">{{ item[2] }}</span><span style="font-size:0.72rem;color:var(--text-muted)">/kg</span></div>
+            </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="huduma">
+  <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
+    <div class="section-eyebrow">Huduma Zetu</div>
+    <h2 class="section-title">Kila Kitu Unachohitaji kwa Kilimo</h2>
+    <p class="section-subtitle">Kutoka bei za soko hadi hali ya hewa — AgroLink inakupa nguvu ya kufanya maamuzi sahihi.</p>
+  </div>
+  <div class="features-grid">
+    {% for icon,color,title,desc in [
+      ('trending-up','','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania — Kariakoo, Arusha, Mbeya na zaidi.'),
+      ('cloud-sun','amber','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo — zinazosaidia kupanga kilimo chako.'),
+      ('users','sky','Mtandao wa Wakulima','Unganika na wakulima wengine, mawakala wa kilimo, na wanunuzi kutoka kila pembe ya Tanzania.'),
+      ('shield-check','','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco — data yako inalindwa na usimbaji wa hali ya juu.'),
+      ('sprout','amber','Mashauri ya Kilimo','Pata vidokezo vya kitaalamu kuhusu msimu wa kupanda, mbolea, na udhibiti wa wadudu.'),
+      ('smartphone','sky','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.')
+    ] %}
+    <div class="feature-card glass reveal">
+      <div class="feature-icon {{ color }}"><i data-lucide="{{ icon }}" style="width:24px;height:24px"></i></div>
+      <div class="feature-title">{{ title }}</div>
+      <p class="feature-desc">{{ desc }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- MARKET LISTINGS -->
+<section id="soko">
+  <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
+    <div class="section-eyebrow">Soko la AgroLink</div>
+    <h2 class="section-title">Orodha za Mazao Zinazopatikana</h2>
+    <p class="section-subtitle">Nunua au Uza mazao yako moja kwa moja na wakulima na wanunuzi wa Tanzania.</p>
+  </div>
+  <div class="listings-grid">
+    {% if listings %}
+      {% for l in listings %}
+      <div class="listing-card glass">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">
+          <span class="listing-crop-badge"><i data-lucide="sprout" style="width:12px;height:12px;display:inline;vertical-align:middle"></i> {{ l.crop_name }}</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted)"><i data-lucide="map-pin" style="width:12px;height:12px"></i>{{ l.region }}</span>
+        </div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.5rem">{{ l.title }}</div>
+        <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
+          <div><div style="font-size:0.72rem;color:var(--text-muted)">Kiasi</div><div class="listing-meta-value">{{ "{:,.0f}".format(l.quantity_kg) }} kg</div></div>
+          <div><div style="font-size:0.72rem;color:var(--text-muted)">Bei</div><div class="listing-meta-value">TZS {{ "{:,.0f}".format(l.price_tzs) }}/kg</div></div>
+        </div>
+        <button class="listing-contact-btn"><i data-lucide="phone" style="width:14px;height:14px"></i>{{ l.contact }}</button>
+      </div>
+      {% endfor %}
+    {% else %}
+      {% for title,crop,qty,price,region,contact in [
+        ('Mahindi Mazuri — Mbeya 2025','Mahindi','500','850','Mbeya','+255712000001'),
+        ('Nyanya Mpya — Arusha','Nyanya','200','1,100','Arusha','+255712000002'),
+        ('Kahawa Arabica Premium','Kahawa','1,000','4,500','Kilimanjaro','+255712000003')
+      ] %}
+      <div class="listing-card glass">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">
+          <span class="listing-crop-badge"><i data-lucide="sprout" style="width:12px;height:12px;display:inline;vertical-align:middle"></i> {{ crop }}</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted)"><i data-lucide="map-pin" style="width:12px;height:12px"></i>{{ region }}</span>
+        </div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.5rem">{{ title }}</div>
+        <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
+          <div><div style="font-size:0.72rem;color:var(--text-muted)">Kiasi</div><div class="listing-meta-value">{{ qty }} kg</div></div>
+          <div><div style="font-size:0.72rem;color:var(--text-muted)">Bei</div><div class="listing-meta-value">TZS {{ price }}/kg</div></div>
+        </div>
+        <button class="listing-contact-btn"><i data-lucide="phone" style="width:14px;height:14px"></i>{{ contact }}</button>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <div style="text-align:center;margin-top:2.5rem">
+    <a href="/listings" class="btn-primary"><i data-lucide="arrow-right" style="width:18px;height:18px"></i>Angalia Orodha Zote</a>
+  </div>
+</section>
+
+<!-- WEATHER WIDGET -->
+<section id="hali-ya-hewa">
+  <div style="text-align:center;margin-bottom:3.5rem" class="reveal">
+    <div class="section-eyebrow">Hali ya Hewa</div>
+    <h2 class="section-title">Angalia Hali ya Hewa Mjini Kwako</h2>
+    <p class="section-subtitle">Ingiza jina la mji wako na upate hali ya hewa ya sasa hivi.</p>
+  </div>
+  <div class="glass" style="max-width:600px;margin:0 auto;padding:2rem;border-radius:var(--radius-lg)" class="reveal">
+    <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem">
+      <input type="text" id="city-input" class="weather-input" placeholder="Mji wako — Dodoma, Arusha, Dar es Salaam..."/>
+      <button class="weather-btn" onclick="fetchWeather()"><i data-lucide="search" style="width:16px;height:16px"></i>Tafuta</button>
+    </div>
+    <div id="weather-result" style="display:none">
+      <div style="font-family:var(--font-display);font-weight:700;font-size:1.2rem;margin-bottom:0.5rem" id="wr-city"></div>
+      <div style="display:flex;align-items:flex-end;gap:1rem;margin-bottom:1rem">
+        <div class="weather-temp" id="wr-temp"></div>
+        <div style="font-size:1rem;color:var(--text-secondary);padding-bottom:0.3rem;text-transform:capitalize" id="wr-desc"></div>
+      </div>
+      <div style="display:flex;gap:1.5rem">
+        <div class="weather-detail"><i data-lucide="droplets" style="width:15px;height:15px;color:var(--sky-cool)"></i><span id="wr-humidity"></span></div>
+        <div class="weather-detail"><i data-lucide="wind" style="width:15px;height:15px;color:var(--sky-cool)"></i><span id="wr-wind"></span></div>
+      </div>
+    </div>
+    <div id="weather-error" style="color:#f87171;font-size:0.88rem;display:none"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="kuhusu" style="background:var(--glass-bg);backdrop-filter:blur(20px);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);padding:5rem clamp(1rem,5vw,4rem);max-width:100%">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1.5fr;gap:4rem;align-items:center">
+    <div class="reveal">
+      <div class="about-avatar glass">
+        <div class="avatar-initials">ERM</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;position:relative;text-align:center">Ebenezer Richard Masanja</div>
+        <div style="font-size:0.82rem;color:var(--text-secondary);position:relative">ICT Student & Full-Stack Developer</div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="section-eyebrow">Msanidi wa AgroLink</div>
+      <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:0.5rem">Ebenezer Richard Masanja</div>
+      <div style="font-size:0.95rem;color:var(--emerald-bright);font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px">
+        <i data-lucide="graduation-cap" style="width:16px;height:16px"></i>
+        Mwanafunzi wa ICT — MUST Mbeya | Full-Stack Developer
+      </div>
+      <p style="font-size:0.95rem;color:var(--text-secondary);line-height:1.8;margin-bottom:2rem">
+        Mimi ni mwanafunzi wa mwaka wa kwanza wa ICT katika Chuo Kikuu cha Mbeya cha Sayansi na Teknolojia (MUST). Nina shauku kubwa ya kujenga mifumo ya teknolojia inayosuluhisha matatizo ya kweli kwa jamii ya Tanzania. AgroLink Tanzania ni mradi wangu wa kwanza wa uzalishaji.
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem">
+        {% for cert in ['freeCodeCamp — Responsive Web Design','Cisco — Cybersecurity','Cisco — Endpoint Security','Cisco — Network Defense','Python — Flask','PostgreSQL'] %}
+        <span class="cert-chip">{{ cert }}</span>
+        {% endfor %}
+      </div>
+      <div style="display:flex;gap:1rem;flex-wrap:wrap">
+        <a href="https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399" target="_blank" class="social-link linkedin"><i data-lucide="linkedin" style="width:18px;height:18px"></i>LinkedIn</a>
+        <a href="https://github.com/Ebencode-x" target="_blank" class="social-link github"><i data-lucide="github" style="width:18px;height:18px"></i>GitHub</a>
+        <a href="mailto:admin@agrolink.co.tz" class="social-link github"><i data-lucide="mail" style="width:18px;height:18px"></i>Barua Pepe</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function loadHeroWeather(){
+  try{
+    const res=await fetch('/weather?city=Mbeya');
+    const data=await res.json();
+    const w=data.weather;
+    if(w.success){
+      document.getElementById('weather-temp').textContent=Math.round(w.temperature)+'°C';
+      document.getElementById('weather-desc').textContent=w.description;
+      document.getElementById('weather-humidity').textContent=w.humidity+'%';
+      document.getElementById('weather-wind').textContent=w.wind_speed+' m/s';
+      if(w.feels_like)document.getElementById('weather-feels').textContent=Math.round(w.feels_like)+'°C';
+    }
+  }catch(e){console.warn('Weather unavailable')}
+}
+async function fetchWeather(){
+  const city=document.getElementById('city-input').value.trim();
+  if(!city)return;
+  document.getElementById('weather-result').style.display='none';
+  document.getElementById('weather-error').style.display='none';
+  try{
+    const res=await fetch('/weather?city='+encodeURIComponent(city));
+    const data=await res.json();
+    const w=data.weather;
+    if(w.success){
+      document.getElementById('wr-city').textContent=w.city+', Tanzania';
+      document.getElementById('wr-temp').textContent=Math.round(w.temperature)+'°C';
+      document.getElementById('wr-desc').textContent=w.description;
+      document.getElementById('wr-humidity').textContent='Unyevu: '+w.humidity+'%';
+      document.getElementById('wr-wind').textContent='Upepo: '+w.wind_speed+' m/s';
+      document.getElementById('weather-result').style.display='block';
+      lucide.createIcons();
+    }else{
+      document.getElementById('weather-error').textContent='Mji "'+city+'" haukupatikana.';
+      document.getElementById('weather-error').style.display='block';
+    }
+  }catch(e){
+    document.getElementById('weather-error').textContent='Hitilafu ya mtandao.';
+    document.getElementById('weather-error').style.display='block';
+  }
+}
+document.getElementById('city-input').addEventListener('keydown',e=>{if(e.key==='Enter')fetchWeather()});
+document.addEventListener('DOMContentLoaded',loadHeroWeather);
+</script>
+{% endblock %}
