@@ -76,7 +76,7 @@
     .footer-links a:hover{color:var(--emerald-bright)}
     .footer-bottom{font-size:0.78rem;color:var(--text-muted);border-top:1px solid var(--glass-border);padding-top:1.2rem}
     .footer-bottom a{color:var(--emerald-bright);text-decoration:none;font-weight:600}
-    @media(max-width:768px){.nav-links{display:none}.nav-links.open{display:flex;flex-direction:column;position:fixed;top:70px;left:0;right:0;background:rgba(6,78,59,0.97);backdrop-filter:blur(24px);padding:2rem;gap:1.5rem;border-bottom:1px solid var(--glass-border);z-index:99}.nav-hamburger{display:flex}}
+    @media(max-width:768px){.footer-grid{grid-template-columns:1fr!important}.footer-social{justify-content:center!important}.nav-links{display:none}.nav-links.open{display:flex;flex-direction:column;position:fixed;top:70px;left:0;right:0;background:rgba(6,78,59,0.97);backdrop-filter:blur(24px);padding:2rem;gap:1.5rem;border-bottom:1px solid var(--glass-border);z-index:99}.nav-hamburger{display:flex}}
   </style>
   {% block extra_head %}{% endblock %}
 </head>
@@ -145,7 +145,7 @@
 </body>
 </html>
 <style>
-@media(max-width:768px){
+@media(max-width:768px){.footer-grid{grid-template-columns:1fr!important}.footer-social{justify-content:center!important}
   .hero{grid-template-columns:1fr!important;padding:2rem 1rem!important;min-height:auto!important}
   .hero-visual{order:-1}
   .hero-stats{gap:1rem!important}
