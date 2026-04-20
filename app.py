@@ -303,12 +303,12 @@ def health():
 
 @app.errorhandler(404)
 def not_found(e):
-    return jsonify({"error": "Ukurasa haukupatikana."}), 404
+    return render_template("404.html"), 404
 
 
 @app.errorhandler(500)
 def server_error(e):
-    return jsonify({"error": "Hitilafu ya seva."}), 500
+    return render_template("500.html"), 500
 
 
 # ── Init DB & Run ────────────────────────────────────────────────────────────

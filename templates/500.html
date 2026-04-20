@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}500 — Hitilafu ya Seva | AgroLink Tanzania{% endblock %}
+{% block content %}
+<div style="min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:2rem">
+  <div style="text-align:center;max-width:500px">
+    <div style="font-family:var(--font-display);font-size:8rem;font-weight:800;line-height:1;background:linear-gradient(135deg,#f43f5e,var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem">500</div>
+    <div class="glass" style="padding:2.5rem;border-radius:var(--radius-lg);margin-bottom:2rem">
+      <i data-lucide="server-crash" style="width:48px;height:48px;color:#f43f5e;margin-bottom:1.5rem"></i>
+      <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:0.75rem">Hitilafu ya Seva</h1>
+      <p style="color:var(--text-secondary);line-height:1.7;margin-bottom:0.5rem">Samahani! Kuna tatizo la ndani la seva yetu.</p>
+      <p style="color:var(--text-muted);font-size:0.85rem">Tunafanya kazi kurekebisha. Tafadhali jaribu tena baadaye.</p>
+    </div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <a href="/" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none;transition:all var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35)">
+        <i data-lucide="home" style="width:18px;height:18px"></i>Rudi Nyumbani
+      </a>
+      <a href="javascript:history.back()" style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);padding:0.85rem 2rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none;transition:all var(--transition)">
+        <i data-lucide="arrow-left" style="width:18px;height:18px"></i>Rudi Nyuma
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
