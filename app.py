@@ -373,3 +373,25 @@ if __name__ == "__main__":
 
 
 
+
+@app.route("/change-password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    if request.method == "POST":
+        data = request.get_json() or request.form
+        old_password = data.get("old_password", "")
+        new_password = data.get("new_password", "")
+        confirm      = data.get("confirm_password", "")
+
+        if not current_user.check_password(old_password):
+            return jsonify({"error": "Nywila ya zamani si sahihi."}), 400
+        if len(new_password) < 8:
+            return jsonify({"error": "Nywila mpya lazima iwe na herufi 8 au zaidi."}), 400
+        if new_password != confirm:
+            return jsonify({"error": "Nywila mpya hazifanani."}), 400
+
+        current_user.set_password(new_password)
+        db.session.commit()
+        return jsonify({"message": "Nywila imebadilishwa!"})
+
+    return render_template("auth/change_password.html")
