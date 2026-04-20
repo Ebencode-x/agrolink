@@ -367,15 +367,3 @@ if __name__ == "__main__":
 
 
 
-@app.route("/fix-contacts")
-def fix_contacts():
-    try:
-        listings = MarketListing.query.filter(
-            MarketListing.contact.like('+25571200000%')
-        ).all()
-        for l in listings:
-            l.contact = "Wasiliana na Msimamizi"
-        db.session.commit()
-        return jsonify({"status": f"Namba {len(listings)} zimebadilishwa!"})
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
