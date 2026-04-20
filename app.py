@@ -367,3 +367,18 @@ if __name__ == "__main__":
 
 
 
+
+@app.route("/update-contacts-now")
+def update_contacts_now():
+    try:
+        count = 0
+        listings = MarketListing.query.all()
+        for l in listings:
+            if l.contact.startswith('+25571200000') or l.contact == 'Wasiliana na Msimamizi':
+                l.contact = "Wasiliana na Msimamizi"
+                count += 1
+        db.session.commit()
+        return jsonify({"status": f"Zimebadilishwa: {count}"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
