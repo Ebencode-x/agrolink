@@ -149,7 +149,36 @@ def get_weather(city="Mbeya"):
                 "cache_age_mins": int(age.total_seconds() / 60)
             }
 
-    params = {"q": f"{city},TZ", "appid": WEATHER_API_KEY, "units": "metric", "lang": "sw"}
+    # Coordinates za miji mikuu ya Tanzania kwa accuracy zaidi
+    tz_cities = {
+        "mbeya":         {"lat": -8.9000,  "lon": 33.4600},
+        "dar es salaam": {"lat": -6.7924,  "lon": 39.2083},
+        "dodoma":        {"lat": -6.1730,  "lon": 35.7395},
+        "arusha":        {"lat": -3.3869,  "lon": 36.6830},
+        "mwanza":        {"lat": -2.5164,  "lon": 32.9175},
+        "tanga":         {"lat": -5.0690,  "lon": 39.0987},
+        "morogoro":      {"lat": -6.8160,  "lon": 37.6833},
+        "iringa":        {"lat": -7.7700,  "lon": 35.6930},
+        "kilimanjaro":   {"lat": -3.0674,  "lon": 37.3556},
+        "tabora":        {"lat": -5.0167,  "lon": 32.8000},
+        "kigoma":        {"lat": -4.8771,  "lon": 29.6278},
+        "singida":       {"lat": -4.8185,  "lon": 34.7500},
+        "songwe":        {"lat": -9.3500,  "lon": 33.2000},
+        "lindi":         {"lat": -9.9970,  "lon": 39.7140},
+        "mtwara":        {"lat": -10.2667, "lon": 40.1833},
+        "kagera":        {"lat": -1.2833,  "lon": 31.7667},
+        "geita":         {"lat": -2.8667,  "lon": 32.1667},
+        "shinyanga":     {"lat": -3.6600,  "lon": 33.4200},
+        "rukwa":         {"lat": -7.9000,  "lon": 31.4167},
+        "ruvuma":        {"lat": -10.6833, "lon": 35.6500},
+    }
+    city_key = city.lower().strip()
+    coords = tz_cities.get(city_key)
+    if coords:
+        params = {"lat": coords["lat"], "lon": coords["lon"],
+                  "appid": WEATHER_API_KEY, "units": "metric", "lang": "sw"}
+    else:
+        params = {"q": f"{city},TZ", "appid": WEATHER_API_KEY, "units": "metric", "lang": "sw"}
     try:
         resp = requests.get(WEATHER_BASE_URL, params=params, timeout=5)
         resp.raise_for_status()
