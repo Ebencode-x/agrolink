@@ -178,14 +178,13 @@
     </div>
   </footer>
   <script>
-    lucide.createIcons();
     function toggleNav(){document.getElementById('nav-links').classList.toggle('open')}
     const ro=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:0.1});
     document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
     setTimeout(()=>{document.querySelectorAll('.flash').forEach(f=>{f.style.opacity='0';setTimeout(()=>f.remove(),400)})},5000);
   </script>
   {% block extra_scripts %}{% endblock %}
-  <script>lucide.createIcons();</script>
+  <script>document.addEventListener("DOMContentLoaded",function(){lucide.createIcons()});</script>
 </body>
 </html>
 <style>
