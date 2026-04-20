@@ -3,7 +3,7 @@
 
 {% block extra_head %}
 <style>
-  .add-wrap{max-width:800px;margin:0 auto;padding:3rem clamp(1rem,4vw,3rem) 5rem}
+  .add-page-bg{position:fixed;inset:0;z-index:-2;background-image:url("https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=1920&q=80&auto=format&fit=crop");background-size:cover;background-position:center;filter:brightness(0.15) saturate(0.7)}.add-page-overlay{position:fixed;inset:0;z-index:-1;background:linear-gradient(160deg,rgba(2,20,12,0.88) 0%,rgba(6,78,59,0.78) 50%,rgba(2,20,12,0.92) 100%)}.add-wrap{max-width:800px;margin:0 auto;padding:3rem clamp(1rem,4vw,3rem) 5rem}
   .add-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-lg);padding:2.5rem;box-shadow:0 16px 56px rgba(0,0,0,0.5)}
   .add-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--glass-border)}
   .add-title{font-family:var(--font-display);font-size:1.8rem;font-weight:800;margin-bottom:0.4rem}
@@ -38,6 +38,8 @@
 {% endblock %}
 
 {% block content %}
+<div class="add-page-bg"></div>
+<div class="add-page-overlay"></div>
 <div class="add-wrap">
 
   <!-- Back button -->
