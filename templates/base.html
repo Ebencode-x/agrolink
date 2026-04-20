@@ -123,16 +123,59 @@
   {% endwith %}
   <div class="page-wrapper">{% block content %}{% endblock %}</div>
   <footer>
-    <div class="footer-brand"><img src="/static/favicon.svg" width="24" height="24" alt="AgroLink" style="vertical-align:middle;margin-right:8px;border-radius:6px">AgroLink Tanzania</div>
-    <div class="footer-tagline">Teknolojia kwa Wakulima wa Tanzania</div>
-    <div class="footer-links">
-      <a href="{{ url_for('index') }}">Nyumbani</a>
-      <a href="#soko">Soko</a>
-      <a href="#hali-ya-hewa">Hali ya Hewa</a>
-      <a href="/about">Kuhusu</a>
-      <a href="/health">API Status</a>
+    <div style="max-width:1100px;margin:0 auto">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--glass-border)">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+            <img src="/static/favicon.svg" width="36" height="36" alt="AgroLink" style="border-radius:8px">
+            <span style="font-family:var(--font-display);font-size:1.3rem;font-weight:800">AgroLink<span style="color:var(--emerald-glow)">TZ</span></span>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.8;margin-bottom:1.5rem;max-width:280px">Jukwaa la kisasa la kilimo linalounganisha wakulima, mawakala, na masoko ya Tanzania.</p>
+          <div style="display:flex;gap:0.75rem">
+            <a href="https://github.com/Ebencode-x" target="_blank" rel="noopener" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all var(--transition);text-decoration:none">
+              <i data-lucide="github" style="width:16px;height:16px"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399" target="_blank" rel="noopener" style="width:36px;height:36px;border-radius:50%;background:rgba(10,102,194,0.12);border:1px solid rgba(10,102,194,0.25);display:flex;align-items:center;justify-content:center;color:#93c5fd;transition:all var(--transition);text-decoration:none">
+              <i data-lucide="linkedin" style="width:16px;height:16px"></i>
+            </a>
+            <a href="https://www.credly.com/earner/dashboard" target="_blank" rel="noopener" style="width:36px;height:36px;border-radius:50%;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;color:var(--amber-light);transition:all var(--transition);text-decoration:none">
+              <i data-lucide="award" style="width:16px;height:16px"></i>
+            </a>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-primary);margin-bottom:1.25rem">Viungo</div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <a href="/" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Nyumbani</a>
+            <a href="/listings" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Soko</a>
+            <a href="/#hali-ya-hewa" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Hali ya Hewa</a>
+            <a href="/about" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Kuhusu</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-primary);margin-bottom:1.25rem">Akaunti</div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <a href="/login" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Ingia</a>
+            <a href="/register" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Jiunge</a>
+            <a href="/dashboard" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>Dashboard</a>
+            <a href="/health" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:6px"><i data-lucide="chevron-right" style="width:13px;height:13px;color:var(--emerald-bright)"></i>API Status</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-primary);margin-bottom:1.25rem">Mawasiliano</div>
+          <div style="display:flex;flex-direction:column;gap:0.75rem">
+            <a href="https://github.com/Ebencode-x" target="_blank" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:8px"><i data-lucide="github" style="width:14px;height:14px;color:var(--emerald-bright)"></i>Ebencode-x</a>
+            <a href="https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399" target="_blank" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:8px"><i data-lucide="linkedin" style="width:14px;height:14px;color:#93c5fd"></i>Ebenezer R. Masanja</a>
+            <a href="https://www.credly.com/earner/dashboard" target="_blank" style="font-size:0.85rem;color:var(--text-secondary);text-decoration:none;display:flex;align-items:center;gap:8px"><i data-lucide="award" style="width:14px;height:14px;color:var(--amber-warm)"></i>Credly — Vyeti</a>
+            <div style="font-size:0.85rem;color:var(--text-secondary);display:flex;align-items:center;gap:8px"><i data-lucide="map-pin" style="width:14px;height:14px;color:var(--emerald-bright)"></i>Mbeya, Tanzania</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+        <div style="font-size:0.78rem;color:var(--text-muted)">© 2025 AgroLink Tanzania. Imeundwa na <a href="https://github.com/Ebencode-x" target="_blank" style="color:var(--emerald-bright);text-decoration:none;font-weight:600">Ebenezer Richard Masanja</a> — MUST Mbeya 🇹🇿</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--text-muted)"><div style="width:6px;height:6px;border-radius:50%;background:var(--emerald-bright);animation:pulse-dot 2s ease-in-out infinite"></div>Iko Live — Tanzania</div>
+      </div>
     </div>
-    <div class="footer-bottom">© 2025 AgroLink Tanzania. Imeundwa na <a href="https://github.com/Ebencode-x" target="_blank">Ebenezer Richard Masanja</a> — MUST Mbeya 🇹🇿</div>
   </footer>
   <script>
     lucide.createIcons();
