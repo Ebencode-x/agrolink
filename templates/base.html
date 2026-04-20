@@ -185,6 +185,7 @@
     setTimeout(()=>{document.querySelectorAll('.flash').forEach(f=>{f.style.opacity='0';setTimeout(()=>f.remove(),400)})},5000);
   </script>
   {% block extra_scripts %}{% endblock %}
+  <script>lucide.createIcons();</script>
 </body>
 </html>
 <style>
