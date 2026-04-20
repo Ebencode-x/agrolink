@@ -133,6 +133,22 @@ def load_user(user_id):
 def get_weather(city="Mbeya"):
     if not WEATHER_API_KEY:
         return {"error": "API key haijawekwa", "city": city, "success": False}
+
+    # Check cache kwanza — ikiwa data ina umri wa chini ya dakika 30, itumie
+    from datetime import timedelta
+    cached = (WeatherLog.query.filter_by(city=city)
+              .order_by(WeatherLog.fetched_at.desc()).first())
+    if cached:
+        age = datetime.utcnow() - cached.fetched_at
+        if age < timedelta(minutes=30):
+            return {
+                "city": city, "temperature": cached.temperature,
+                "humidity": cached.humidity, "description": cached.description,
+                "wind_speed": cached.wind_speed, "icon": cached.icon,
+                "success": True, "cached": True,
+                "cache_age_mins": int(age.total_seconds() / 60)
+            }
+
     params = {"q": f"{city},TZ", "appid": WEATHER_API_KEY, "units": "metric", "lang": "sw"}
     try:
         resp = requests.get(WEATHER_BASE_URL, params=params, timeout=5)
