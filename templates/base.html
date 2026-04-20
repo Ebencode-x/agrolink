@@ -87,7 +87,7 @@
   <div class="orb orb-3"></div>
   <nav>
     <a href="{{ url_for('index') }}" class="nav-brand">
-      <div class="nav-brand-icon">🌾</div>
+      <div class="nav-brand-icon"><img src="/static/favicon.svg" width="22" height="22" alt="AgroLink"/></div>
       AgroLink<span style="color:var(--emerald-glow)">TZ</span>
     </a>
     <ul class="nav-links" id="nav-links">
@@ -123,7 +123,7 @@
   {% endwith %}
   <div class="page-wrapper">{% block content %}{% endblock %}</div>
   <footer>
-    <div class="footer-brand">AgroLink Tanzania</div>
+    <div class="footer-brand"><img src="/static/favicon.svg" width="24" height="24" alt="AgroLink" style="vertical-align:middle;margin-right:8px;border-radius:6px">AgroLink Tanzania</div>
     <div class="footer-tagline">Teknolojia kwa Wakulima wa Tanzania</div>
     <div class="footer-links">
       <a href="{{ url_for('index') }}">Nyumbani</a>
