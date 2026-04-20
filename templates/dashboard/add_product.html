@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block title %}Ongeza Zao — AgroLink Tanzania{% endblock %}
+
+{% block extra_head %}
+<style>
+  .add-wrap{max-width:800px;margin:0 auto;padding:3rem clamp(1rem,4vw,3rem) 5rem}
+  .add-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-lg);padding:2.5rem;box-shadow:0 16px 56px rgba(0,0,0,0.5)}
+  .add-header{margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--glass-border)}
+  .add-title{font-family:var(--font-display);font-size:1.8rem;font-weight:800;margin-bottom:0.4rem}
+  .add-subtitle{font-size:0.875rem;color:var(--text-secondary)}
+  .form-section{margin-bottom:2rem}
+  .form-section-label{font-size:0.78rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:1rem;display:flex;align-items:center;gap:6px}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem}
+  .form-select{background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;width:100%;transition:border-color var(--transition);cursor:pointer}
+  .form-select:focus{border-color:var(--emerald-bright)}
+  .form-select option{background:#064e3b}
+  .form-textarea{background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;width:100%;resize:vertical;min-height:100px;transition:border-color var(--transition)}
+  .form-textarea:focus{border-color:var(--emerald-bright)}
+  .form-textarea::placeholder{color:var(--text-muted)}
+  .price-preview{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:var(--radius-sm);padding:1rem 1.25rem;margin-top:1rem;display:none}
+  .price-preview-label{font-size:0.75rem;color:var(--text-muted);margin-bottom:4px}
+  .price-preview-value{font-family:var(--font-display);font-size:1.3rem;font-weight:800;color:var(--emerald-glow)}
+  .btn-submit-full{width:100%;justify-content:center;padding:1rem;font-size:1rem;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;border:none;border-radius:50px;font-family:var(--font-display);font-weight:700;cursor:pointer;transition:all var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35);margin-top:1.5rem}
+  .btn-submit-full:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(16,185,129,0.5)}
+  .btn-submit-full:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .success-card{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);border-radius:var(--radius-md);padding:2rem;text-align:center;display:none}
+  .error-bar{background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:10px;padding:0.75rem 1rem;font-size:0.875rem;color:#fda4af;display:none;align-items:center;gap:8px;margin-top:1rem}
+  .tip-box{background:rgba(14,165,233,0.08);border:1px solid rgba(14,165,233,0.2);border-radius:var(--radius-sm);padding:1rem 1.25rem;display:flex;gap:10px;margin-bottom:1.5rem}
+  .tip-box-text{font-size:0.83rem;color:var(--text-secondary);line-height:1.6}
+  @media(max-width:768px){
+    .form-grid-2{grid-template-columns:1fr!important}
+    .form-grid-3{grid-template-columns:1fr!important}
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="add-wrap">
+
+  <!-- Back button -->
+  <a href="/dashboard" style="display:inline-flex;align-items:center;gap:6px;color:var(--text-secondary);text-decoration:none;font-size:0.875rem;margin-bottom:1.5rem;transition:color var(--transition)" class="reveal">
+    <i data-lucide="arrow-left" style="width:16px;height:16px"></i>Rudi Dashboard
+  </a>
+
+  <div class="add-card reveal">
+    <div class="add-header">
+      <div class="add-title">🌾 Ongeza Orodha Mpya</div>
+      <div class="add-subtitle">Chapisha mazao yako kwenye soko la AgroLink Tanzania — wakulima na wanunuzi watakuona.</div>
+    </div>
+
+    <!-- Tip -->
+    <div class="tip-box">
+      <i data-lucide="info" style="width:18px;height:18px;color:var(--sky-cool);flex-shrink:0;margin-top:1px"></i>
+      <div class="tip-box-text">
+        <strong style="color:var(--sky-pale)">Kidokezo:</strong> Weka bei ya soko la sasa hivi. Orodha yako itaonekana kwa wanunuzi wote Tanzania mara tu baada ya kuchapishwa.
+      </div>
+    </div>
+
+    <form id="add-product-form" novalidate>
+
+      <!-- Sehemu 1: Taarifa za Zao -->
+      <div class="form-section">
+        <div class="form-section-label">
+          <i data-lucide="sprout" style="width:14px;height:14px"></i>
+          Taarifa za Zao
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">Jina la Orodha *</label>
+            <div class="input-wrapper">
+              <div class="input-icon"><i data-lucide="tag" style="width:16px;height:16px"></i></div>
+              <input type="text" id="title" class="form-input" placeholder="Mfano: Mahindi Mazuri Mbeya — Msimu wa 2025" required/>
+            </div>
+            <span class="form-error" id="title-error"></span>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Aina ya Zao *</label>
+              <div class="input-wrapper">
+                <div class="input-icon"><i data-lucide="sprout" style="width:16px;height:16px"></i></div>
+                <input type="text" id="crop_name" class="form-input" placeholder="Mahindi, Mpunga, Kahawa..." required/>
+              </div>
+              <span class="form-error" id="crop_name-error"></span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mkoa *</label>
+              <div class="input-wrapper">
+                <div class="input-icon"><i data-lucide="map-pin" style="width:16px;height:16px"></i></div>
+                <select id="region" class="form-select" style="padding-left:2.75rem">
+                  {% for r in ['Arusha','Dar es Salaam','Dodoma','Geita','Iringa','Kagera','Katavi','Kigoma','Kilimanjaro','Lindi','Manyara','Mara','Mbeya','Morogoro','Mtwara','Mwanza','Njombe','Pwani','Rukwa','Ruvuma','Shinyanga','Simiyu','Singida','Songwe','Tabora','Tanga'] %}
+                  <option value="{{ r }}" {{ 'selected' if r==current_user.region }}>{{ r }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sehemu 2: Bei na Kiasi -->
+      <div class="form-section">
+        <div class="form-section-label">
+          <i data-lucide="banknote" style="width:14px;height:14px"></i>
+          Bei na Kiasi
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Kiasi (kg) *</label>
+            <div class="input-wrapper">
+              <div class="input-icon"><i data-lucide="weight" style="width:16px;height:16px"></i></div>
+              <input type="number" id="quantity_kg" class="form-input" placeholder="500" min="1" required oninput="updatePreview()"/>
+            </div>
+            <span class="form-hint" style="font-size:0.75rem;color:var(--text-muted)">Kiasi unachopenda kuuza kwa jumla</span>
+            <span class="form-error" id="quantity_kg-error"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bei kwa kg (TZS) *</label>
+            <div class="input-wrapper">
+              <div class="input-icon"><i data-lucide="banknote" style="width:16px;height:16px"></i></div>
+              <input type="number" id="price_tzs" class="form-input" placeholder="850" min="1" required oninput="updatePreview()"/>
+            </div>
+            <span class="form-hint" style="font-size:0.75rem;color:var(--text-muted)">Bei ya soko ya sasa hivi</span>
+            <span class="form-error" id="price_tzs-error"></span>
+          </div>
+        </div>
+
+        <!-- Price Preview -->
+        <div class="price-preview" id="price-preview">
+          <div class="price-preview-label">Jumla ya Mauzo (Kiasi × Bei)</div>
+          <div class="price-preview-value" id="price-preview-value">TZS 0</div>
+        </div>
+      </div>
+
+      <!-- Sehemu 3: Mawasiliano -->
+      <div class="form-section">
+        <div class="form-section-label">
+          <i data-lucide="phone" style="width:14px;height:14px"></i>
+          Mawasiliano
+        </div>
+        <div class="form-group">
+          <label class="form-label">Namba ya WhatsApp *</label>
+          <div class="input-wrapper">
+            <div class="input-icon"><i data-lucide="phone" style="width:16px;height:16px"></i></div>
+            <input type="tel" id="contact" class="form-input" placeholder="+255 712 000 000" value="{{ current_user.phone }}" required/>
+          </div>
+          <span class="form-hint" style="font-size:0.75rem;color:var(--text-muted)">Wanunuzi watakupigia WhatsApp moja kwa moja — hakikisha ni namba sahihi</span>
+          <span class="form-error" id="contact-error"></span>
+        </div>
+      </div>
+
+      <!-- Error bar -->
+      <div class="error-bar" id="error-bar">
+        <i data-lucide="x-circle" style="width:16px;height:16px;flex-shrink:0"></i>
+        <span id="error-text">Hitilafu imetokea.</span>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit-full" id="submit-btn">
+        <div class="spinner" id="spinner"></div>
+        <i data-lucide="send" style="width:18px;height:18px" id="submit-icon"></i>
+        <span id="submit-text">Chapisha Orodha Sasa</span>
+      </button>
+
+    </form>
+
+    <!-- Success state -->
+    <div class="success-card" id="success-card">
+      <i data-lucide="check-circle" style="width:48px;height:48px;color:var(--emerald-bright);margin-bottom:1rem"></i>
+      <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;margin-bottom:0.5rem">Orodha Imechapishwa! 🎉</h3>
+      <p style="color:var(--text-secondary);margin-bottom:1.5rem;font-size:0.9rem">Mazao yako yanaonekana kwenye soko la AgroLink Tanzania sasa hivi.</p>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+        <a href="/listings" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;padding:0.75rem 1.5rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none;font-size:0.9rem">
+          <i data-lucide="store" style="width:16px;height:16px"></i>Angalia Soko
+        </a>
+        <a href="/dashboard/add" style="display:inline-flex;align-items:center;gap:8px;background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--text-primary);padding:0.75rem 1.5rem;border-radius:50px;font-family:var(--font-display);font-weight:600;text-decoration:none;font-size:0.9rem">
+          <i data-lucide="plus" style="width:16px;height:16px"></i>Ongeza Nyingine
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function updatePreview(){
+  const qty   = parseFloat(document.getElementById('quantity_kg').value) || 0;
+  const price = parseFloat(document.getElementById('price_tzs').value)   || 0;
+  const preview = document.getElementById('price-preview');
+  const value   = document.getElementById('price-preview-value');
+  if(qty > 0 && price > 0){
+    const total = qty * price;
+    value.textContent = 'TZS ' + total.toLocaleString('sw-TZ');
+    preview.style.display = 'block';
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+function showErr(id, msg){
+  const f = document.getElementById(id);
+  const e = document.getElementById(id + '-error');
+  if(f) f.classList.add('error');
+  if(e) e.textContent = msg;
+}
+
+function clearErrs(){
+  document.querySelectorAll('.form-input,.form-select').forEach(f => f.classList.remove('error'));
+  document.querySelectorAll('.form-error').forEach(e => e.textContent = '');
+  document.getElementById('error-bar').style.display = 'none';
+}
+
+function setLoading(on){
+  document.getElementById('submit-btn').disabled  = on;
+  document.getElementById('spinner').style.display     = on ? 'block' : 'none';
+  document.getElementById('submit-icon').style.display = on ? 'none'  : 'block';
+  document.getElementById('submit-text').textContent   = on ? 'Inachapisha...' : 'Chapisha Orodha Sasa';
+}
+
+document.getElementById('add-product-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  clearErrs();
+
+  const title       = document.getElementById('title').value.trim();
+  const crop_name   = document.getElementById('crop_name').value.trim();
+  const region      = document.getElementById('region').value;
+  const quantity_kg = document.getElementById('quantity_kg').value;
+  const price_tzs   = document.getElementById('price_tzs').value;
+  const contact     = document.getElementById('contact').value.trim();
+
+  let valid = true;
+  if(!title)      { showErr('title',       'Tafadhali ingiza jina la orodha.'); valid = false; }
+  if(!crop_name)  { showErr('crop_name',   'Tafadhali ingiza aina ya zao.');    valid = false; }
+  if(!quantity_kg){ showErr('quantity_kg', 'Tafadhali ingiza kiasi.');          valid = false; }
+  if(!price_tzs)  { showErr('price_tzs',   'Tafadhali ingiza bei.');            valid = false; }
+  if(!contact)    { showErr('contact',     'Tafadhali ingiza namba ya simu.');  valid = false; }
+  if(!valid) return;
+
+  setLoading(true);
+
+  try{
+    const res  = await fetch('/api/listings', {
+      method : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body   : JSON.stringify({ title, crop_name, region, quantity_kg, price_tzs, contact })
+    });
+    const data = await res.json();
+
+    if(res.ok){
+      document.getElementById('add-product-form').style.display = 'none';
+      document.getElementById('success-card').style.display     = 'block';
+      lucide.createIcons();
+    } else {
+      document.getElementById('error-text').textContent = data.error || 'Hitilafu imetokea. Jaribu tena.';
+      document.getElementById('error-bar').style.display = 'flex';
+      lucide.createIcons();
+      setLoading(false);
+    }
+  } catch {
+    document.getElementById('error-text').textContent = 'Hitilafu ya mtandao. Angalia intaneti yako.';
+    document.getElementById('error-bar').style.display = 'flex';
+    setLoading(false);
+  }
+});
+</script>
+{% endblock %}

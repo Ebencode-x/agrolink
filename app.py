@@ -293,6 +293,12 @@ def about():
     return render_template("about.html")
 
 
+@app.route("/dashboard/add")
+@login_required
+def add_product():
+    return render_template("dashboard/add_product.html")
+
+
 @app.route("/listings")
 def listings():
     all_listings = MarketListing.query.filter_by(is_available=True).order_by(MarketListing.posted_at.desc()).all()
