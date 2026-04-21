@@ -319,7 +319,7 @@ def add_product():
         db.session.add(listing)
         db.session.commit()
         return jsonify({"message": "Orodha imeongezwa!", "id": listing.id}), 201
-    crops = Crop.query.order_by(Crop.name).all()
+    crops = Crop.query.all()
     return render_template("dashboard/add_product.html", crops=crops)
 
 
