@@ -395,3 +395,19 @@ def change_password():
         return jsonify({"message": "Nywila imebadilishwa!"})
 
     return render_template("auth/change_password.html")
+
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if request.method == "POST":
+        data  = request.get_json() or request.form
+        phone = data.get("phone")
+        user  = User.query.filter_by(phone=phone).first()
+        if not user:
+            return jsonify({"error": "Namba ya simu haijapatikana."}), 404
+        new_password = data.get("new_password")
+        if not new_password or len(new_password) < 6:
+            return jsonify({"error": "Nywila mpya iwe na herufi 6 au zaidi."}), 400
+        user.set_password(new_password)
+        db.session.commit()
+        return jsonify({"message": "Nywila imebadilishwa. Ingia sasa."})
+    return render_template("auth/forgot_password.html")
