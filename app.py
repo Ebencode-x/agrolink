@@ -411,3 +411,17 @@ def forgot_password():
         db.session.commit()
         return jsonify({"message": "Nywila imebadilishwa. Ingia sasa."})
     return render_template("auth/forgot_password.html")
+
+@app.route("/farmers")
+def farmers():
+    q      = request.args.get("q", "").strip()
+    region = request.args.get("region", "").strip()
+    query  = User.query.filter_by(role="farmer")
+    if q:
+        query = query.filter(User.full_name.ilike(f"%{q}%"))
+    if region:
+        query = query.filter(User.region.ilike(f"%{region}%"))
+    farmers = query.order_by(User.full_name).all()
+    regions = db.session.query(User.region).filter(User.role=="farmer").distinct().all()
+    regions = [r[0] for r in regions if r[0]]
+    return render_template("farmers.html", farmers=farmers, regions=regions, q=q, region=region)
