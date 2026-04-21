@@ -293,10 +293,34 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/dashboard/add")
+@app.route("/dashboard/add", methods=["GET", "POST"])
 @login_required
 def add_product():
-    return render_template("dashboard/add_product.html")
+    if request.method == "POST":
+        data        = request.get_json() or request.form
+        crop_name   = data.get("crop_name", "").strip()
+        quantity    = data.get("quantity", 0)
+        unit        = data.get("unit", "kg")
+        price       = data.get("price", 0)
+        location    = data.get("location", current_user.region or "")
+        description = data.get("description", "")
+        if not crop_name or not price:
+            return jsonify({"error": "Jaza sehemu zote zinazohitajika."}), 400
+        listing = MarketListing(
+            seller_id   = current_user.id,
+            crop_name   = crop_name,
+            quantity    = float(quantity),
+            unit        = unit,
+            price       = float(price),
+            location    = location,
+            description = description,
+            is_available= True
+        )
+        db.session.add(listing)
+        db.session.commit()
+        return jsonify({"message": "Orodha imeongezwa!", "id": listing.id}), 201
+    crops = Crop.query.order_by(Crop.name).all()
+    return render_template("dashboard/add_product.html", crops=crops)
 
 
 @app.route("/listings")
