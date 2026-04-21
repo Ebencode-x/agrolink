@@ -449,3 +449,41 @@ def farmers():
     regions = db.session.query(User.region).filter(User.role=="farmer").distinct().all()
     regions = [r[0] for r in regions if r[0]]
     return render_template("farmers.html", farmers=farmers, regions=regions, q=q, region=region)
+
+@app.route("/admin")
+@login_required
+def admin_panel():
+    if current_user.role != "admin":
+        return redirect(url_for("index"))
+    users    = User.query.order_by(User.created_at.desc()).all()
+    listings = MarketListing.query.order_by(MarketListing.posted_at.desc()).all()
+    total_farmers  = User.query.filter_by(role="farmer").count()
+    total_admins   = User.query.filter_by(role="admin").count()
+    total_listings = MarketListing.query.count()
+    active_listings= MarketListing.query.filter_by(is_available=True).count()
+    return render_template("admin/panel.html",
+        users=users, listings=listings,
+        total_farmers=total_farmers, total_admins=total_admins,
+        total_listings=total_listings, active_listings=active_listings)
+
+@app.route("/admin/delete-listing/<int:listing_id>", methods=["POST"])
+@login_required
+def admin_delete_listing(listing_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Hairuhusiwi."}), 403
+    listing = MarketListing.query.get_or_404(listing_id)
+    db.session.delete(listing)
+    db.session.commit()
+    return jsonify({"message": "Orodha imefutwa."})
+
+@app.route("/admin/delete-user/<int:user_id>", methods=["POST"])
+@login_required
+def admin_delete_user(user_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Hairuhusiwi."}), 403
+    if user_id == current_user.id:
+        return jsonify({"error": "Huwezi kujifuta mwenyewe."}), 400
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"message": "Mtumiaji amefutwa."})
