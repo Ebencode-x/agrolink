@@ -491,3 +491,13 @@ def admin_delete_user(user_id):
 @app.route("/developer")
 def developer():
     return render_template("developer.html")
+
+@app.route("/dashboard/delete-listing/<int:listing_id>", methods=["POST"])
+@login_required
+def delete_listing(listing_id):
+    listing = MarketListing.query.get_or_404(listing_id)
+    if listing.seller_id != current_user.id:
+        return jsonify({"error": "Hairuhusiwi."}), 403
+    db.session.delete(listing)
+    db.session.commit()
+    return jsonify({"message": "Orodha imefutwa."})
