@@ -144,6 +144,7 @@
               </a>
             </div>
           </div>
+              <button onclick="deleteListing({{ l.id }}, this)" style="display:inline-flex;align-items:center;gap:4px;background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.25);color:#fda4af;padding:0.35rem 0.75rem;border-radius:8px;font-size:0.75rem;font-weight:600;cursor:pointer"><i data-lucide="trash-2" style="width:12px;height:12px"></i>Futa</button>
           {% endfor %}
         {% else %}
           <div style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted)">
@@ -358,5 +359,13 @@ document.getElementById('add-form').addEventListener('submit',async e=>{
     document.getElementById('modal-btn-text').textContent='Chapisha Orodha';
   }
 });
+  async function deleteListing(id, btn){
+    if(!confirm("Futa orodha hii? Hatua hii haiwezi kurudishwa."))return;
+    const row=btn.closest(".listing-row");
+    const res=await fetch(`/dashboard/delete-listing/${id}`,{method:"POST"});
+    const data=await res.json();
+    if(res.ok){row.remove();}
+    else{alert(data.error);}
+  }
 </script>
 {% endblock %}
