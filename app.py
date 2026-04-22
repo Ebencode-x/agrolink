@@ -487,3 +487,7 @@ def admin_delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"message": "Mtumiaji amefutwa."})
+
+@app.route("/developer")
+def developer():
+    return render_template("developer.html")
