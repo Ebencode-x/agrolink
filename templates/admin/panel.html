@@ -135,7 +135,7 @@
         <tr id="listing-row-{{ l.id }}">
           <td style="font-weight:600">{{ l.crop_name }}</td>
           <td style="color:var(--text-muted)">{{ l.seller.full_name if l.seller else '—' }}</td>
-          <td style="color:var(--amber-warm);font-weight:600">TZS {{ '{:,.0f}'.format(l.price) }}</td>
+          <td style="color:var(--amber-warm);font-weight:600">TZS {{ l.price|int|string if l.price else '0' }}</td>
           <td>{{ l.quantity }} {{ l.unit }}</td>
           <td style="color:var(--text-muted)">{{ l.location or '—' }}</td>
           <td><span class="available-badge {{ 'yes' if l.is_available else 'no' }}">{{ 'Inapatikana' if l.is_available else 'Haipatikani' }}</span></td>
