@@ -129,8 +129,8 @@
             <div class="listing-row-info">
               <div class="listing-row-name">{{ l.crop_name }} — {{ l.location }}</div>
               <div class="listing-row-meta">
-                TZS {{ "{:,.0f}".format(l.price) }}/kg ·
-                {{ "{:,.0f}".format(l.quantity) }} kg ·
+                TZS {{ "{:,.0f}".format(l.price or 0) }} ·
+                {{ "{:,.0f}".format(l.quantity or 0) }} kg ·
                 {{ l.posted_at.strftime('%d %b %Y') }}
               </div>
             </div>
