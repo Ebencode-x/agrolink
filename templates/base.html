@@ -101,7 +101,7 @@
     <div class="nav-user">
       {% if current_user.is_authenticated %}
         <span style="font-size:0.85rem;color:var(--text-secondary)">Karibu, {{ current_user.full_name.split()[0] }}!</span>
-        <a href="/dashboard" class="nav-btn nav-btn-ghost"><i data-lucide="layout-dashboard" style="width:15px;height:15px"></i> Dashboard</a>
+        <a href="/dashboard" class="nav-btn nav-btn-ghost"><i data-lucide="layout-dashboard" style="width:15px;height:15px"></i> Dashboard</a>{% if current_user.role == 'admin' %}<a href="/admin" class="nav-btn nav-btn-ghost" style="color:#fda4af;border-color:rgba(244,63,94,0.3)"><i data-lucide="shield" style="width:15px;height:15px"></i> Admin</a>{% endif %}
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-ghost" style="color:#fda4af"><i data-lucide="log-out" style="width:15px;height:15px"></i> Toka</a>
       {% else %}
         <a href="{{ url_for('login') }}" class="nav-btn nav-btn-ghost">Ingia</a>
