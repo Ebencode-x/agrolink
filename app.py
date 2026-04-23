@@ -8,12 +8,11 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from dotenv import load_dotenv
-
+from supabase import create_client
 
 load_dotenv()
 
 app = Flask(__name__)
-
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///agrolink.db")
 if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgresql+psycopg://"):
@@ -21,8 +20,12 @@ if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgresql+psycopg://"):
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 300}
 
-WEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
-WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
+SUPABASE_URL      = os.environ.get("SUPABASE_URL", "")
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
+supabase_client   = create_client(SUPABASE_URL, SUPABASE_ANON_KEY) if SUPABASE_URL else None
+
+WEATHER_API_KEY   = os.environ.get("OPENWEATHER_API_KEY", "")
+WEATHER_BASE_URL  = "https://api.openweathermap.org/data/2.5/weather"
 FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
 db      = SQLAlchemy(app)
@@ -33,9 +36,7 @@ login_manager.login_view = "login"
 login_manager.login_message = "Tafadhali ingia kwanza."
 CORS(app)
 
-
 # ── Models ──────────────────────────────────────────────────────────────────
-
 class User(db.Model):
     __tablename__ = "users"
     id            = db.Column(db.Integer, primary_key=True)
