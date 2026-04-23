@@ -310,9 +310,9 @@ def add_product():
         listing = MarketListing(
             seller_id   = current_user.id,
             crop_name   = crop_name,
-            quantity    = float(quantity),
+            quantity_kg  = float(quantity),
             unit        = unit,
-            price       = float(price),
+            price_tzs    = float(price),
             location    = location,
             description = description,
             is_available= True
