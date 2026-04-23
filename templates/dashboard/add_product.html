@@ -113,6 +113,20 @@
           </div>
         </div>
 
+        <div class="section-divider"><i data-lucide="image" style="width:13px;height:13px"></i>Picha ya Zao</div>
+        <div class="form-grid full">
+          <div>
+            <label class="field-label"><i data-lucide="image" style="width:13px;height:13px"></i>Pakia Picha</label>
+            <div id="upload-area" style="border:2px dashed rgba(16,185,129,0.3);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:all var(--transition)" onclick="document.getElementById('image-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--emerald-bright)'" ondrop="handleDrop(event)">
+              <i data-lucide="upload-cloud" style="width:32px;height:32px;color:var(--text-muted);margin-bottom:0.75rem"></i>
+              <p style="font-size:0.85rem;color:var(--text-muted)">Bonyeza kupakia picha au buruta hapa</p>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">JPG, PNG, WEBP — Max 5MB</p>
+            </div>
+            <input type="file" id="image-input" accept="image/*" style="display:none" onchange="previewImage(this)"/>
+            <img id="image-preview" src="" style="display:none;width:100%;max-height:200px;object-fit:cover;border-radius:12px;margin-top:0.75rem"/>
+            <input type="hidden" id="image-url" name="image_url"/>
+          </div>
+        </div>
         <div class="section-divider"><i data-lucide="file-text" style="width:13px;height:13px"></i>Maelezo</div>
         <div class="form-grid full">
           <div>
@@ -143,6 +157,35 @@
 
 {% block extra_scripts %}
 <script>
+async function previewImage(input){
+  const file=input.files[0];
+  if(!file)return;
+  if(file.size>5*1024*1024){alert("Picha ni kubwa sana — max 5MB");input.value="";return;}
+  const preview=document.getElementById("image-preview");
+  preview.src=URL.createObjectURL(file);
+  preview.style.display="block";
+  const area=document.getElementById("upload-area");
+  area.style.borderColor="var(--emerald-bright)";
+  const formData=new FormData();
+  formData.append("file",file);
+  try{
+    const res=await fetch("/api/upload-image",{method:"POST",body:formData});
+    const data=await res.json();
+    if(res.ok){document.getElementById("image-url").value=data.url;lucide.createIcons();}
+    else{alert(data.error||"Hitilafu ya kupakia picha.");}
+  }catch{alert("Hitilafu ya mtandao.");}
+}
+function handleDrop(e){
+  e.preventDefault();
+  const file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith("image/")){
+    const input=document.getElementById("image-input");
+    const dt=new DataTransfer();
+    dt.items.add(file);
+    input.files=dt.files;
+    previewImage(input);
+  }
+}
 function updatePreview(){
   const name=document.getElementById('crop_name').value;
   const qty=document.getElementById('quantity').value;
