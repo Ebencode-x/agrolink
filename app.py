@@ -437,6 +437,28 @@ def forgot_password():
         return jsonify({"message": "Nywila imebadilishwa. Ingia sasa."})
     return render_template("auth/forgot_password.html")
 
+@app.route("/api/upload-image", methods=["POST"])
+@login_required
+def upload_image():
+    if "file" not in request.files:
+        return jsonify({"error": "Hakuna faili."}), 400
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "Chagua picha kwanza."}), 400
+    if not supabase_client:
+        return jsonify({"error": "Storage haipo."}), 500
+    allowed = {"jpg", "jpeg", "png", "webp"}
+    ext = file.filename.rsplit(".", 1)[-1].lower()
+    if ext not in allowed:
+        return jsonify({"error": "Picha lazima iwe jpg, png, au webp."}), 400
+    filename = f"crops/{current_user.id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.{ext}"
+    file_bytes = file.read()
+    supabase_client.storage.from_("crop-images").upload(
+        filename, file_bytes, {"content-type": file.content_type}
+    )
+    public_url = f"{SUPABASE_URL}/storage/v1/object/public/crop-images/{filename}"
+    return jsonify({"url": public_url})    
+
 @app.route("/farmers")
 def farmers():
     q      = request.args.get("q", "").strip()
