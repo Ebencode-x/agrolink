@@ -298,28 +298,31 @@ def about():
 @login_required
 def add_product():
     if request.method == "POST":
-        data        = request.get_json() or request.form
-        crop_name   = data.get("crop_name", "").strip()
-        quantity    = data.get("quantity", 0)
-        unit        = data.get("unit", "kg")
-        price       = data.get("price", 0)
-        location    = data.get("location", current_user.region or "")
-        description = data.get("description", "")
+        data      = request.get_json() or request.form
+        crop_name = data.get("crop_name", "").strip()
+        quantity  = data.get("quantity", 0)
+        price     = data.get("price", 0)
+        region    = data.get("location", current_user.region or "")
+        contact   = current_user.phone or ""
+        image_url = data.get("image_url", "")
         if not crop_name or not price:
             return jsonify({"error": "Jaza sehemu zote zinazohitajika."}), 400
         listing = MarketListing(
-            seller_id   = current_user.id,
-            crop_name   = crop_name,
+            seller_id    = current_user.id,
+            title        = crop_name,
+            crop_name    = crop_name,
             quantity_kg  = float(quantity),
-            unit        = unit,
             price_tzs    = float(price),
-            location    = location,
-            description = description,
-            is_available= True
+            region       = region,
+            contact      = contact,
+            image_url    = image_url,
+            is_available = True
         )
         db.session.add(listing)
         db.session.commit()
         return jsonify({"message": "Orodha imeongezwa!", "id": listing.id}), 201
+    crops = Crop.query.all()
+    return render_template("dashboard/add_product.html", crops=crops)
     crops = Crop.query.all()
     return render_template("dashboard/add_product.html", crops=crops)
 
