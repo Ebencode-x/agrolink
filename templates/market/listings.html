@@ -13,16 +13,17 @@
   .listing-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--emerald-bright),var(--amber-warm));transform:scaleX(0);transition:transform var(--transition);transform-origin:left}
   .listing-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.3)}
   .listing-card:hover::before{transform:scaleX(1)}
+  .listing-img{width:100%;height:160px;object-fit:cover;border-radius:10px;margin-bottom:1rem}
   .listing-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem}
   .listing-badge{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.3rem 0.8rem;border-radius:50px;font-size:0.78rem;font-weight:600;display:flex;align-items:center;gap:4px}
   .listing-region{display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted)}
   .listing-title{font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.4rem;line-height:1.3}
   .listing-desc{font-size:0.83rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem}
-  .listing-stats{display:flex;gap:1rem;padding:1rem 0;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);margin-bottom:1rem}
-  .listing-stat{display:flex;flex-direction:column;gap:2px}
-  .listing-stat-label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em}
+  .listing-stats{display:flex;gap:1rem;padding:1rem 0;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);margin-bottom:1rem;flex-wrap:wrap}
+  .listing-stat{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .listing-stat-label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
   .listing-stat-value{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--amber-warm)}
-  .listing-footer{display:flex;align-items:center;justify-content:space-between}
+  .listing-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
   .listing-seller{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-muted)}
   .contact-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;padding:0.5rem 1.1rem;border-radius:50px;font-size:0.82rem;font-weight:600;text-decoration:none;transition:all var(--transition);border:none;cursor:pointer}
   .contact-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,0.4)}
@@ -38,6 +39,8 @@
     .listings-grid{grid-template-columns:1fr!important}
     .search-bar{flex-direction:column}
     .listings-filters{gap:0.5rem}
+    .listing-stat-value{font-size:0.9rem!important}
+    .listing-stats{gap:0.75rem}
   }
 </style>
 {% endblock %}
@@ -53,7 +56,7 @@
       <p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.7;max-width:500px">Nunua na uza mazao moja kwa moja na wakulima wa Tanzania. Bei za kweli, watu wa kweli.</p>
     </div>
     {% if current_user.is_authenticated %}
-    <a href="/dashboard" class="post-btn reveal">
+    <a href="/dashboard/add" class="post-btn reveal">
       <i data-lucide="plus-circle" style="width:18px;height:18px"></i>Weka Orodha Yako
     </a>
     {% else %}
@@ -95,6 +98,11 @@
     {% if listings %}
       {% for l in listings %}
       <div class="listing-card glass" data-crop="{{ l.crop_name|lower }}" data-region="{{ l.region|lower }}" data-category="">
+
+        {% if l.image_url %}
+        <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" class="listing-img"/>
+        {% endif %}
+
         <div class="listing-top">
           <span class="listing-badge">
             <i data-lucide="sprout" style="width:12px;height:12px"></i>{{ l.crop_name }}
@@ -106,13 +114,17 @@
 
         <div class="listing-title">{{ l.title }}</div>
 
+        {% if l.description %}
+        <div class="listing-desc">{{ l.description }}</div>
+        {% endif %}
+
         <div class="listing-stats">
           <div class="listing-stat">
             <span class="listing-stat-label">Kiasi</span>
-            <span class="listing-stat-value">{{ "{:,.0f}".format(l.quantity_kg) }} kg</span>
+            <span class="listing-stat-value">{{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }}</span>
           </div>
           <div class="listing-stat">
-            <span class="listing-stat-label">Bei / kg</span>
+            <span class="listing-stat-label">Bei / {{ l.unit or 'kg' }}</span>
             <span class="listing-stat-value">TZS {{ "{:,.0f}".format(l.price_tzs) }}</span>
           </div>
           <div class="listing-stat">

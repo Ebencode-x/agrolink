@@ -137,7 +137,6 @@ def get_weather(city="Mbeya"):
     if not WEATHER_API_KEY:
         return {"error": "API key haijawekwa", "city": city, "success": False}
 
-    # Check cache kwanza — ikiwa data ina umri wa chini ya dakika 30, itumie
     from datetime import timedelta
     cached = (WeatherLog.query.filter_by(city=city)
               .order_by(WeatherLog.fetched_at.desc()).first())
@@ -152,7 +151,6 @@ def get_weather(city="Mbeya"):
                 "cache_age_mins": int(age.total_seconds() / 60)
             }
 
-    # Coordinates za miji mikuu ya Tanzania kwa accuracy zaidi
     tz_cities = {
         "mbeya":         {"lat": -8.9000,  "lon": 33.4600},
         "dar es salaam": {"lat": -6.7924,  "lon": 39.2083},
@@ -300,31 +298,35 @@ def about():
 @login_required
 def add_product():
     if request.method == "POST":
-        data      = request.get_json() or request.form
-        crop_name = data.get("crop_name", "").strip()
-        quantity  = data.get("quantity", 0)
-        price     = data.get("price", 0)
-        region    = data.get("location", current_user.region or "")
-        contact   = current_user.phone or ""
-        image_url = data.get("image_url", "")
+        data        = request.get_json() or request.form
+        crop_name   = data.get("crop_name", "").strip()
+        quantity    = data.get("quantity", 0)
+        price       = data.get("price", 0)
+        region      = data.get("location", current_user.region or "")
+        contact     = current_user.phone or ""
+        image_url   = data.get("image_url", "")
+        unit        = data.get("unit", "kg")
+        description = data.get("description", "")
+
         if not crop_name or not price:
             return jsonify({"error": "Jaza sehemu zote zinazohitajika."}), 400
+
         listing = MarketListing(
             seller_id    = current_user.id,
             title        = crop_name,
             crop_name    = crop_name,
             quantity_kg  = float(quantity),
+            unit         = unit,
             price_tzs    = float(price),
             region       = region,
             contact      = contact,
+            description  = description,
             image_url    = image_url,
             is_available = True
         )
         db.session.add(listing)
         db.session.commit()
         return jsonify({"message": "Orodha imeongezwa!", "id": listing.id}), 201
-    crops = Crop.query.all()
-    return render_template("dashboard/add_product.html", crops=crops)
     crops = Crop.query.all()
     return render_template("dashboard/add_product.html", crops=crops)
 
@@ -354,7 +356,7 @@ def api_prices():
 def api_listings():
     listings = MarketListing.query.filter_by(is_available=True).order_by(MarketListing.posted_at.desc()).all()
     return jsonify([{"id": l.id, "title": l.title, "crop_name": l.crop_name,
-                     "quantity_kg": l.quantity_kg, "price_tzs": l.price_tzs,
+                     "quantity_kg": l.quantity_kg, "unit": l.unit, "price_tzs": l.price_tzs,
                      "region": l.region, "contact": l.contact,
                      "posted_at": l.posted_at.isoformat()} for l in listings])
 
@@ -362,20 +364,32 @@ def api_listings():
 @app.route("/api/listings", methods=["POST"])
 @login_required
 def create_listing():
-    data = request.get_json()
+    data        = request.get_json()
+    crop_name   = data.get("crop_name", "").strip()
+    quantity    = data.get("quantity", 0)
+    price       = data.get("price", 0)
+    region      = data.get("region", current_user.region or "")
+    contact     = data.get("contact", current_user.phone or "")
+    image_url   = data.get("image_url", "")
+    unit        = data.get("unit", "kg")
+    description = data.get("description", "")
+
+    if not crop_name or not price:
+        return jsonify({"error": "Jaza sehemu zote zinazohitajika."}), 400
+
     listing = MarketListing(
-            seller_id    = current_user.id,
-            title        = crop_name,
-            crop_name    = crop_name,
-            quantity_kg  = float(quantity),
-            unit         = data.get("unit", "kg"),
-            price_tzs    = float(price),
-            region       = region,
-            contact      = contact,
-            description  = data.get("description", ""),
-            image_url    = image_url,
-            is_available = True
-        )
+        seller_id    = current_user.id,
+        title        = crop_name,
+        crop_name    = crop_name,
+        quantity_kg  = float(quantity),
+        unit         = unit,
+        price_tzs    = float(price),
+        region       = region,
+        contact      = contact,
+        description  = description,
+        image_url    = image_url,
+        is_available = True
+    )
     db.session.add(listing)
     db.session.commit()
     return jsonify({"message": "Orodha imeongezwa.", "id": listing.id}), 201
@@ -404,8 +418,6 @@ with app.app_context():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port, debug=os.environ.get("FLASK_DEBUG", "false").lower() == "true")
-
-
 
 
 @app.route("/change-password", methods=["GET", "POST"])
@@ -466,7 +478,7 @@ def upload_image():
         filename, file_bytes, {"content-type": file.content_type}
     )
     public_url = f"{SUPABASE_URL}/storage/v1/object/public/crop-images/{filename}"
-    return jsonify({"url": public_url})    
+    return jsonify({"url": public_url})
 
 @app.route("/farmers")
 def farmers():
