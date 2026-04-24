@@ -102,9 +102,11 @@ class MarketListing(db.Model):
     title        = db.Column(db.String(200), nullable=False)
     crop_name    = db.Column(db.String(100), nullable=False)
     quantity_kg  = db.Column(db.Float, nullable=False)
+    unit         = db.Column(db.String(20), default="kg")
     price_tzs    = db.Column(db.Float, nullable=False)
     region       = db.Column(db.String(80), nullable=False)
     contact      = db.Column(db.String(50), nullable=False)
+    description  = db.Column(db.String(500), nullable=True)
     is_available = db.Column(db.Boolean, default=True)
     image_url    = db.Column(db.String(300), nullable=True)
     posted_at    = db.Column(db.DateTime, default=datetime.utcnow)
@@ -362,14 +364,18 @@ def api_listings():
 def create_listing():
     data = request.get_json()
     listing = MarketListing(
-        seller_id   = current_user.id,
-        title       = data["title"],
-        crop_name   = data["crop_name"],
-        quantity_kg = float(data["quantity_kg"]),
-        price_tzs   = float(data["price_tzs"]),
-        region      = data["region"],
-        contact     = data.get("contact", current_user.phone),
-    )
+            seller_id    = current_user.id,
+            title        = crop_name,
+            crop_name    = crop_name,
+            quantity_kg  = float(quantity),
+            unit         = data.get("unit", "kg"),
+            price_tzs    = float(price),
+            region       = region,
+            contact      = contact,
+            description  = data.get("description", ""),
+            image_url    = image_url,
+            is_available = True
+        )
     db.session.add(listing)
     db.session.commit()
     return jsonify({"message": "Orodha imeongezwa.", "id": listing.id}), 201
