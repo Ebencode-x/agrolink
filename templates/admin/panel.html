@@ -35,7 +35,7 @@
   .available-badge.yes{background:rgba(16,185,129,0.12);color:var(--emerald-bright);border:1px solid rgba(16,185,129,0.2)}
   .available-badge.no{background:rgba(255,255,255,0.06);color:var(--text-muted);border:1px solid rgba(255,255,255,0.1)}
   .tab-btns{display:flex;gap:0.5rem;margin-bottom:2rem}
-  .tab-btn{padding:0.5rem 1.25rem;border-radius:50px;font-size:0.85rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-secondary);transition:all var(--transition)}
+  .tab-btn{padding:0.5rem 1.25rem;border-radius:50px;font-size:0.85rem;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:var(--text-secondary);transition:all var(--transition);display:inline-flex;align-items:center;gap:6px}
   .tab-btn.active{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.35);color:var(--emerald-bright)}
   .tab-content{display:none}
   .tab-content.active{display:block}
@@ -72,13 +72,20 @@
 
 <div class="admin-section">
   <div class="tab-btns">
-    <button class="tab-btn active" onclick="switchTab('users',this)"><i data-lucide="users" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:4px"></i>Watumiaji ({{ users|length }})</button>
-    <button class="tab-btn" onclick="switchTab('listings',this)"><i data-lucide="shopping-basket" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:4px"></i>Orodha ({{ listings|length }})</button>
+    <button class="tab-btn active" onclick="switchTab('users',this)">
+      <i data-lucide="users" style="width:14px;height:14px"></i>Watumiaji ({{ users|length }})
+    </button>
+    <button class="tab-btn" onclick="switchTab('listings',this)">
+      <i data-lucide="shopping-basket" style="width:14px;height:14px"></i>Orodha ({{ listings|length }})
+    </button>
   </div>
 
+  <!-- Watumiaji -->
   <div class="tab-content active" id="tab-users">
     <div class="section-header">
-      <div class="section-title"><i data-lucide="users" style="width:18px;height:18px;color:var(--emerald-bright)"></i>Watumiaji Wote</div>
+      <div class="section-title">
+        <i data-lucide="users" style="width:18px;height:18px;color:var(--emerald-bright)"></i>Watumiaji Wote
+      </div>
     </div>
     <table class="data-table">
       <thead>
@@ -97,7 +104,12 @@
           <td style="font-weight:600">{{ u.full_name }}</td>
           <td style="color:var(--text-muted)">{{ u.phone }}</td>
           <td>{{ u.region or '—' }}</td>
-          <td><span class="role-badge {{ u.role }}"><i data-lucide="{{ 'shield' if u.role=='admin' else 'sprout' }}" style="width:11px;height:11px"></i>{{ u.role }}</span></td>
+          <td>
+            <span class="role-badge {{ u.role }}">
+              <i data-lucide="{{ 'shield' if u.role=='admin' else 'sprout' }}" style="width:11px;height:11px"></i>
+              {{ u.role }}
+            </span>
+          </td>
           <td style="color:var(--text-muted)">{{ u.created_at.strftime('%d %b %Y') if u.created_at else '—' }}</td>
           <td>
             {% if u.id != current_user.id %}
@@ -105,7 +117,9 @@
               <i data-lucide="trash-2" style="width:13px;height:13px"></i>Futa
             </button>
             {% else %}
-            <span style="font-size:0.75rem;color:var(--text-muted)">Wewe</span>
+            <span style="font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;gap:4px">
+              <i data-lucide="user" style="width:12px;height:12px"></i>Wewe
+            </span>
             {% endif %}
           </td>
         </tr>
@@ -114,9 +128,12 @@
     </table>
   </div>
 
+  <!-- Orodha -->
   <div class="tab-content" id="tab-listings">
     <div class="section-header">
-      <div class="section-title"><i data-lucide="shopping-basket" style="width:18px;height:18px;color:var(--emerald-bright)"></i>Orodha Zote</div>
+      <div class="section-title">
+        <i data-lucide="shopping-basket" style="width:18px;height:18px;color:var(--emerald-bright)"></i>Orodha Zote
+      </div>
     </div>
     <table class="data-table">
       <thead>
@@ -135,10 +152,14 @@
         <tr id="listing-row-{{ l.id }}">
           <td style="font-weight:600">{{ l.crop_name }}</td>
           <td style="color:var(--text-muted)">{{ l.seller.full_name if l.seller else '—' }}</td>
-          <td style="color:var(--amber-warm);font-weight:600">TZS {{ l.price|int|string if l.price else '0' }}</td>
-          <td>{{ l.quantity }} {{ l.unit }}</td>
-          <td style="color:var(--text-muted)">{{ l.location or '—' }}</td>
-          <td><span class="available-badge {{ 'yes' if l.is_available else 'no' }}">{{ 'Inapatikana' if l.is_available else 'Haipatikani' }}</span></td>
+          <td style="color:var(--amber-warm);font-weight:600">TZS {{ "{:,.0f}".format(l.price_tzs) }}</td>
+          <td>{{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }}</td>
+          <td style="color:var(--text-muted)">{{ l.region or '—' }}</td>
+          <td>
+            <span class="available-badge {{ 'yes' if l.is_available else 'no' }}">
+              {{ 'Inapatikana' if l.is_available else 'Haipatikani' }}
+            </span>
+          </td>
           <td>
             <button class="btn-danger" onclick="deleteListing({{ l.id }}, '{{ l.crop_name }}')">
               <i data-lucide="trash-2" style="width:13px;height:13px"></i>Futa
@@ -164,21 +185,15 @@ async function deleteUser(id, name){
   if(!confirm(`Futa mtumiaji "${name}"? Hatua hii haiwezi kurudishwa.`))return;
   const res=await fetch(`/admin/delete-user/${id}`,{method:'POST'});
   const data=await res.json();
-  if(res.ok){
-    document.getElementById(`user-row-${id}`).remove();
-  }else{
-    alert(data.error);
-  }
+  if(res.ok){ document.getElementById(`user-row-${id}`).remove(); }
+  else{ alert(data.error); }
 }
 async function deleteListing(id, name){
   if(!confirm(`Futa orodha ya "${name}"? Hatua hii haiwezi kurudishwa.`))return;
   const res=await fetch(`/admin/delete-listing/${id}`,{method:'POST'});
   const data=await res.json();
-  if(res.ok){
-    document.getElementById(`listing-row-${id}`).remove();
-  }else{
-    alert(data.error);
-  }
+  if(res.ok){ document.getElementById(`listing-row-${id}`).remove(); }
+  else{ alert(data.error); }
 }
 </script>
 {% endblock %}
