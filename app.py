@@ -121,6 +121,8 @@ class ListingReport(db.Model):
     reason      = db.Column(db.String(200), nullable=False)
     created_at  = db.Column(db.DateTime, default=datetime.utcnow)
     __table_args__ = (db.UniqueConstraint("reporter_id", "listing_id", name="unique_report"),)
+    reporter = db.relationship("User", foreign_keys=[reporter_id], backref="reports_made")
+    listing  = db.relationship("MarketListing", foreign_keys=[listing_id], backref="reports")
 
 class WeatherLog(db.Model):
     __tablename__ = "weather_logs"
