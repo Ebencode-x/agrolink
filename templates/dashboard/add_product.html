@@ -225,7 +225,8 @@ document.getElementById('add-form').addEventListener('submit',async e=>{
   document.getElementById('submit-icon').style.display='none';
   document.getElementById('submit-text').textContent='Inaongeza...';
   try{
-    const res=await fetch('/dashboard/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crop_name,quantity,unit,price,location,description})});
+    const image_url=document.getElementById('image-url').value||'';
+    const res=await fetch('/dashboard/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crop_name,quantity,unit,price,location,description,image_url})});
     const data=await res.json();
     if(res.ok){
       document.getElementById('success-msg').textContent=data.message+' Unaweza kuongeza nyingine au kurudi dashboard.';
