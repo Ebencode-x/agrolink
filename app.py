@@ -113,6 +113,15 @@ class MarketListing(db.Model):
     posted_at    = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class ListingReport(db.Model):
+    __tablename__ = "listing_reports"
+    id          = db.Column(db.Integer, primary_key=True)
+    reporter_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    listing_id  = db.Column(db.Integer, db.ForeignKey("market_listings.id"), nullable=False)
+    reason      = db.Column(db.String(200), nullable=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    __table_args__ = (db.UniqueConstraint("reporter_id", "listing_id", name="unique_report"),)
+
 class WeatherLog(db.Model):
     __tablename__ = "weather_logs"
     id          = db.Column(db.Integer, primary_key=True)
@@ -506,8 +515,9 @@ def admin_panel():
     total_admins   = User.query.filter_by(role="admin").count()
     total_listings = MarketListing.query.count()
     active_listings= MarketListing.query.filter_by(is_available=True).count()
+    reports = ListingReport.query.order_by(ListingReport.created_at.desc()).all()
     return render_template("admin/panel.html",
-        users=users, listings=listings,
+        users=users, listings=listings, reports=reports,
         total_farmers=total_farmers, total_admins=total_admins,
         total_listings=total_listings, active_listings=active_listings)
 
@@ -536,6 +546,24 @@ def admin_delete_user(user_id):
 @app.route("/developer")
 def developer():
     return render_template("developer.html")
+
+@app.route("/listings/report/<int:listing_id>", methods=["POST"])
+@login_required
+def report_listing(listing_id):
+    listing = MarketListing.query.get_or_404(listing_id)
+    if listing.seller_id == current_user.id:
+        return jsonify({"error": "Huwezi ku-report orodha yako mwenyewe."}), 400
+    data   = request.get_json() or request.form
+    reason = data.get("reason", "").strip()
+    if not reason:
+        return jsonify({"error": "Taja sababu ya ripoti."}), 400
+    existing = ListingReport.query.filter_by(reporter_id=current_user.id, listing_id=listing_id).first()
+    if existing:
+        return jsonify({"error": "Tayari umesharipoti orodha hii."}), 409
+    report = ListingReport(reporter_id=current_user.id, listing_id=listing_id, reason=reason)
+    db.session.add(report)
+    db.session.commit()
+    return jsonify({"message": "Ripoti imetumwa. Asante kwa kutusaidia."}), 201
 
 @app.route("/dashboard/delete-listing/<int:listing_id>", methods=["POST"])
 @login_required

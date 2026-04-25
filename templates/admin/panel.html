@@ -75,6 +75,12 @@
     <button class="tab-btn active" onclick="switchTab('users',this)">
       <i data-lucide="users" style="width:14px;height:14px"></i>Watumiaji ({{ users|length }})
     </button>
+    <button class="tab-btn" onclick="switchTab('reports',this)">
+      <i data-lucide="flag" style="width:14px;height:14px"></i>Ripoti
+    </button>
+    <button class="tab-btn" onclick="switchTab('reports',this)">
+      <i data-lucide="flag" style="width:14px;height:14px"></i>Ripoti
+    </button>
     <button class="tab-btn" onclick="switchTab('listings',this)">
       <i data-lucide="shopping-basket" style="width:14px;height:14px"></i>Orodha ({{ listings|length }})
     </button>
@@ -170,6 +176,50 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+
+  <div class="tab-content" id="tab-reports">
+    <div class="section-header">
+      <div class="section-title">
+        <i data-lucide="flag" style="width:18px;height:18px;color:#fbbf24"></i>Ripoti za Orodha
+      </div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Orodha</th>
+          <th>Muuzaji</th>
+          <th>Aliyeripoti</th>
+          <th>Sababu</th>
+          <th>Tarehe</th>
+          <th>Hatua</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+        <tr>
+          <td style="font-weight:600">{{ r.listing.crop_name if r.listing else '—' }}</td>
+          <td style="color:var(--text-muted)">{{ r.listing.seller.full_name if r.listing and r.listing.seller else '—' }}</td>
+          <td style="color:var(--text-muted)">{{ r.reporter.full_name if r.reporter else '—' }}</td>
+          <td>{{ r.reason }}</td>
+          <td style="color:var(--text-muted)">{{ r.created_at.strftime('%d %b %Y') }}</td>
+          <td>
+            {% if r.listing %}
+            <button class="btn-danger" onclick="deleteListing({{ r.listing.id }}, '{{ r.listing.crop_name }}')">
+              <i data-lucide="trash-2" style="width:13px;height:13px"></i>Futa
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not reports %}
+        <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem">Hakuna ripoti bado</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Ripoti -->
   </div>
 </div>
 {% endblock %}
