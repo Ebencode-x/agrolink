@@ -112,6 +112,7 @@
           </td>
           <td style="color:var(--text-muted)">{{ u.created_at.strftime('%d %b %Y') if u.created_at else '—' }}</td>
           <td>
+            <button id="verify-btn-{{ u.id }}" onclick="verifyUser({{ u.id }}, this)" style="display:inline-flex;align-items:center;gap:5px;padding:0.35rem 0.85rem;background:{{ 'rgba(16,185,129,0.15)' if u.is_verified else 'rgba(255,255,255,0.05)' }};border:1px solid {{ 'rgba(16,185,129,0.35)' if u.is_verified else 'rgba(255,255,255,0.12)' }};border-radius:8px;color:{{ 'var(--emerald-bright)' if u.is_verified else 'var(--text-muted)' }};font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--transition);margin-right:4px"><i data-lucide="badge-check" style="width:13px;height:13px"></i>{{ 'Verified' if u.is_verified else 'Verify' }}</button>
             {% if u.id != current_user.id %}
             <button class="btn-danger" onclick="deleteUser({{ u.id }}, '{{ u.full_name }}')">
               <i data-lucide="trash-2" style="width:13px;height:13px"></i>Futa
@@ -187,6 +188,18 @@ async function deleteUser(id, name){
   const data=await res.json();
   if(res.ok){ document.getElementById(`user-row-${id}`).remove(); }
   else{ alert(data.error); }
+}
+async function verifyUser(id, btn){
+  const res=await fetch('/admin/verify-user/'+id,{method:'POST'});
+  const data=await res.json();
+  if(res.ok){
+    const verified=data.is_verified;
+    btn.style.background=verified?'rgba(16,185,129,0.15)':'rgba(255,255,255,0.05)';
+    btn.style.borderColor=verified?'rgba(16,185,129,0.35)':'rgba(255,255,255,0.12)';
+    btn.style.color=verified?'var(--emerald-bright)':'var(--text-muted)';
+    btn.innerHTML='<i data-lucide="badge-check" style="width:13px;height:13px"></i>'+(verified?'Verified':'Verify');
+    lucide.createIcons();
+  }else{ alert(data.error||'Hitilafu. Jaribu tena.'); }
 }
 async function deleteListing(id, name){
   if(!confirm(`Futa orodha ya "${name}"? Hatua hii haiwezi kurudishwa.`))return;

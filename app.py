@@ -47,6 +47,7 @@ class User(db.Model):
     region        = db.Column(db.String(80), nullable=True)
     role          = db.Column(db.String(20), default="farmer")
     is_active     = db.Column(db.Boolean, default=True)
+    is_verified   = db.Column(db.Boolean, default=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     crops         = db.relationship("Crop", backref="owner", lazy=True)
     listings      = db.relationship("MarketListing", backref="seller", lazy=True)
@@ -545,3 +546,13 @@ def delete_listing(listing_id):
     db.session.delete(listing)
     db.session.commit()
     return jsonify({"message": "Orodha imefutwa."})
+@app.route("/admin/verify-user/<int:user_id>", methods=["POST"])
+@login_required
+def admin_verify_user(user_id):
+    if current_user.role != "admin":
+        return jsonify({"error": "Hairuhusiwi."}), 403
+    user = User.query.get_or_404(user_id)
+    user.is_verified = not user.is_verified
+    db.session.commit()
+    status = "imethibitishwa" if user.is_verified else "imeondolewa uthibitisho"
+    return jsonify({"message": f"Akaunti ya {user.full_name} {status}.", "is_verified": user.is_verified})

@@ -157,7 +157,7 @@
           <div class="listing-footer">
             <div class="listing-seller">
               <i data-lucide="user-circle" style="width:14px;height:14px"></i>
-              {{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}
+              {{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}{% if l.seller and l.seller.is_verified %} <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--emerald-glow);padding:1px 7px;border-radius:50px;font-size:0.7rem;font-weight:700;margin-left:4px"><i data-lucide="badge-check" style="width:11px;height:11px"></i>Verified</span>{% endif %}
               · {{ l.posted_at.strftime('%d %b') }}
             </div>
             <div class="listing-actions">
