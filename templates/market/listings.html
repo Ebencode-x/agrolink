@@ -49,9 +49,11 @@
     .listing-img-wrap{height:200px}
     .listing-stats{grid-template-columns:repeat(3,1fr);gap:0.4rem}
     .listing-stat-value{font-size:0.88rem}
-    .listing-footer{flex-direction:column;align-items:flex-start}
-    .listing-actions{width:100%;justify-content:flex-end}
-    .contact-btn{flex:1;justify-content:center}
+    .listing-footer{flex-direction:column;align-items:flex-start;gap:0.75rem}
+    .listing-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
+    .contact-btn{grid-column:1/-1;justify-content:center}
+    .btn-report{justify-content:center}
+    .btn-del-listing{justify-content:center}
   }
 </style>
 {% endblock %}
@@ -198,46 +200,34 @@
 {% block extra_scripts %}
 <script>
 async function reportListing(id, btn){
-  const reasons = [
-    'Bei ya uongo',
-    'Bidhaa haipo / Spam',
-    'Picha ya kudanganya',
-    'Maudhui yasiyofaa',
-    'Nyingine'
-  ];
-  const reason = prompt('Chagua sababu ya ripoti:
-1. Bei ya uongo
-2. Bidhaa haipo / Spam
-3. Picha ya kudanganya
-4. Maudhui yasiyofaa
-5. Nyingine
-
-Andika sababu yako:');
+  const reason = prompt("Taja sababu ya ripoti (mfano: Bei ya uongo, Spam, n.k):");
+  if(!reason || !reason.trim()) return;
   btn.disabled=true;
-  btn.innerHTML='<i data-lucide="loader" style="width:13px;height:13px"></i>Inatuma...';
-  const res=await fetch(`/listings/report/${id}`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
+  btn.innerHTML="<i data-lucide='loader' style='width:13px;height:13px'></i> Inatuma...";
+  lucide.createIcons();
+  const res=await fetch("/listings/report/"+id,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({reason:reason.trim()})
   });
   const data=await res.json();
   if(res.ok){
-    btn.innerHTML='<i data-lucide="check" style="width:13px;height:13px"></i>Imeripotiwa';
-    btn.style.background='rgba(16,185,129,0.1)';
-    btn.style.borderColor='rgba(16,185,129,0.25)';
-    btn.style.color='var(--emerald-bright)';
+    btn.innerHTML="<i data-lucide='check' style='width:13px;height:13px'></i> Imeripotiwa";
+    btn.style.background="rgba(16,185,129,0.1)";
+    btn.style.borderColor="rgba(16,185,129,0.25)";
+    btn.style.color="var(--emerald-bright)";
     lucide.createIcons();
   }else{
-    alert(data.error||'Hitilafu. Jaribu tena.');
+    alert(data.error||"Hitilafu. Jaribu tena.");
     btn.disabled=false;
-    btn.innerHTML='<i data-lucide="flag" style="width:13px;height:13px"></i>Ripoti';
+    btn.innerHTML="<i data-lucide='flag' style='width:13px;height:13px'></i> Ripoti";
     lucide.createIcons();
   }
 }
 async function deleteListing(id, btn){
   if(!confirm("Futa orodha hii? Hatua hii haiwezi kurudishwa."))return;
   btn.disabled=true;
-  const res=await fetch(`/dashboard/delete-listing/${id}`,{method:"POST"});
+  const res=await fetch("/dashboard/delete-listing/"+id,{method:"POST"});
   const data=await res.json();
   if(res.ok){
     const card=document.getElementById("listing-card-"+id);
@@ -246,44 +236,42 @@ async function deleteListing(id, btn){
     card.style.transition="all 0.3s ease";
     setTimeout(()=>{
       card.remove();
-      const remaining=document.querySelectorAll('.listing-card').length;
-      document.getElementById('listings-count').innerHTML=
-        'Orodha <strong style="color:var(--text-primary)">'+remaining+'</strong> zinapatikana';
+      const remaining=document.querySelectorAll(".listing-card").length;
+      document.getElementById("listings-count").innerHTML=
+        "Orodha <strong style='color:var(--text-primary)'>"+remaining+"</strong> zinapatikana";
     },300);
   }else{
     alert(data.error||"Hitilafu. Jaribu tena.");
     btn.disabled=false;
   }
 }
-
 function filterListings(){
-  const q=document.getElementById('search-input').value.toLowerCase();
-  const cards=document.querySelectorAll('.listing-card');
+  const q=document.getElementById("search-input").value.toLowerCase();
+  const cards=document.querySelectorAll(".listing-card");
   let visible=0;
   cards.forEach(card=>{
-    const crop=card.dataset.crop||'';
-    const region=card.dataset.region||'';
+    const crop=card.dataset.crop||"";
+    const region=card.dataset.region||"";
     const text=card.innerText.toLowerCase();
     const match=text.includes(q)||crop.includes(q)||region.includes(q);
-    card.style.display=match?'':'none';
+    card.style.display=match?"":"none";
     if(match)visible++;
   });
-  document.getElementById('listings-count').innerHTML=
-    'Orodha <strong style="color:var(--text-primary)">'+visible+'</strong> zinapatikana';
+  document.getElementById("listings-count").innerHTML=
+    "Orodha <strong style='color:var(--text-primary)'>"+visible+"</strong> zinapatikana";
 }
-
 function filterCategory(cat,btn){
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const cards=document.querySelectorAll('.listing-card');
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const cards=document.querySelectorAll(".listing-card");
   let visible=0;
   cards.forEach(card=>{
-    const show=cat==='all'||card.dataset.category===cat||card.dataset.crop.includes(cat);
-    card.style.display=show?'':'none';
+    const show=cat==="all"||card.dataset.category===cat||card.dataset.crop.includes(cat);
+    card.style.display=show?"":"none";
     if(show)visible++;
   });
-  document.getElementById('listings-count').innerHTML=
-    'Orodha <strong style="color:var(--text-primary)">'+visible+'</strong> zinapatikana';
+  document.getElementById("listings-count").innerHTML=
+    "Orodha <strong style='color:var(--text-primary)'>"+visible+"</strong> zinapatikana";
 }
 </script>
 {% endblock %}
