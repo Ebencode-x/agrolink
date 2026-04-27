@@ -140,6 +140,22 @@ class SellerRating(db.Model):
     listing = db.relationship("MarketListing", foreign_keys=[listing_id], backref="ratings")
 
 
+
+
+class PricePredictionLog(db.Model):
+    """Logs every AI price prediction query for analytics and audit trail."""
+    __tablename__ = "price_prediction_logs"
+    id          = db.Column(db.Integer, primary_key=True)
+    crop_name   = db.Column(db.String(100), nullable=False)
+    region      = db.Column(db.String(80), nullable=False)
+    month       = db.Column(db.String(20), nullable=False)
+    season      = db.Column(db.String(30), nullable=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    ai_response = db.Column(db.Text, nullable=True)
+    queried_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    user = db.relationship("User", foreign_keys=[user_id], backref="price_queries")
+
+
 class WeatherLog(db.Model):
     __tablename__ = "weather_logs"
     id          = db.Column(db.Integer, primary_key=True)
@@ -471,6 +487,147 @@ def listing_rating_api(listing_id):
 @app.route("/api/seller/<int:seller_id>/rating", methods=["GET"])
 def seller_rating_api(seller_id):
     return jsonify(get_seller_avg_rating(seller_id))
+
+
+
+# ── AI Price Prediction ───────────────────────────────────────────────────────
+
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+
+TANZANIA_CROPS = {
+    "mahindi":   {"en": "Maize",        "category": "staple",      "unit": "kg"},
+    "mpunga":    {"en": "Rice (paddy)",  "category": "staple",      "unit": "kg"},
+    "viazi":     {"en": "Potatoes",      "category": "staple",      "unit": "kg"},
+    "muhogo":    {"en": "Cassava",       "category": "staple",      "unit": "kg"},
+    "ndizi":     {"en": "Bananas",       "category": "horticulture","unit": "bunch"},
+    "nyanya":    {"en": "Tomatoes",      "category": "horticulture","unit": "kg"},
+    "vitunguu":  {"en": "Onions",        "category": "horticulture","unit": "kg"},
+    "korosho":   {"en": "Cashew nuts",   "category": "cash_crop",   "unit": "kg"},
+    "kahawa":    {"en": "Coffee",        "category": "cash_crop",   "unit": "kg"},
+    "alizeti":   {"en": "Sunflower",     "category": "oilseed",     "unit": "kg"},
+    "maharage":  {"en": "Beans",         "category": "pulse",       "unit": "kg"},
+    "mtama":     {"en": "Sorghum",       "category": "cereal",      "unit": "kg"},
+}
+
+TANZANIA_REGIONS = [
+    "Dar es Salaam", "Mwanza", "Arusha", "Dodoma", "Mbeya",
+    "Morogoro", "Tanga", "Iringa", "Kilimanjaro", "Tabora",
+    "Kigoma", "Singida", "Kagera", "Geita", "Shinyanga",
+    "Rukwa", "Ruvuma", "Lindi", "Mtwara", "Songwe",
+    "Simiyu", "Katavi", "Njombe", "Pwani", "Manyara"
+]
+
+def build_prediction_prompt(crop_sw, region, month):
+    crop_info = TANZANIA_CROPS.get(crop_sw.lower(), {})
+    crop_en   = crop_info.get("en", crop_sw)
+    unit      = crop_info.get("unit", "kg")
+    category  = crop_info.get("category", "general")
+
+    return f"""You are an expert agricultural market analyst specializing in Tanzania's farming economy. Provide a precise crop price prediction based on real market knowledge.
+
+QUERY:
+- Crop: {crop_sw.title()} ({crop_en})
+- Region: {region}, Tanzania
+- Month: {month}
+- Category: {category}
+- Unit: per {unit}
+
+Respond ONLY with a valid JSON object. No markdown, no explanation outside JSON.
+
+{{
+  "crop_sw": "{crop_sw}",
+  "crop_en": "{crop_en}",
+  "region": "{region}",
+  "month": "{month}",
+  "unit": "{unit}",
+  "predicted_price_low": <integer in TZS>,
+  "predicted_price_high": <integer in TZS>,
+  "predicted_price_mid": <integer in TZS>,
+  "trend": "rising" | "stable" | "falling",
+  "trend_pct": <float, e.g. 8.5 means +8.5%>,
+  "confidence": "high" | "medium" | "low",
+  "season_context": "<1 sentence about the season and how it affects this crop in this region>",
+  "market_advice": "<2-3 sentences: concrete advice for a Tanzanian farmer — when to sell, where, and why>",
+  "key_factors": ["<factor 1>", "<factor 2>", "<factor 3>"],
+  "best_markets": ["<market/town name>", "<market/town name>"]
+}}
+
+Use real Tanzanian market knowledge. Prices must be realistic TZS values (e.g. mahindi: 400-900 TZS/kg, nyanya: 800-2500 TZS/kg, korosho: 2000-4500 TZS/kg). Account for seasonal patterns, regional demand, post-harvest timing, and current market conditions in Tanzania."""
+
+
+@app.route("/api/price-prediction", methods=["POST"])
+def api_price_prediction():
+    if not GEMINI_API_KEY:
+        return jsonify({"error": "Huduma ya AI haipo. Wasiliana na msimamizi."}), 503
+
+    data    = request.get_json() or {}
+    crop_sw = data.get("crop", "").strip().lower()
+    region  = data.get("region", "").strip()
+    month   = data.get("month", "").strip()
+
+    if not crop_sw or crop_sw not in TANZANIA_CROPS:
+        return jsonify({"error": "Zao halijulikani. Chagua zao kutoka kwenye orodha."}), 400
+    if not region:
+        return jsonify({"error": "Taja mkoa wako."}), 400
+    if not month:
+        return jsonify({"error": "Taja mwezi."}), 400
+
+    prompt = build_prediction_prompt(crop_sw, region, month)
+
+    try:
+        resp = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}",
+            headers={"content-type": "application/json"},
+            json={"contents": [{"parts": [{"text": prompt}]}]},
+            timeout=20,
+        )
+        resp.raise_for_status()
+        ai_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+
+        # Strip markdown fences if Gemini wraps in ```json
+        if ai_text.startswith("```"):
+            ai_text = ai_text.split("```")[1]
+            if ai_text.startswith("json"):
+                ai_text = ai_text[4:]
+            ai_text = ai_text.strip()
+
+        import json as json_lib
+        prediction = json_lib.loads(ai_text)
+
+        # Log to DB (non-blocking — best effort)
+        try:
+            log = PricePredictionLog(
+                crop_name   = crop_sw,
+                region      = region,
+                month       = month,
+                user_id     = current_user.id if current_user.is_authenticated else None,
+                ai_response = ai_text,
+            )
+            db.session.add(log)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        return jsonify({"success": True, "prediction": prediction})
+
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "AI imechukua muda mrefu. Jaribu tena."}), 504
+    except requests.exceptions.RequestException as exc:
+        return jsonify({"error": f"Tatizo la mtandao: {str(exc)}"}), 502
+    except Exception:
+        return jsonify({"error": "AI ilirudisha jibu lisilo sahihi. Jaribu tena."}), 500
+
+
+@app.route("/api/price-prediction/crops", methods=["GET"])
+def api_prediction_crops():
+    """Returns the list of supported crops for the frontend selector."""
+    crops = [
+        {"sw": k, "en": v["en"], "category": v["category"], "unit": v["unit"]}
+        for k, v in TANZANIA_CROPS.items()
+    ]
+    return jsonify({"crops": crops, "regions": TANZANIA_REGIONS})
+
+
 
 @app.errorhandler(404)
 def not_found(e):
