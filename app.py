@@ -612,8 +612,15 @@ def api_price_prediction():
 
     except requests.exceptions.Timeout:
         return jsonify({"error": "AI imechukua muda mrefu. Jaribu tena."}), 504
-    except requests.exceptions.RequestException as exc:
-        return jsonify({"error": f"Tatizo la mtandao: {str(exc)}"}), 502
+    except requests.exceptions.HTTPError as exc:
+        status = exc.response.status_code if exc.response is not None else 0
+        if status == 429:
+            return jsonify({"error": "Huduma ya AI imefika kikomo. Jaribu tena baada ya dakika chache."}), 429
+        if status == 400:
+            return jsonify({"error": "Ombi lisilo sahihi kwa AI. Jaribu tena."}), 400
+        return jsonify({"error": "Huduma ya AI haipatikani kwa sasa."}), 502
+    except requests.exceptions.RequestException:
+        return jsonify({"error": "Tatizo la mtandao. Angalia muunganiko wako."}), 502
     except Exception:
         return jsonify({"error": "AI ilirudisha jibu lisilo sahihi. Jaribu tena."}), 500
 
