@@ -707,6 +707,11 @@ def upload_image():
     public_url = f"{SUPABASE_URL}/storage/v1/object/public/crop-images/{filename}"
     return jsonify({"url": public_url})
 
+@app.route("/bei")
+def price_intelligence():
+    return render_template("market/price_intelligence.html")
+
+
 @app.route("/farmers")
 def farmers():
     q      = request.args.get("q", "").strip()

@@ -183,6 +183,7 @@
     <ul class="nav-links">
       <li><a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint=='index' }}">Nyumbani</a></li>
       <li><a href="/listings" class="{{ 'active' if request.endpoint=='listings' }}">Soko</a></li>
+      <li><a href="/bei" class="{{ 'active' if request.endpoint=='price_intelligence' }}">Bei ya AI</a></li>
       <li><a href="/#huduma">Huduma</a></li>
       <li><a href="/#hali-ya-hewa">Hali ya Hewa</a></li>
       <li><a href="/farmers" class="{{ 'active' if request.endpoint=='farmers' }}">Wakulima</a></li>
@@ -226,6 +227,9 @@
       </a>
       <a href="/listings" class="{{ 'active' if request.endpoint=='listings' }}">
         <i data-lucide="store" style="width:18px;height:18px"></i>Soko
+      </a>
+      <a href="/bei" class="{{ 'active' if request.endpoint=='price_intelligence' }}">
+        <i data-lucide="trending-up" style="width:18px;height:18px"></i>Bei ya AI
       </a>
       <a href="/#huduma">
         <i data-lucide="layers" style="width:18px;height:18px"></i>Huduma
