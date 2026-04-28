@@ -142,6 +142,18 @@ class SellerRating(db.Model):
 
 
 
+
+class PricePredictionCache(db.Model):
+    """Cache layer for Gemini AI price predictions — 6-hour TTL."""
+    __tablename__ = "price_prediction_cache"
+    id          = db.Column(db.Integer, primary_key=True)
+    cache_key   = db.Column(db.String(200), unique=True, nullable=False, index=True)
+    crop_name   = db.Column(db.String(100), nullable=False)
+    region      = db.Column(db.String(80),  nullable=False)
+    month       = db.Column(db.String(20),  nullable=False)
+    ai_response = db.Column(db.Text, nullable=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
 class PricePredictionLog(db.Model):
     """Logs every AI price prediction query for analytics and audit trail."""
     __tablename__ = "price_prediction_logs"
@@ -492,6 +504,40 @@ def seller_rating_api(seller_id):
 
 # ── AI Price Prediction ───────────────────────────────────────────────────────
 
+
+def get_cached_prediction(cache_key):
+    """Return cached prediction if exists and under 6 hours old."""
+    from datetime import timedelta
+    cached = PricePredictionCache.query.filter_by(cache_key=cache_key).first()
+    if cached:
+        age = datetime.utcnow() - cached.created_at
+        if age < timedelta(hours=6):
+            import json as json_lib
+            return json_lib.loads(cached.ai_response)
+        db.session.delete(cached)
+        db.session.commit()
+    return None
+
+def save_prediction_cache(cache_key, crop_sw, region, month, ai_response_text):
+    """Save a new prediction to cache."""
+    try:
+        existing = PricePredictionCache.query.filter_by(cache_key=cache_key).first()
+        if existing:
+            existing.ai_response = ai_response_text
+            existing.created_at  = datetime.utcnow()
+        else:
+            entry = PricePredictionCache(
+                cache_key   = cache_key,
+                crop_name   = crop_sw,
+                region      = region,
+                month       = month,
+                ai_response = ai_response_text,
+            )
+            db.session.add(entry)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 TANZANIA_CROPS = {
@@ -572,6 +618,12 @@ def api_price_prediction():
     if not month:
         return jsonify({"error": "Taja mwezi."}), 400
 
+    # ── Cache check ──────────────────────────────────────────────────────────
+    cache_key  = f"{crop_sw}:{region.lower()}:{month.lower()}"
+    cached     = get_cached_prediction(cache_key)
+    if cached:
+        return jsonify({"success": True, "prediction": cached, "cached": True})
+
     prompt = build_prediction_prompt(crop_sw, region, month)
 
     try:
@@ -584,7 +636,6 @@ def api_price_prediction():
         resp.raise_for_status()
         ai_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
 
-        # Strip markdown fences if Gemini wraps in ```json
         if ai_text.startswith("```"):
             ai_text = ai_text.split("```")[1]
             if ai_text.startswith("json"):
@@ -594,7 +645,10 @@ def api_price_prediction():
         import json as json_lib
         prediction = json_lib.loads(ai_text)
 
-        # Log to DB (non-blocking — best effort)
+        # ── Save to cache ────────────────────────────────────────────────────
+        save_prediction_cache(cache_key, crop_sw, region, month, ai_text)
+
+        # ── Log to DB ────────────────────────────────────────────────────────
         try:
             log = PricePredictionLog(
                 crop_name   = crop_sw,
@@ -608,7 +662,7 @@ def api_price_prediction():
         except Exception:
             db.session.rollback()
 
-        return jsonify({"success": True, "prediction": prediction})
+        return jsonify({"success": True, "prediction": prediction, "cached": False})
 
     except requests.exceptions.Timeout:
         return jsonify({"error": "AI imechukua muda mrefu. Jaribu tena."}), 504
