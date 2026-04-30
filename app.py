@@ -563,6 +563,100 @@ TANZANIA_REGIONS = [
     "Simiyu", "Katavi", "Njombe", "Pwani", "Manyara"
 ]
 
+
+def build_static_prediction(crop_sw, region, month):
+    import random
+    crop_info = TANZANIA_CROPS.get(crop_sw, {})
+    crop_en   = crop_info.get("en", crop_sw)
+    unit      = crop_info.get("unit", "kg")
+    BASE = {
+        "mahindi":  {"low": 400,  "high": 900,  "mid": 620},
+        "mpunga":   {"low": 900,  "high": 1800, "mid": 1300},
+        "viazi":    {"low": 500,  "high": 1200, "mid": 800},
+        "muhogo":   {"low": 300,  "high": 700,  "mid": 480},
+        "ndizi":    {"low": 800,  "high": 2000, "mid": 1300},
+        "nyanya":   {"low": 800,  "high": 2500, "mid": 1500},
+        "vitunguu": {"low": 600,  "high": 1800, "mid": 1100},
+        "korosho":  {"low": 2000, "high": 4500, "mid": 3200},
+        "kahawa":   {"low": 3000, "high": 6000, "mid": 4500},
+        "alizeti":  {"low": 1200, "high": 2500, "mid": 1800},
+        "maharage": {"low": 1200, "high": 2800, "mid": 1900},
+        "mtama":    {"low": 400,  "high": 900,  "mid": 600},
+    }
+    SEASON = {
+        "Januari": 1.10, "Februari": 1.05, "Machi": 0.90,
+        "Aprili": 0.85, "Mei": 0.80, "Juni": 0.88,
+        "Julai": 0.95, "Agosti": 1.00, "Septemba": 1.05,
+        "Oktoba": 1.10, "Novemba": 1.15, "Desemba": 1.20,
+    }
+    REGION_MOD = {
+        "Dar es Salaam": 1.25, "Arusha": 1.15, "Kilimanjaro": 1.10,
+        "Mbeya": 0.90, "Iringa": 0.88, "Morogoro": 0.95,
+        "Mwanza": 1.05, "Tanga": 1.00, "Dodoma": 1.00,
+        "Tabora": 0.92, "Kigoma": 1.08, "Ruvuma": 0.90,
+        "Lindi": 0.95, "Mtwara": 1.00, "Kagera": 0.95,
+        "Geita": 0.98, "Shinyanga": 0.93, "Singida": 0.92,
+        "Rukwa": 0.88, "Songwe": 0.90, "Njombe": 0.92,
+        "Simiyu": 0.90, "Katavi": 0.88, "Pwani": 1.05, "Manyara": 1.00,
+    }
+    MARKETS = {
+        "Dar es Salaam": ["Kariakoo", "Tandale"], "Mbeya": ["Uyole", "Kariakoo Mbeya"],
+        "Arusha": ["Arusha Mjini", "Moshi"], "Kilimanjaro": ["Moshi", "Himo"],
+        "Iringa": ["Iringa Mjini", "Mafinga"], "Morogoro": ["Morogoro Mjini", "Dar es Salaam"],
+        "Mwanza": ["Mwanza Mjini", "Nyegezi"], "Dodoma": ["Dodoma Mjini", "Kondoa"],
+        "Tanga": ["Tanga Mjini", "Dar es Salaam"], "Kagera": ["Bukoba", "Mwanza"],
+        "Ruvuma": ["Songea", "Dar es Salaam"], "Mtwara": ["Mtwara Mjini", "Masasi"],
+        "Tabora": ["Tabora Mjini", "Dar es Salaam"], "Kigoma": ["Kigoma Mjini", "Ujiji"],
+        "Lindi": ["Lindi Mjini", "Mtwara"], "Songwe": ["Tunduma", "Mbeya"],
+        "Njombe": ["Njombe Mjini", "Iringa"], "Rukwa": ["Sumbawanga", "Mbeya"],
+        "Pwani": ["Kibaha", "Dar es Salaam"], "Manyara": ["Babati", "Arusha"],
+        "Geita": ["Geita Mjini", "Mwanza"], "Shinyanga": ["Shinyanga Mjini", "Mwanza"],
+        "Singida": ["Singida Mjini", "Dodoma"], "Simiyu": ["Bariadi", "Mwanza"],
+        "Katavi": ["Mpanda", "Tabora"],
+    }
+    FACTORS = {
+        "mahindi":  ["Msimu wa mvua na ukame", "Ugavi kutoka mikoa ya Kusini", "Mahitaji ya viwanda vya unga"],
+        "mpunga":   ["Umwagiliaji wa mashamba", "Uagizaji wa mpunga kutoka nje", "Mahitaji ya miji mikubwa"],
+        "nyanya":   ["Hali ya hewa na mvua", "Umbali wa usafirishaji", "Soko la Kariakoo Dar es Salaam"],
+        "korosho":  ["Bei ya soko la dunia", "Ubora wa usindikaji", "Ununuzi wa BOMA na wafanyabiashara wa nje"],
+        "kahawa":   ["Bei ya soko la dunia (ICO)", "Ubora wa kukaanga na usindikaji", "Mauzo ya nje (export)"],
+        "viazi":    ["Hali ya hewa ya baridi", "Udongo na mbolea", "Mahitaji ya miji na migodi"],
+        "vitunguu": ["Msimu wa mvua", "Uagizaji kutoka India", "Mahitaji ya kila nyumba"],
+        "maharage": ["Msimu wa kilimo na mvua", "Mahitaji ya protini", "Uagizaji kutoka jirani"],
+        "alizeti":  ["Mahitaji ya viwanda vya mafuta", "Bei ya mafuta ya petroli", "Hali ya hewa ya ukame"],
+        "ndizi":    ["Unyevu wa hewa na ardhi", "Umbali wa masoko makubwa", "Uozo wakati wa usafirishaji"],
+        "muhogo":   ["Uvumilivu wa ukame", "Mahitaji ya chakula cha bei nafuu", "Usindikaji wa unga"],
+        "mtama":    ["Msimu wa ukame na mvua", "Mahitaji ya bia za kienyeji", "Hifadhi na usindikaji"],
+    }
+    base  = BASE.get(crop_sw, {"low": 500, "high": 1500, "mid": 1000})
+    s_mod = SEASON.get(month, 1.0)
+    r_mod = REGION_MOD.get(region, 1.0)
+    noise = random.uniform(0.97, 1.03)
+    low  = int(base["low"]  * s_mod * r_mod * noise)
+    high = int(base["high"] * s_mod * r_mod * noise)
+    mid  = int(base["mid"]  * s_mod * r_mod * noise)
+    if s_mod >= 1.10:
+        trend, trend_pct = "rising", round((s_mod - 1) * 100, 1)
+    elif s_mod <= 0.88:
+        trend, trend_pct = "falling", round((1 - s_mod) * 100, 1)
+    else:
+        trend, trend_pct = "stable", round(abs(s_mod - 1) * 100, 1)
+    confidence = "high" if crop_sw in ["mahindi", "mpunga", "nyanya", "korosho"] else "medium"
+    season_note = "mavuno makubwa — bei inashuka" if s_mod < 0.95 else "uhaba wa soko — bei inapanda"
+    season_context = f"Mwezi wa {month} ni wakati wa {season_note} kwa {crop_sw} katika {region}. Hali ya hewa na msimu wa kilimo vinaathiri sana ugavi na bei ya soko."
+    if s_mod >= 1.0:
+        market_advice = f"Hii ni wakati mzuri wa kuuza {crop_sw} — bei ipo juu. Masoko ya {region} na Dar es Salaam yanatoa bei nzuri. Hakikisha ubora wa zao lako ili kupata bei ya juu zaidi."
+    else:
+        market_advice = f"Bei ya {crop_sw} ipo chini kwa sasa kutokana na mavuno mengi. Subiri miezi 1-2 au hifadhi vizuri. Ukiuza sasa, chagua masoko ya miji mikubwa kwa bei nzuri zaidi."
+    return {
+        "crop_sw": crop_sw, "crop_en": crop_en, "region": region, "month": month, "unit": unit,
+        "predicted_price_low": low, "predicted_price_high": high, "predicted_price_mid": mid,
+        "trend": trend, "trend_pct": trend_pct, "confidence": confidence,
+        "season_context": season_context, "market_advice": market_advice,
+        "key_factors": FACTORS.get(crop_sw, ["Hali ya hewa", "Ugavi wa soko", "Mahitaji ya watumiaji"]),
+        "best_markets": MARKETS.get(region, ["Soko Kuu", "Dar es Salaam"])[:2],
+    }
+
 def build_prediction_prompt(crop_sw, region, month):
     crop_info = TANZANIA_CROPS.get(crop_sw.lower(), {})
     crop_en   = crop_info.get("en", crop_sw)
@@ -603,80 +697,24 @@ Use real Tanzanian market knowledge. Prices must be realistic TZS values (e.g. m
 
 @app.route("/api/price-prediction", methods=["POST"])
 def api_price_prediction():
-    if not GEMINI_API_KEY:
-        return jsonify({"error": "Huduma ya AI haipo. Wasiliana na msimamizi."}), 503
-
     data    = request.get_json() or {}
     crop_sw = data.get("crop", "").strip().lower()
     region  = data.get("region", "").strip()
     month   = data.get("month", "").strip()
-
     if not crop_sw or crop_sw not in TANZANIA_CROPS:
         return jsonify({"error": "Zao halijulikani. Chagua zao kutoka kwenye orodha."}), 400
     if not region:
         return jsonify({"error": "Taja mkoa wako."}), 400
     if not month:
         return jsonify({"error": "Taja mwezi."}), 400
-
-    # ── Cache check ──────────────────────────────────────────────────────────
-    cache_key  = f"{crop_sw}:{region.lower()}:{month.lower()}"
-    cached     = get_cached_prediction(cache_key)
+    cache_key = f"{crop_sw}:{region.lower()}:{month.lower()}"
+    cached    = get_cached_prediction(cache_key)
     if cached:
         return jsonify({"success": True, "prediction": cached, "cached": True})
-
-    prompt = build_prediction_prompt(crop_sw, region, month)
-
-    try:
-        resp = requests.post(
-            f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_API_KEY}",
-            headers={"content-type": "application/json"},
-            json={"contents": [{"parts": [{"text": prompt}]}]},
-            timeout=20,
-        )
-        resp.raise_for_status()
-        ai_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
-
-        if ai_text.startswith("```"):
-            ai_text = ai_text.split("```")[1]
-            if ai_text.startswith("json"):
-                ai_text = ai_text[4:]
-            ai_text = ai_text.strip()
-
-        import json as json_lib
-        prediction = json_lib.loads(ai_text)
-
-        # ── Save to cache ────────────────────────────────────────────────────
-        save_prediction_cache(cache_key, crop_sw, region, month, ai_text)
-
-        # ── Log to DB ────────────────────────────────────────────────────────
-        try:
-            log = PricePredictionLog(
-                crop_name   = crop_sw,
-                region      = region,
-                month       = month,
-                user_id     = current_user.id if current_user.is_authenticated else None,
-                ai_response = ai_text,
-            )
-            db.session.add(log)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-
-        return jsonify({"success": True, "prediction": prediction, "cached": False})
-
-    except requests.exceptions.Timeout:
-        return jsonify({"error": "AI imechukua muda mrefu. Jaribu tena."}), 504
-    except requests.exceptions.HTTPError as exc:
-        status = exc.response.status_code if exc.response is not None else 0
-        if status == 429:
-            return jsonify({"error": "Huduma ya AI imefika kikomo. Jaribu tena baada ya dakika chache."}), 429
-        if status == 400:
-            return jsonify({"error": "Ombi lisilo sahihi kwa AI. Jaribu tena."}), 400
-        return jsonify({"error": "Huduma ya AI haipatikani kwa sasa."}), 502
-    except requests.exceptions.RequestException:
-        return jsonify({"error": "Tatizo la mtandao. Angalia muunganiko wako."}), 502
-    except Exception:
-        return jsonify({"error": "AI ilirudisha jibu lisilo sahihi. Jaribu tena."}), 500
+    prediction = build_static_prediction(crop_sw, region, month)
+    import json as json_lib
+    save_prediction_cache(cache_key, crop_sw, region, month, json_lib.dumps(prediction))
+    return jsonify({"success": True, "prediction": prediction, "cached": False})
 
 
 @app.route("/api/price-prediction/crops", methods=["GET"])
