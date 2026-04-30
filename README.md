@@ -65,7 +65,7 @@ Built mobile-first, designed specifically for smartphone users in Tanzania's far
 ---
 
 ## Project Structure
-
+<div>
 agrolink/
 ├── app.py                  # Main Flask app — models, routes, services
 ├── requirements.txt        # Python dependencies
@@ -81,7 +81,7 @@ agrolink/
 │   ├── market/             # Listings marketplace, price intelligence
 │   └── admin/              # Admin panel
 └── migrations/             # Alembic migration files
-
+</div>
 ---
 
 ## Getting Started
