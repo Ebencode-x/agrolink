@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.396.0/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
   <style>
     :root{
       --emerald-deep:#064e3b;--emerald-mid:#065f46;--emerald-bright:#10b981;
@@ -370,7 +370,10 @@
     // Auto-dismiss flash
     setTimeout(()=>{document.querySelectorAll('.flash').forEach(f=>{f.style.opacity='0';setTimeout(()=>f.remove(),400)})},5000);
   </script>
+  <script>
+    function initIcons(){if(window.lucide){lucide.createIcons();}else{setTimeout(initIcons,50);}}
+    document.addEventListener("DOMContentLoaded", initIcons);
+  </script>
   {% block extra_scripts %}{% endblock %}
-  <script>document.addEventListener("DOMContentLoaded",function(){lucide.createIcons()});</script>
 </body>
 </html>
