@@ -176,19 +176,18 @@
     <p class="section-subtitle">Kutoka bei za soko hadi hali ya hewa — AgroLink inakupa nguvu ya kufanya maamuzi sahihi.</p>
   </div>
   <div class="features-grid">
-    {% for emoji,color,title,desc,tag in [
-      ('📈','','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania — Kariakoo, Arusha, Mbeya na zaidi.','Bei • Live'),
-      ('🌤️','amber','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo — zinazosaidia kupanga kilimo chako.','Hewa • API'),
-      ('🤝','sky','Mtandao wa Wakulima','Unganika na wakulima wengine, mawakala wa kilimo, na wanunuzi kutoka kila pembe ya Tanzania.','Mtandao'),
-      ('🔒','','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco — data yako inalindwa na usimbaji wa hali ya juu.','Cisco • SSL'),
-      ('🌱','amber','Mashauri ya Kilimo','Pata vidokezo vya kitaalamu kuhusu msimu wa kupanda, mbolea, na udhibiti wa wadudu.','Kilimo'),
-      ('📱','sky','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.','Mobile')
+    {% for icon,color,title,desc,tag in [
+      ('trending-up','','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania — Kariakoo, Arusha, Mbeya na zaidi.','Bei • Live'),
+      ('cloud-sun','amber','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo — zinazosaidia kupanga kilimo chako.','Hewa • API'),
+      ('users','sky','Mtandao wa Wakulima','Unganika na wakulima wengine, mawakala wa kilimo, na wanunuzi kutoka kila pembe ya Tanzania.','Mtandao'),
+      ('shield-check','','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco — data yako inalindwa na usimbaji wa hali ya juu.','Cisco • SSL'),
+      ('sprout','amber','Mashauri ya Kilimo','Pata vidokezo vya kitaalamu kuhusu msimu wa kupanda, mbolea, na udhibiti wa wadudu.','Kilimo'),
+      ('smartphone','sky','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.','Mobile')
     ] %}
     <div class="feature-card glass reveal" style="position:relative;overflow:hidden">
       <div style="position:absolute;top:1rem;right:1rem;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:50px;border:1px solid var(--glass-border)">{{ tag }}</div>
-      <div class="feature-icon {{ color }}" style="font-size:1.5rem;background:none;border:none;width:56px;height:56px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;position:relative">
-        <div style="position:absolute;inset:0;border-radius:14px;{% if color == 'amber' %}background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.03));border:1px solid rgba(245,158,11,0.2){% elif color == 'sky' %}background:linear-gradient(135deg,rgba(14,165,233,0.15),rgba(14,165,233,0.03));border:1px solid rgba(14,165,233,0.2){% else %}background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.03));border:1px solid rgba(16,185,129,0.2){% endif %}"></div>
-        <span style="position:relative;z-index:1;line-height:1">{{ emoji }}</span>
+      <div class="feature-icon {{ color }}" style="width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem">
+        <i data-lucide="{{ icon }}" style="width:26px;height:26px"></i>
       </div>
       <div class="feature-title">{{ title }}</div>
       <p class="feature-desc">{{ desc }}</p>

@@ -138,9 +138,9 @@
           {% if l.image_url %}
           <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" class="listing-img" loading="lazy"/>
           {% else %}
-          <div class="listing-img-placeholder" style="flex-direction:column;gap:0.5rem;background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(6,78,59,0.4))">
-            <span style="font-size:3rem;line-height:1" id="crop-emoji-{{ l.id }}">🌾</span>
-            <span style="font-size:0.72rem;color:var(--text-muted);font-weight:600">{{ l.crop_name }}</span>
+          <div class="listing-img-placeholder" style="flex-direction:column;gap:0.75rem;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(6,78,59,0.35))">
+            <i data-lucide="sprout" style="width:40px;height:40px;opacity:0.35;color:var(--emerald-bright)"></i>
+            <span style="font-size:0.72rem;color:var(--text-muted);font-weight:600;letter-spacing:0.05em;text-transform:uppercase">{{ l.crop_name }}</span>
           </div>
           {% endif %}
         </div>
@@ -253,30 +253,8 @@
 </div>
 
 <script>
-// Crop emoji map
-const CROP_EMOJI = {
-  'mahindi':'🌽','mpunga':'🍚','viazi':'🥔','nyanya':'🍅',
-  'vitunguu':'🧅','korosho':'🥜','kahawa':'☕','ndizi':'🍌',
-  'maharage':'🫘','alizeti':'🌻','muhogo':'🍠','mtama':'🌾',
-  'sukari':'🍬','pamba':'🪡','chai':'🍵','parachichi':'🥑',
-  'mango':'🥭','nanasi':'🍍','papai':'🍈','tunda':'🍑'
-};
-function setCropEmojis(){
-  document.querySelectorAll('.listing-card').forEach(card=>{
-    const crop = (card.dataset.crop||'').toLowerCase();
-    const id = card.id.replace('listing-card-','');
-    const el = document.getElementById('crop-emoji-'+id);
-    if(!el) return;
-    let emoji = '🌾';
-    for(const [key,val] of Object.entries(CROP_EMOJI)){
-      if(crop.includes(key)){emoji=val;break;}
-    }
-    el.textContent = emoji;
-  });
-}
 // Load ratings for all listings
 document.addEventListener('DOMContentLoaded', function(){
-  setCropEmojis();
   document.querySelectorAll('.listing-card').forEach(card => {
     const id = card.id.replace('listing-card-','');
     loadRating(id);
