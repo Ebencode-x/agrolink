@@ -494,10 +494,21 @@ def forgot_password():
         if new_password != confirm:
             return jsonify({"error": "Nywila mpya hazifanani."}), 400
 
+        full_name = sanitize(data.get("full_name", ""), max_length=120).strip().lower()
+        if not full_name:
+            return jsonify({"error": "Jina kamili linahitajika kuthibitisha akaunti."}), 400
+
         user = User.query.filter_by(phone=phone).first()
-        # SECURITY FIX: Generic message — usithibitishe kama namba ipo au la
+
+        # SECURITY: Generic message + constant-time check — prevent user enumeration
+        generic_ok = jsonify({"message": "Kama taarifa ni sahihi, nywila imebadilishwa."}), 200
+
         if not user:
-            return jsonify({"message": "Kama namba ipo kwenye mfumo, nywila imebadilishwa."}), 200
+            return generic_ok
+
+        # Verify full name matches — second factor without OTP
+        if user.full_name.strip().lower() != full_name:
+            return generic_ok
 
         if not user.is_active:
             return jsonify({"error": "Akaunti imesimamishwa. Wasiliana na msimamizi."}), 403
