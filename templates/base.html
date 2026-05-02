@@ -32,9 +32,13 @@
     .bg-canvas{
       position:fixed;inset:0;z-index:-1;
       background:
-        radial-gradient(ellipse 80% 60% at 20% 10%,rgba(16,185,129,0.25) 0%,transparent 60%),
-        radial-gradient(ellipse 60% 70% at 80% 80%,rgba(6,78,59,0.8) 0%,transparent 60%),
-        linear-gradient(160deg,#022c22 0%,#064e3b 40%,#065f46 70%,#022c22 100%)
+        radial-gradient(ellipse 80% 60% at 20% 10%,rgba(16,185,129,0.18) 0%,transparent 60%),
+        radial-gradient(ellipse 60% 70% at 80% 80%,rgba(6,78,59,0.7) 0%,transparent 60%),
+        linear-gradient(160deg,rgba(2,20,12,0.88) 0%,rgba(6,78,59,0.82) 40%,rgba(6,95,70,0.85) 70%,rgba(2,20,12,0.90) 100%),
+        url('https://picsum.photos/seed/agrolink-tz/1920/1080');
+      background-size:cover;
+      background-position:center;
+      background-attachment:fixed;
     }
     .bg-canvas::before{
       content:'';position:absolute;inset:0;

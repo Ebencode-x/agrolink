@@ -4,12 +4,7 @@
 {% block extra_head %}
 <style>
   .listings-hero{padding:4rem clamp(1rem,5vw,4rem) 2rem;max-width:1400px;margin:0 auto}
-  .listings-page-bg{position:fixed;inset:0;z-index:-2;
-    background-image:url('https://picsum.photos/seed/market-tz/1920/1080');
-    background-size:cover;background-position:center;
-    filter:brightness(0.15) saturate(0.6)}
-  .listings-page-overlay{position:fixed;inset:0;z-index:-1;
-    background:linear-gradient(160deg,rgba(2,20,12,0.95) 0%,rgba(6,78,59,0.82) 50%,rgba(2,20,12,0.95) 100%)}
+
   .listings-filters{display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.5rem}
   .filter-btn{display:inline-flex;align-items:center;gap:6px;padding:0.5rem 1.1rem;border-radius:50px;font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-secondary);transition:all var(--transition)}
   .filter-btn:hover,.filter-btn.active{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.4);color:var(--emerald-glow)}
@@ -86,9 +81,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="listings-page-bg"></div>
-<div class="listings-page-overlay"></div>
-
 <!-- HERO -->
 <div class="listings-hero">
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1.5rem">

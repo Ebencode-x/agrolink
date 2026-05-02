@@ -66,29 +66,6 @@
   .social-link:hover{transform:translateY(-2px);filter:brightness(1.15)}
   @media(max-width:900px){.hero{grid-template-columns:1fr;min-height:auto;padding-top:3rem}.hero-visual{order:-1}}
 </style>
-  <style>
-    /* Subtle full-page farm texture overlay */
-    .page-wrapper{
-      background-image:
-        url('https://picsum.photos/seed/agro-bg/1920/1080');
-      background-size:cover;
-      background-position:center top;
-      background-attachment:fixed;
-    }
-    .page-wrapper::before{
-      content:'';
-      position:fixed;
-      inset:0;
-      background:linear-gradient(160deg,
-        rgba(2,20,12,0.92) 0%,
-        rgba(6,78,59,0.80) 40%,
-        rgba(2,20,12,0.92) 100%
-      );
-      z-index:0;
-      pointer-events:none;
-    }
-    .hero,.features-grid,section{position:relative;z-index:1}
-  </style>
 {% endblock %}
 
 {% block content %}
