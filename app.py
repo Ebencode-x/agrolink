@@ -1524,3 +1524,8 @@ if __name__ == "__main__":
         port=port,
         debug=os.environ.get("FLASK_DEBUG", "false").lower() == "true",
     )
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is missing (Render/Supabase not configured)")
+
