@@ -1,4 +1,3 @@
-from app.extensions import db
 import os
 import requests
 from datetime import datetime, timedelta
