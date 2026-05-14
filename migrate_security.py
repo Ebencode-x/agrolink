@@ -3,17 +3,17 @@ migrate_security.py — Ongeza columns mpya za security kwenye DB iliyopo
 Run mara moja tu: python migrate_security.py
 """
 
-import os
 from dotenv import load_dotenv
+from sqlalchemy import text
+from app import app, db
+
 load_dotenv()
 
-from app import app, db
-from sqlalchemy import text
 
 def run_migration():
     with app.app_context():
         conn = db.engine.connect()
-        
+
         migrations = [
             # Ongeza accepted_terms column kwenye users
             """
@@ -22,7 +22,6 @@ def run_migration():
             EXCEPTION WHEN duplicate_column THEN NULL;
             END $$;
             """,
-            
             # Ongeza terms_accepted_at column kwenye users
             """
             DO $$ BEGIN
@@ -30,7 +29,6 @@ def run_migration():
             EXCEPTION WHEN duplicate_column THEN NULL;
             END $$;
             """,
-            
             # Unda banned_emails table kama haipo
             """
             CREATE TABLE IF NOT EXISTS banned_emails (
@@ -42,27 +40,27 @@ def run_migration():
                 banned_by INTEGER REFERENCES users(id)
             );
             """,
-            
             # Index kwa speed
             """
             CREATE INDEX IF NOT EXISTS idx_banned_email ON banned_emails(email);
             CREATE INDEX IF NOT EXISTS idx_banned_phone ON banned_emails(phone);
             """,
         ]
-        
+
         for sql in migrations:
             try:
                 conn.execute(text(sql))
                 conn.commit()
-                print(f"✓ Migration OK")
+                print("✓ Migration OK")
             except Exception as e:
                 print(f"✗ Migration error: {e}")
                 conn.rollback()
-        
+
         conn.close()
         print("\n✓ Migrations zote zimekamilika!")
         print("  Columns mpya: users.accepted_terms, users.terms_accepted_at")
         print("  Table mpya:   banned_emails")
+
 
 if __name__ == "__main__":
     run_migration()
