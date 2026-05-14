@@ -1,4 +1,4 @@
-from app.extensions import db
+from app_pkg.extensions import db
 import os
 import requests
 from datetime import datetime, timedelta
