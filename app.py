@@ -31,6 +31,10 @@ from security import (
     apply_security_headers,
 )
 
+import base64
+import json as json_lib
+import re
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -49,6 +53,25 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle"
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+WFP_API_URL = "https://api.vam.wfp.org/api/1/vam-data-bridges/1.0.0"
+WFP_COMMODITY_MAP = {
+    "mahindi":  {"id": 1,   "name": "Maize"},
+    "mpunga":   {"id": 82,  "name": "Rice"},
+    "maharage": {"id": 36,  "name": "Beans"},
+    "viazi":    {"id": 117, "name": "Potatoes"},
+    "vitunguu": {"id": 63,  "name": "Onions"},
+    "nyanya":   {"id": 63,  "name": "Tomatoes"},
+    "alizeti":  {"id": 56,  "name": "Oil (sunflower)"},
+    "muhogo":   {"id": 55,  "name": "Cassava"},
+    "ndizi":    {"id": 15,  "name": "Bananas"},
+    "korosho":  {"id": 165, "name": "Cashewnuts"},
+    "kahawa":   {"id": 33,  "name": "Coffee"},
+    "mtama":    {"id": 83,  "name": "Sorghum"},
+}
+WFP_COUNTRY_ID = 214
+
 supabase_client = (
     create_client(SUPABASE_URL, SUPABASE_ANON_KEY) if SUPABASE_URL else None
 )
@@ -879,6 +902,79 @@ def api_crops():
     )
 
 
+
+@app.route("/ai-daktari")
+def ai_daktari():
+    return render_template("market/ai_daktari.html")
+
+
+@app.route("/api/analyze-crop", methods=["POST"])
+@limiter.limit("15 per hour")
+def analyze_crop():
+    if "image" not in request.files:
+        return jsonify({"error": "Pakia picha ya zao kwanza."}), 400
+    file = request.files["image"]
+    if file.filename == "":
+        return jsonify({"error": "Hakuna picha iliyochaguliwa."}), 400
+    allowed = {"jpg", "jpeg", "png", "webp"}
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in allowed:
+        return jsonify({"error": "Picha lazima iwe JPG, PNG, au WEBP."}), 400
+    file_bytes = file.read()
+    if len(file_bytes) > 5 * 1024 * 1024:
+        return jsonify({"error": "Picha ni kubwa mno. Kikomo ni 5MB."}), 400
+    context = sanitize(request.form.get("context", ""), max_length=500)
+    if not GEMINI_API_KEY:
+        return jsonify({"error": "Huduma ya AI haipatikani sasa hivi."}), 503
+    img_b64 = base64.b64encode(file_bytes).decode("utf-8")
+    mime_type = f"image/{ext if ext != 'jpg' else 'jpeg'}"
+    context_line = f"\nMaelezo ya mkulima: {context}" if context else ""
+    prompt = f"""Wewe ni mtaalamu wa kilimo wa Tanzania. Chunguza picha hii ya zao na utoe uchambuzi kamili kwa JSON tu.{context_line}
+
+Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
+{{
+  "crop_detected": "jina la zao lililoonekana (Kiswahili)",
+  "severity": "healthy|mild|moderate|severe",
+  "diagnosis": "maelezo ya tatizo au hali ya zao kwa Kiswahili (sentensi 2-3)",
+  "symptoms": ["dalili 1", "dalili 2", "dalili 3"],
+  "treatment": ["hatua ya 1", "hatua ya 2", "hatua ya 3", "hatua ya 4"],
+  "available_meds_tz": ["dawa 1 inayopatikana TZ", "dawa 2", "dawa 3"],
+  "prevention": "jinsi ya kuzuia tatizo hili (Kiswahili)",
+  "season_advice": "ushauri kulingana na msimu wa kilimo Tanzania (Kiswahili)",
+  "confidence_pct": 85
+}}"""
+    try:
+        payload = {
+            "contents": [{"parts": [
+                {"text": prompt},
+                {"inline_data": {"mime_type": mime_type, "data": img_b64}}
+            ]}],
+            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 1024},
+        }
+        resp = requests.post(
+            f"{GEMINI_VISION_URL}?key={GEMINI_API_KEY}",
+            json=payload, timeout=30,
+        )
+        resp.raise_for_status()
+        gemini_data = resp.json()
+        raw_text = (
+            gemini_data.get("candidates", [{}])[0]
+            .get("content", {}).get("parts", [{}])[0].get("text", "")
+        )
+        raw_text = re.sub(r"```json|```", "", raw_text).strip()
+        analysis = json_lib.loads(raw_text)
+        for field in ["crop_detected","severity","diagnosis","prevention","season_advice"]:
+            if field in analysis:
+                analysis[field] = str(analysis[field])[:600]
+        return jsonify({"success": True, "analysis": analysis})
+    except json_lib.JSONDecodeError:
+        return jsonify({"error": "AI ilirudi na jibu lisilo sahihi. Jaribu tena."}), 500
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "Muda wa kusubiri umepita. Jaribu tena."}), 504
+    except Exception as exc:
+        print(f"Gemini error: {exc}")
+        return jsonify({"error": "Hitilafu ya AI. Jaribu tena baadaye."}), 500
+
 @app.route("/api/prices")
 def api_prices():
     prices = MarketPrice.query.order_by(MarketPrice.recorded_at.desc()).limit(50).all()
@@ -1073,6 +1169,76 @@ def save_prediction_cache(cache_key, crop_sw, region, month, ai_response_text):
     except Exception:
         db.session.rollback()
 
+
+
+def fetch_wfp_price(crop_sw, region):
+    commodity = WFP_COMMODITY_MAP.get(crop_sw)
+    if not commodity:
+        return None
+    try:
+        params = {"CountryCode": "TZ", "CommodityID": commodity["id"], "page": 1, "format": "json"}
+        resp = requests.get(
+            f"{WFP_API_URL}/MarketPrices/PriceWeekly",
+            params=params, timeout=10,
+            headers={"Accept": "application/json"},
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        items = data.get("items", [])
+        if not items:
+            return None
+        region_lower = region.lower()
+        regional = [i for i in items if region_lower in (i.get("admName","") or "").lower() or region_lower in (i.get("mktName","") or "").lower()]
+        pool = regional if regional else items
+        pool.sort(key=lambda x: x.get("date",""), reverse=True)
+        latest = pool[0]
+        price_usd = float(latest.get("price", 0) or 0)
+        if price_usd <= 0:
+            return None
+        usd_per_kg = price_usd / 100
+        tzs_per_kg = usd_per_kg * 2600
+        return {
+            "price_tzs_kg": round(tzs_per_kg),
+            "market": latest.get("mktName", region),
+            "date": (latest.get("date","") or "")[:10],
+            "source": "WFP VAM",
+        }
+    except Exception as exc:
+        print(f"WFP API error: {exc}")
+        return None
+
+
+def build_dynamic_prediction(crop_sw, region, month):
+    wfp = fetch_wfp_price(crop_sw, region)
+    static = build_static_prediction(crop_sw, region, month)
+    if wfp and wfp.get("price_tzs_kg", 0) > 0:
+        real_price = wfp["price_tzs_kg"]
+        low  = int(real_price * 0.85)
+        high = int(real_price * 1.15)
+        mid  = int(real_price)
+        static_mid = static["predicted_price_mid"]
+        if mid > static_mid * 1.08:
+            trend, trend_pct = "rising", round(((mid/static_mid)-1)*100,1)
+        elif mid < static_mid * 0.92:
+            trend, trend_pct = "falling", round((1-(mid/static_mid))*100,1)
+        else:
+            trend, trend_pct = "stable", round(abs((mid/static_mid)-1)*100,1)
+        static.update({
+            "predicted_price_low": low,
+            "predicted_price_high": high,
+            "predicted_price_mid": mid,
+            "trend": trend,
+            "trend_pct": trend_pct,
+            "confidence": "high",
+            "data_source": f"WFP VAM — Bei halisi ({wfp['date']})",
+        })
+        static["market_advice"] = (
+            f"Bei halisi ya {crop_sw} kutoka soko la {wfp['market']} ni TZS {mid:,}/kg "
+            f"(tarehe {wfp['date']}, chanzo: WFP VAM). " + static["market_advice"]
+        )
+    else:
+        static["data_source"] = "Mfano wa AI (WFP data haikupatikana)"
+    return static
 
 def build_static_prediction(crop_sw, region, month):
     import random
@@ -1304,7 +1470,7 @@ def api_price_prediction():
     if cached:
         return jsonify({"success": True, "prediction": cached, "cached": True})
 
-    prediction = build_static_prediction(crop_sw, region, month)
+    prediction = build_dynamic_prediction(crop_sw, region, month)
     import json as json_lib
 
     save_prediction_cache(cache_key, crop_sw, region, month, json_lib.dumps(prediction))

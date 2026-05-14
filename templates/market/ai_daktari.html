@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+{% block title %}Daktari wa Zao — AgroLink Tanzania{% endblock %}
+
+{% block extra_head %}
+<style>
+  .ai-page{max-width:1100px;margin:0 auto;padding:2.5rem clamp(1rem,4vw,3rem) 5rem}
+  .ai-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.3rem 0.9rem;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:1rem}
+  .ai-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;margin-bottom:0.6rem}
+  .ai-title .accent{background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .ai-subtitle{font-size:0.95rem;color:var(--text-secondary);max-width:580px;line-height:1.7;margin-bottom:2.5rem}
+  .ai-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:1.75rem;align-items:start}
+  .upload-panel{padding:2rem;border-radius:var(--radius-lg)}
+  .upload-zone{border:2px dashed rgba(16,185,129,0.35);border-radius:16px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all 0.25s ease;background:rgba(16,185,129,0.04);position:relative;overflow:hidden}
+  .upload-zone:hover,.upload-zone.drag-over{border-color:var(--emerald-bright);background:rgba(16,185,129,0.09)}
+  .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+  .upload-icon{width:56px;height:56px;border-radius:16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--emerald-bright)}
+  .upload-text{font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:0.3rem}
+  .upload-hint{font-size:0.78rem;color:var(--text-muted)}
+  .preview-wrap{margin-top:1.25rem;display:none;border-radius:12px;overflow:hidden;border:1px solid var(--glass-border)}
+  .preview-wrap img{width:100%;max-height:260px;object-fit:cover;display:block}
+  .preview-label{padding:0.6rem 0.75rem;background:rgba(0,0,0,0.3);font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+  .crop-hint-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1.25rem 0 1rem}
+  .crop-hint{padding:0.3rem 0.75rem;border-radius:50px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.04);font-size:0.75rem;color:var(--text-secondary);cursor:pointer;transition:all 0.2s}
+  .crop-hint:hover{border-color:var(--emerald-bright);color:var(--emerald-glow)}
+  .context-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:12px;padding:0.7rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.875rem;resize:vertical;min-height:80px;outline:none;transition:border-color 0.2s;margin-bottom:1.1rem}
+  .context-input:focus{border-color:var(--emerald-bright);background:rgba(255,255,255,0.09)}
+  .context-input::placeholder{color:var(--text-muted)}
+  .ai-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;border:none;border-radius:12px;padding:0.9rem 1.5rem;font-family:var(--font-display);font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.25s ease}
+  .ai-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,0.45)}
+  .ai-submit:disabled{opacity:0.55;cursor:not-allowed;transform:none;box-shadow:none}
+  .spin{animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .result-panel{border-radius:var(--radius-lg);min-height:400px;display:flex;flex-direction:column}
+  .state-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1.5rem;text-align:center;gap:1rem;color:var(--text-muted)}
+  .state-empty-icon{width:64px;height:64px;border-radius:20px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;color:rgba(16,185,129,0.35)}
+  .state-loading{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;padding:3rem;text-align:center}
+  .loading-ring{width:48px;height:48px;border:3px solid rgba(16,185,129,0.15);border-top-color:var(--emerald-bright);border-radius:50%;animation:spin 0.9s linear infinite}
+  .loading-steps{display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem}
+  .loading-step{font-size:0.8rem;color:var(--text-muted);display:flex;align-items:center;gap:7px}
+  .loading-step.active{color:var(--emerald-glow)}
+  .ai-result{display:none;padding:1.75rem;flex-direction:column;gap:1.1rem}
+  .result-header{display:flex;align-items:center;gap:10px;margin-bottom:0.25rem}
+  .result-badge{display:inline-flex;align-items:center;gap:5px;padding:0.25rem 0.75rem;border-radius:50px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+  .badge-danger{background:rgba(244,63,94,0.15);border:1px solid rgba(244,63,94,0.3);color:#fda4af}
+  .badge-warning{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--amber-light)}
+  .badge-healthy{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow)}
+  .result-crop-name{font-family:var(--font-display);font-weight:800;font-size:1.15rem}
+  .r-card{background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:12px;padding:1.1rem 1.2rem}
+  .r-card-title{display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.65rem}
+  .r-card-title svg{color:var(--emerald-bright)}
+  .r-card-body{font-size:0.875rem;color:var(--text-secondary);line-height:1.7}
+  .dawa-list{display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem}
+  .dawa-item{display:flex;align-items:flex-start;gap:8px;font-size:0.85rem;color:var(--text-secondary);line-height:1.5}
+  .dawa-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald-bright);flex-shrink:0;margin-top:6px}
+  .tag-list{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem}
+  .tag{padding:0.25rem 0.65rem;border-radius:50px;font-size:0.73rem;font-weight:600}
+  .tag-blue{background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.2);color:var(--sky-pale)}
+  .tag-amber{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--amber-light)}
+  .conf-wrap{height:5px;background:rgba(255,255,255,0.08);border-radius:5px;overflow:hidden;margin-top:0.5rem}
+  .conf-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--emerald-bright),var(--emerald-glow));transition:width 0.6s ease}
+  .ai-error{display:none;margin:1.5rem;padding:1.25rem;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:12px;color:#fda4af;font-size:0.875rem;align-items:center;gap:8px}
+  .ai-disclaimer{margin-top:1.25rem;padding:0.9rem 1rem;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:12px;display:flex;gap:8px;align-items:flex-start}
+  .ai-disclaimer p{font-size:0.77rem;color:var(--text-muted);line-height:1.6}
+  @media(max-width:768px){.ai-grid{grid-template-columns:1fr}.result-panel{min-height:auto}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ai-page">
+  <div class="reveal" style="margin-bottom:0">
+    <div class="ai-eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Teknolojia ya AI — Bure Kabisa
+    </div>
+    <h1 class="ai-title">Daktari wa Zao<br/><span class="accent">Piga Picha, Pata Ushauri</span></h1>
+    <p class="ai-subtitle">Piga picha ya zao lako — AI yetu itachambua magonjwa, wadudu, au upungufu wa lishe na kutoa dawa na matibabu ya kitaalamu kwa sekunde chache.</p>
+  </div>
+
+  <div class="ai-grid">
+    <div class="glass upload-panel reveal">
+      <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        Pakia Picha ya Zao
+      </div>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" onchange="handleFile(event)"/>
+        <div class="upload-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        </div>
+        <div class="upload-text">Bonyeza au buruta picha hapa</div>
+        <div class="upload-hint">JPG, PNG, WEBP — hadi 5MB</div>
+      </div>
+      <div class="preview-wrap" id="preview-wrap">
+        <img id="preview-img" src="" alt="Picha ya zao"/>
+        <div class="preview-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="preview-name"></span>
+        </div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin:1.1rem 0 0.4rem">Au andika zao lako (si lazima):</div>
+      <div class="crop-hint-row">
+        <span class="crop-hint" onclick="setHint('Mahindi')">Mahindi</span>
+        <span class="crop-hint" onclick="setHint('Mpunga')">Mpunga</span>
+        <span class="crop-hint" onclick="setHint('Nyanya')">Nyanya</span>
+        <span class="crop-hint" onclick="setHint('Viazi')">Viazi</span>
+        <span class="crop-hint" onclick="setHint('Ndizi')">Ndizi</span>
+        <span class="crop-hint" onclick="setHint('Maharage')">Maharage</span>
+      </div>
+      <textarea class="context-input" id="context-input" placeholder="Mfano: Mahindi yangu — majani yanageuka njano, kuna madoa meusi. Mkoa wa Mbeya..."></textarea>
+      <button class="ai-submit" id="ai-submit-btn" onclick="analyzeImage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Chunguza Zao Langu
+      </button>
+      <div class="ai-disclaimer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amber-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>Matokeo ni ushauri wa awali wa AI. Kwa tatizo kubwa, wasiliana na mtaalamu wa kilimo au ugani wa serikali.</p>
+      </div>
+    </div>
+
+    <div class="glass result-panel">
+      <div class="state-empty" id="state-empty">
+        <div class="state-empty-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem">Daktari wa Zao</div>
+        <p style="font-size:0.85rem;max-width:230px;line-height:1.65">Pakia picha ya zao lako — AI itachambua na kutoa ushauri wa kitaalamu.</p>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:240px;margin-top:0.5rem">
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Utambuzi wa magonjwa</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dawa na matibabu</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Kinga na uzuiaji</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Ushauri wa msimu</div>
+        </div>
+      </div>
+      <div class="state-loading" id="state-loading">
+        <div class="loading-ring"></div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:0.95rem">AI inachambua picha...</div>
+        <div class="loading-steps">
+          <div class="loading-step active" id="step-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Inapakia picha...</div>
+          <div class="loading-step" id="step-2"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Inachambua magonjwa...</div>
+          <div class="loading-step" id="step-3"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Inatoa ushauri wa dawa...</div>
+        </div>
+      </div>
+      <div class="ai-error" id="state-error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        <span id="error-msg"></span>
+      </div>
+      <div class="ai-result" id="ai-result">
+        <div class="result-header">
+          <span class="result-badge" id="r-severity-badge"></span>
+          <span class="result-crop-name" id="r-crop-detected"></span>
+        </div>
+        <div class="r-card" style="border-color:rgba(244,63,94,0.2)">
+          <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Utambuzi — Tatizo Lililoonekana</div>
+          <div class="r-card-body" id="r-diagnosis"></div>
+          <div class="tag-list" id="r-symptoms"></div>
+        </div>
+        <div class="r-card" style="border-color:rgba(16,185,129,0.2)">
+          <div class="r-card-title" style="color:var(--emerald-glow)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Dawa na Matibabu</div>
+          <div class="dawa-list" id="r-treatment"></div>
+        </div>
+        <div class="r-card">
+          <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Kinga na Uzuiaji</div>
+          <div class="r-card-body" id="r-prevention"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+          <div class="r-card">
+            <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>Ushauri wa Msimu</div>
+            <div class="r-card-body" id="r-season-advice"></div>
+          </div>
+          <div class="r-card">
+            <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Uhakika wa Uchambuzi</div>
+            <div style="font-size:0.82rem;color:var(--text-secondary);margin-bottom:0.5rem" id="r-confidence-label"></div>
+            <div class="conf-wrap"><div class="conf-fill" id="r-confidence-bar"></div></div>
+          </div>
+        </div>
+        <div class="r-card">
+          <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Dawa Zinazopatikana Tanzania</div>
+          <div class="tag-list" id="r-available-meds"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let selectedFile = null;
+function handleFile(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  if(file.size>5*1024*1024){showError('Picha ni kubwa mno. Kikomo ni 5MB.');return;}
+  selectedFile=file;
+  document.getElementById('preview-img').src=URL.createObjectURL(file);
+  document.getElementById('preview-name').textContent=file.name;
+  document.getElementById('preview-wrap').style.display='block';
+}
+const zone=document.getElementById('upload-zone');
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+zone.addEventListener('drop',e=>{
+  e.preventDefault();zone.classList.remove('drag-over');
+  const file=e.dataTransfer.files[0];
+  if(file&&file.type.startsWith('image/')){
+    selectedFile=file;
+    document.getElementById('preview-img').src=URL.createObjectURL(file);
+    document.getElementById('preview-name').textContent=file.name;
+    document.getElementById('preview-wrap').style.display='block';
+  }
+});
+function setHint(crop){
+  const t=document.getElementById('context-input');
+  if(!t.value.startsWith(crop))t.value=crop+(t.value?' — '+t.value:'');
+}
+function showState(name){
+  document.getElementById('state-empty').style.display=name==='empty'?'flex':'none';
+  document.getElementById('state-loading').style.display=name==='loading'?'flex':'none';
+  document.getElementById('state-error').style.display=name==='error'?'flex':'none';
+  document.getElementById('ai-result').style.display=name==='result'?'flex':'none';
+}
+function showError(msg){document.getElementById('error-msg').textContent=msg;showState('error');}
+function animateSteps(){
+  let i=1;
+  const iv=setInterval(()=>{
+    if(i>3){clearInterval(iv);return;}
+    document.getElementById('step-'+i).classList.add('active');i++;
+  },900);
+  return iv;
+}
+async function analyzeImage(){
+  if(!selectedFile){alert('Pakia picha ya zao kwanza.');return;}
+  const context=document.getElementById('context-input').value.trim();
+  const btn=document.getElementById('ai-submit-btn');
+  btn.disabled=true;
+  btn.innerHTML='<svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg> Inachambua...';
+  showState('loading');
+  const iv=animateSteps();
+  try{
+    const fd=new FormData();
+    fd.append('image',selectedFile);
+    if(context)fd.append('context',context);
+    const res=await fetch('/api/analyze-crop',{method:'POST',body:fd});
+    const data=await res.json();
+    clearInterval(iv);
+    if(data.success&&data.analysis){renderResult(data.analysis);}
+    else{showError(data.error||'Hitilafu isiyojulikana. Jaribu tena.');}
+  }catch(e){clearInterval(iv);showError('Tatizo la mtandao. Angalia internet yako.');}
+  finally{
+    btn.disabled=false;
+    btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Chunguza Zao Langu';
+  }
+}
+function renderResult(a){
+  const sevMap={severe:{cls:'badge-danger',label:'Hatari — Haraka'},moderate:{cls:'badge-warning',label:'Ya Wastani'},mild:{cls:'badge-healthy',label:'Ndogo'},healthy:{cls:'badge-healthy',label:'Zao Zuri'}};
+  const s=sevMap[a.severity||'moderate']||sevMap.moderate;
+  const badge=document.getElementById('r-severity-badge');
+  badge.className='result-badge '+s.cls;badge.textContent=s.label;
+  document.getElementById('r-crop-detected').textContent=a.crop_detected||'Zao';
+  document.getElementById('r-diagnosis').textContent=a.diagnosis||'—';
+  document.getElementById('r-prevention').textContent=a.prevention||'—';
+  document.getElementById('r-season-advice').textContent=a.season_advice||'—';
+  const sympEl=document.getElementById('r-symptoms');sympEl.innerHTML='';
+  (a.symptoms||[]).forEach(s=>sympEl.innerHTML+=`<span class="tag tag-blue">${s}</span>`);
+  const treatEl=document.getElementById('r-treatment');treatEl.innerHTML='';
+  (a.treatment||[]).forEach(t=>treatEl.innerHTML+=`<div class="dawa-item"><div class="dawa-dot"></div><span>${t}</span></div>`);
+  const medsEl=document.getElementById('r-available-meds');medsEl.innerHTML='';
+  (a.available_meds_tz||[]).forEach(m=>medsEl.innerHTML+=`<span class="tag tag-amber">${m}</span>`);
+  const conf=Math.min(Math.max(a.confidence_pct||70,10),99);
+  document.getElementById('r-confidence-label').textContent=conf+'% — '+(conf>=80?'Uhakika wa Juu':conf>=60?'Wastani':'Chini — Picha bora itasaidia');
+  document.getElementById('r-confidence-bar').style.width=conf+'%';
+  showState('result');
+}
+</script>
+{% endblock %}
