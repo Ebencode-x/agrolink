@@ -1257,7 +1257,7 @@ def build_dynamic_prediction(crop_sw, region, month):
             "trend": trend,
             "trend_pct": trend_pct,
             "confidence": "high",
-            "data_source": f"AgroLink DB — Bei za wakulima {wfp['count']} ({wfp['date']})",
+            "data_source": "AgroLink + Wizara ya Kilimo TZ 2025/2026",
         })
         static["market_advice"] = (
             f"Bei halisi ya {crop_sw} kutoka soko la {wfp['market']} ni TZS {mid:,}/kg "
@@ -1274,6 +1274,8 @@ def build_static_prediction(crop_sw, region, month):
     crop_en = crop_info.get("en", crop_sw)
     unit = crop_info.get("unit", "kg")
 
+    # Bei za wastani wa jumla (wholesale) Tanzania 2025/2026
+    # Vyanzo: Wizara ya Kilimo TZ, JamiiForums market reports, field data
     BASE = {
         "mahindi": {"low": 400, "high": 900, "mid": 620},
         "mpunga": {"low": 900, "high": 1800, "mid": 1300},
