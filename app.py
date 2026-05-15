@@ -984,6 +984,8 @@ Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
         return jsonify({"error": "Muda wa kusubiri umepita. Jaribu tena."}), 504
     except Exception as exc:
         print(f"Gemini error: {exc}")
+        if "429" in str(exc):
+            return jsonify({"error": "Huduma ya AI ina watu wengi sasa. Subiri sekunde 30 kisha jaribu tena."}), 429
         return jsonify({"error": "Hitilafu ya AI. Jaribu tena baadaye."}), 500
 
 @app.route("/api/prices")
