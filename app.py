@@ -54,7 +54,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
 WFP_API_URL = "https://api.vam.wfp.org/api/1/vam-data-bridges/1.0.0"
 WFP_COMMODITY_MAP = {
     "mahindi":  {"id": 1,   "name": "Maize"},
@@ -1141,7 +1141,7 @@ def get_cached_prediction(cache_key):
     cached = PricePredictionCache.query.filter_by(cache_key=cache_key).first()
     if cached:
         age = datetime.utcnow() - cached.created_at
-        if age < timedelta(hours=0):
+        if False:  # cache disabled
             import json as json_lib
 
             return json_lib.loads(cached.ai_response)
