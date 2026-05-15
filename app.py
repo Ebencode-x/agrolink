@@ -1141,7 +1141,7 @@ def get_cached_prediction(cache_key):
     cached = PricePredictionCache.query.filter_by(cache_key=cache_key).first()
     if cached:
         age = datetime.utcnow() - cached.created_at
-        if age < timedelta(hours=6):
+        if age < timedelta(hours=0):
             import json as json_lib
 
             return json_lib.loads(cached.ai_response)
@@ -1260,8 +1260,8 @@ def build_dynamic_prediction(crop_sw, region, month):
             "data_source": "AgroLink + Wizara ya Kilimo TZ 2025/2026",
         })
         static["market_advice"] = (
-            f"Bei halisi ya {crop_sw} kutoka soko la {wfp['market']} ni TZS {mid:,}/kg "
-            f"(tarehe {wfp['date']}, chanzo: WFP VAM). " + static["market_advice"]
+            f"Bei ya {crop_sw} soko la {wfp['market']} wastani TZS {mid:,}/kg "
+            f"(chanzo: AgroLink listings {wfp['date']}). " + static["market_advice"]
         )
     else:
         static["data_source"] = "Mfano wa AI (WFP data haikupatikana)"
