@@ -54,7 +54,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent"
+GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent"
 WFP_API_URL = "https://api.vam.wfp.org/api/1/vam-data-bridges/1.0.0"
 WFP_COMMODITY_MAP = {
     "mahindi":  {"id": 1,   "name": "Maize"},
@@ -241,6 +241,16 @@ class SellerRating(db.Model):
         "MarketListing", foreign_keys=[listing_id], backref="ratings"
     )
 
+
+
+class BannedEmail(db.Model):
+    __tablename__ = "banned_emails"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), nullable=True, unique=True)
+    phone = db.Column(db.String(20), nullable=True, unique=True)
+    reason = db.Column(db.String(300), nullable=True)
+    banned_by = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    banned_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class PricePredictionCache(db.Model):
     __tablename__ = "price_prediction_cache"
