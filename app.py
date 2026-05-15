@@ -1289,18 +1289,6 @@ def build_static_prediction(crop_sw, region, month):
         "alizeti":  {"low": 1800, "high": 3200, "mid": 2500},
         "maharage": {"low": 2500, "high": 4000, "mid": 3000},
         "mtama":    {"low": 500,  "high": 1100, "mid": 750},
-    },
-        "mpunga": {"low": 900, "high": 1800, "mid": 1300},
-        "viazi": {"low": 500, "high": 1200, "mid": 800},
-        "muhogo": {"low": 300, "high": 700, "mid": 480},
-        "ndizi": {"low": 800, "high": 2000, "mid": 1300},
-        "nyanya": {"low": 800, "high": 2500, "mid": 1500},
-        "vitunguu": {"low": 600, "high": 1800, "mid": 1100},
-        "korosho": {"low": 2000, "high": 4500, "mid": 3200},
-        "kahawa": {"low": 3000, "high": 6000, "mid": 4500},
-        "alizeti": {"low": 1200, "high": 2500, "mid": 1800},
-        "maharage": {"low": 1200, "high": 2800, "mid": 1900},
-        "mtama": {"low": 400, "high": 900, "mid": 600},
     }
     SEASON = {
         "Januari": 1.10,
