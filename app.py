@@ -54,7 +54,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle"
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 WFP_API_URL = "https://api.vam.wfp.org/api/1/vam-data-bridges/1.0.0"
 WFP_COMMODITY_MAP = {
     "mahindi":  {"id": 1,   "name": "Maize"},
@@ -1277,7 +1277,19 @@ def build_static_prediction(crop_sw, region, month):
     # Bei za wastani wa jumla (wholesale) Tanzania 2025/2026
     # Vyanzo: Wizara ya Kilimo TZ, JamiiForums market reports, field data
     BASE = {
-        "mahindi": {"low": 400, "high": 900, "mid": 620},
+        "mahindi":  {"low": 500,  "high": 900,  "mid": 700},
+        "mpunga":   {"low": 2200, "high": 2800, "mid": 2500},
+        "viazi":    {"low": 700,  "high": 1500, "mid": 1000},
+        "muhogo":   {"low": 350,  "high": 800,  "mid": 550},
+        "ndizi":    {"low": 600,  "high": 1800, "mid": 1000},
+        "nyanya":   {"low": 600,  "high": 2000, "mid": 1200},
+        "vitunguu": {"low": 900,  "high": 2200, "mid": 1500},
+        "korosho":  {"low": 3500, "high": 6500, "mid": 5000},
+        "kahawa":   {"low": 5000, "high": 9000, "mid": 7000},
+        "alizeti":  {"low": 1800, "high": 3200, "mid": 2500},
+        "maharage": {"low": 2500, "high": 4000, "mid": 3000},
+        "mtama":    {"low": 500,  "high": 1100, "mid": 750},
+    },
         "mpunga": {"low": 900, "high": 1800, "mid": 1300},
         "viazi": {"low": 500, "high": 1200, "mid": 800},
         "muhogo": {"low": 300, "high": 700, "mid": 480},
