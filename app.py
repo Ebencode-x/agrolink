@@ -79,7 +79,8 @@ WEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
 WEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 FORECAST_BASE_URL = "https://api.openweathermap.org/data/2.5/forecast"
 
-# db initialized via extensions.py
+db = SQLAlchemy()
+db.init_app(app)
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 
