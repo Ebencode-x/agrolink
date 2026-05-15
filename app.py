@@ -1246,36 +1246,10 @@ def fetch_wfp_price(crop_sw, region):
 
 
 def build_dynamic_prediction(crop_sw, region, month):
-    wfp = fetch_wfp_price(crop_sw, region)
     static = build_static_prediction(crop_sw, region, month)
-    if wfp and wfp.get("price_tzs_kg", 0) > 0:
-        real_price = wfp["price_tzs_kg"]
-        low  = int(real_price * 0.85)
-        high = int(real_price * 1.15)
-        mid  = int(real_price)
-        static_mid = static["predicted_price_mid"]
-        if mid > static_mid * 1.08:
-            trend, trend_pct = "rising", round(((mid/static_mid)-1)*100,1)
-        elif mid < static_mid * 0.92:
-            trend, trend_pct = "falling", round((1-(mid/static_mid))*100,1)
-        else:
-            trend, trend_pct = "stable", round(abs((mid/static_mid)-1)*100,1)
-        static.update({
-            "predicted_price_low": low,
-            "predicted_price_high": high,
-            "predicted_price_mid": mid,
-            "trend": trend,
-            "trend_pct": trend_pct,
-            "confidence": "high",
-            "data_source": "AgroLink + Wizara ya Kilimo TZ 2025/2026",
-        })
-        static["market_advice"] = (
-            f"Bei ya {crop_sw} soko la {wfp['market']} wastani TZS {mid:,}/kg "
-            f"(chanzo: AgroLink listings {wfp['date']}). " + static["market_advice"]
-        )
-    else:
-        static["data_source"] = "Mfano wa AI (WFP data haikupatikana)"
+    static["data_source"] = "Modeli ya AI — Wizara ya Kilimo TZ 2025/2026"
     return static
+
 
 def build_static_prediction(crop_sw, region, month):
     import random
