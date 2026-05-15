@@ -1173,39 +1173,65 @@ def save_prediction_cache(cache_key, crop_sw, region, month, ai_response_text):
 
 
 def fetch_wfp_price(crop_sw, region):
-    commodity = WFP_COMMODITY_MAP.get(crop_sw)
-    if not commodity:
-        return None
+    """Tumia bei halisi kutoka listings za AgroLink database."""
     try:
-        params = {"CountryCode": "TZ", "CommodityID": commodity["id"], "page": 1, "format": "json"}
-        resp = requests.get(
-            f"{WFP_API_URL}/MarketPrices/PriceWeekly",
-            params=params, timeout=10,
-            headers={"Accept": "application/json"},
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        items = data.get("items", [])
-        if not items:
-            return None
+        from sqlalchemy import func
         region_lower = region.lower()
-        regional = [i for i in items if region_lower in (i.get("admName","") or "").lower() or region_lower in (i.get("mktName","") or "").lower()]
-        pool = regional if regional else items
-        pool.sort(key=lambda x: x.get("date",""), reverse=True)
-        latest = pool[0]
-        price_usd = float(latest.get("price", 0) or 0)
-        if price_usd <= 0:
+        # Tafuta listings za hivi karibuni za zao hili
+        listings = MarketListing.query.filter(
+            MarketListing.crop_name.ilike(f"%{crop_sw}%"),
+            MarketListing.is_available == True,
+        ).order_by(MarketListing.posted_at.desc()).limit(20).all()
+
+        if not listings:
+            # Jaribu kwa jina la Kiingereza
+            crop_info = TANZANIA_CROPS.get(crop_sw, {})
+            crop_en = crop_info.get("en", "")
+            if crop_en:
+                listings = MarketListing.query.filter(
+                    MarketListing.crop_name.ilike(f"%{crop_en}%"),
+                    MarketListing.is_available == True,
+                ).order_by(MarketListing.posted_at.desc()).limit(20).all()
+
+        if not listings:
             return None
-        usd_per_kg = price_usd / 100
-        tzs_per_kg = usd_per_kg * 2600
+
+        # Tafuta za mkoa kwanza
+        regional = [l for l in listings if region_lower in (l.region or "").lower()]
+        pool = regional if regional else listings
+
+        # Hesabu wastani wa bei
+        prices = []
+        for l in pool:
+            price = l.price_tzs
+            unit = (l.unit or "kg").lower()
+            qty = l.quantity_kg or 1
+            # Normalize to per kg
+            if unit == "tani":
+                price = price / 1000
+            elif unit == "debe":
+                price = price / 20
+            elif unit == "gunia":
+                price = price / 100
+            if price > 0:
+                prices.append(price)
+
+        if not prices:
+            return None
+
+        avg_price = sum(prices) / len(prices)
+        latest_date = max(l.posted_at for l in pool).strftime("%Y-%m-%d")
+        market_names = list(set(l.region for l in pool if l.region))[:2]
+
         return {
-            "price_tzs_kg": round(tzs_per_kg),
-            "market": latest.get("mktName", region),
-            "date": (latest.get("date","") or "")[:10],
-            "source": "WFP VAM",
+            "price_tzs_kg": round(avg_price),
+            "market": ", ".join(market_names) or region,
+            "date": latest_date,
+            "source": "AgroLink — Bei za Wakulima",
+            "count": len(prices),
         }
     except Exception as exc:
-        print(f"WFP API error: {exc}")
+        print(f"DB price fetch error: {exc}")
         return None
 
 
@@ -1231,7 +1257,7 @@ def build_dynamic_prediction(crop_sw, region, month):
             "trend": trend,
             "trend_pct": trend_pct,
             "confidence": "high",
-            "data_source": f"WFP VAM — Bei halisi ({wfp['date']})",
+            "data_source": f"AgroLink DB — Bei za wakulima {wfp['count']} ({wfp['date']})",
         })
         static["market_advice"] = (
             f"Bei halisi ya {crop_sw} kutoka soko la {wfp['market']} ni TZS {mid:,}/kg "
