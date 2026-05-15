@@ -1693,6 +1693,19 @@ def admin_verify_user(user_id):
 # ── MISC ──────────────────────────────────────────────────────────────────────
 
 
+
+@app.route("/admin/clear-cache", methods=["POST"])
+@login_required
+@require_admin
+def clear_price_cache():
+    try:
+        deleted = PricePredictionCache.query.delete()
+        db.session.commit()
+        return jsonify({"message": f"Cache imefutwa. Records: {deleted}"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/health")
 def health():
     return jsonify({"status": "ok", "timestamp": datetime.utcnow().isoformat()})
