@@ -759,12 +759,21 @@ def delete_listing(listing_id):
 
 @app.route("/listings")
 def listings():
-    all_listings = (
+    page = request.args.get("page", 1, type=int)
+    per_page = 12  # Listings 12 kwa ukurasa
+
+    pagination = (
         MarketListing.query.filter_by(is_available=True)
         .order_by(MarketListing.posted_at.desc())
-        .all()
+        .paginate(page=page, per_page=per_page, error_out=False)
     )
-    return render_template("market/listings.html", listings=all_listings)
+    return render_template(
+        "market/listings.html",
+        listings=pagination.items,
+        pagination=pagination,
+        current_page=page,
+        total_pages=pagination.pages,
+    )
 
 
 @app.route("/about")

@@ -1,5 +1,46 @@
 {% extends "base.html" %}
-{% block title %}Soko — AgroLink Tanzania{% endblock %}
+{% block title %}Soko — AgroLink Tanzania
+<!-- PAGINATION -->
+{% if total_pages and total_pages > 1 %}
+<div style="display:flex;align-items:center;justify-content:center;gap:0.5rem;padding:2.5rem 1rem;flex-wrap:wrap">
+
+  {% if pagination.has_prev %}
+  <a href="{{ url_for('listings', page=current_page-1) }}"
+     style="display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.1rem;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-secondary);text-decoration:none;font-size:0.83rem;font-weight:500;transition:all 0.2s"
+     onmouseover="this.style.borderColor='var(--emerald-bright)';this.style.color='var(--emerald-bright)'"
+     onmouseout="this.style.borderColor='var(--glass-border)';this.style.color='var(--text-secondary)'">
+    <i data-lucide="chevron-left" style="width:14px;height:14px"></i>Iliyopita
+  </a>
+  {% endif %}
+
+  {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+    {% if p %}
+      {% if p == current_page %}
+      <span style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;background:linear-gradient(135deg,var(--emerald-bright),#059669);border-radius:50%;color:white;font-weight:700;font-size:0.85rem;box-shadow:0 2px 10px rgba(16,185,129,0.35)">{{ p }}</span>
+      {% else %}
+      <a href="{{ url_for('listings', page=p) }}"
+         style="display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:50%;color:var(--text-secondary);text-decoration:none;font-size:0.85rem;font-weight:500;transition:all 0.2s"
+         onmouseover="this.style.borderColor='var(--emerald-bright)';this.style.color='var(--emerald-bright)'"
+         onmouseout="this.style.borderColor='var(--glass-border)';this.style.color='var(--text-secondary)'">{{ p }}</a>
+      {% endif %}
+    {% else %}
+      <span style="color:var(--text-muted);padding:0 4px">...</span>
+    {% endif %}
+  {% endfor %}
+
+  {% if pagination.has_next %}
+  <a href="{{ url_for('listings', page=current_page+1) }}"
+     style="display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.1rem;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:50px;color:var(--text-secondary);text-decoration:none;font-size:0.83rem;font-weight:500;transition:all 0.2s"
+     onmouseover="this.style.borderColor='var(--emerald-bright)';this.style.color='var(--emerald-bright)'"
+     onmouseout="this.style.borderColor='var(--glass-border)';this.style.color='var(--text-secondary)'">
+    Inayofuata<i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+  </a>
+  {% endif %}
+
+</div>
+{% endif %}
+
+{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -103,6 +144,15 @@
   <!-- Search & Filters -->
   <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem" class="reveal">
     <div class="search-bar">
+      <select id="category-filter" onchange="filterListings()" style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:50px;padding:0.7rem 1.2rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.85rem;outline:none;cursor:pointer;min-width:130px">
+        <option value="all">Aina Zote</option>
+        <option value="mboga">Mboga</option>
+        <option value="nafaka">Nafaka</option>
+        <option value="jamii">Jamii (Legumes)</option>
+        <option value="matunda">Matunda</option>
+        <option value="mizizi">Mizizi</option>
+        <option value="biashara">Biashara</option>
+      </select>
       <input type="text" id="search-input" class="search-input" placeholder="Tafuta zao, mkoa..." oninput="filterListings()"/>
       <button onclick="filterListings()" style="background:linear-gradient(135deg,var(--emerald-bright),#059669);border:none;border-radius:50px;padding:0.7rem 1.4rem;color:white;font-family:var(--font-display);font-weight:600;font-size:0.875rem;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap">
         <i data-lucide="search" style="width:16px;height:16px"></i>Tafuta
@@ -131,7 +181,7 @@
   <div class="listings-grid" id="listings-grid">
     {% if listings %}
       {% for l in listings %}
-      <div class="listing-card glass" id="listing-card-{{ l.id }}" data-crop="{{ l.crop_name|lower }}" data-region="{{ l.region|lower }}" data-category="">
+      <div class="listing-card glass" id="listing-card-{{ l.id }}" data-crop="{{ l.crop_name|lower }}" data-region="{{ l.region|lower }}" data-category="{{ l.crop_name|lower }}">
 
         <!-- Picha -->
         <div class="listing-img-wrap">
@@ -383,19 +433,46 @@ async function deleteListing(id, btn){
   }
 }
 function filterListings(){
-  const q=document.getElementById("search-input").value.toLowerCase();
+  const search=(document.getElementById("search-input")?.value||"").toLowerCase().trim();
+  const cat=(document.getElementById("category-filter")?.value||"all").toLowerCase().trim();
+  const region=(document.getElementById("region-filter")?.value||"all").toLowerCase().trim();
   const cards=document.querySelectorAll(".listing-card");
   let visible=0;
+
+  // Category groups — zao linaloangukia group gani
+  const CATS={
+    "mboga":["nyanya","kabichi","spinach","mchicha","sukuma","bamia","pilipili","hoho","karoti","boga","bilinganya","vitunguu"],
+    "nafaka":["mahindi","mpunga","mchele","ngano","mtama","uwele","sorgham","shayiri"],
+    "jamii":["maharage","kunde","choroko","mbaazi","njugu","karanga","soya","dengu"],
+    "matunda":["ndizi","embe","parachichi","avocado","papai","fenesi","nanasi","chungwa","limau","tikiti","zabibu","tofaa","pera"],
+    "mizizi":["viazi","muhogo","vitunguu","kitunguu","ginger","tangawizi","cassava"],
+    "biashara":["korosho","kahawa","chai","tumbaku","pamba","ufuta","alizeti","miwa","vanilla","cardamom"]
+  };
+
+  function getCategory(cropName){
+    const c=cropName.toLowerCase();
+    for(const[cat,crops] of Object.entries(CATS)){
+      if(crops.some(crop=>c.includes(crop)||crop.includes(c))) return cat;
+    }
+    return "nyingine";
+  }
+
   cards.forEach(card=>{
     const crop=card.dataset.crop||"";
-    const region=card.dataset.region||"";
-    const text=card.innerText.toLowerCase();
-    const match=text.includes(q)||crop.includes(q)||region.includes(q);
-    card.style.display=match?"":"none";
-    if(match)visible++;
+    const cardRegion=card.dataset.region||"";
+    const cardCat=getCategory(crop);
+
+    const matchSearch=!search||crop.includes(search)||cardRegion.includes(search);
+    const matchCat=cat==="all"||cardCat===cat||crop.includes(cat);
+    const matchRegion=region==="all"||cardRegion.includes(region);
+
+    const show=matchSearch&&matchCat&&matchRegion;
+    card.style.display=show?"":"none";
+    if(show) visible++;
   });
-  document.getElementById("listings-count").innerHTML=
-    "Orodha <strong style='color:var(--text-primary)'>"+visible+"</strong> zinapatikana";
+
+  const countEl=document.getElementById("listings-count");
+  if(countEl) countEl.innerHTML=`Orodha <strong style="color:var(--text-primary)">${visible}</strong> zinapatikana`;
 }
 function filterCategory(cat,btn){
   document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
