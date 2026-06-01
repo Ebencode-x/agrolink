@@ -404,7 +404,7 @@ function build(){
   `;
   document.body.appendChild(pan);
   bub.addEventListener("click",abotOpen);
-  document.getElementById("abot-input").addEventListener("keydown",e=>{if(e.key==="Enter")abotSend();});
+  document.getElementById("abot-input").addEventListener("keyup",e=>{if(e.key==="Enter"&&e.target.value.trim())abotSend();});
 }
 
 // ── MESSAGES ──────────────────────────────────────────────────────────────
