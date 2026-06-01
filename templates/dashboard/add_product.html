@@ -38,6 +38,7 @@
   .server-success{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:10px;padding:0.75rem 1rem;font-size:0.85rem;color:#6ee7b7;display:none;align-items:center;gap:8px;margin-top:1rem}
   .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none}
   @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   @media(max-width:600px){.form-grid{grid-template-columns:1fr}}
 </style>
 {% endblock %}
@@ -135,6 +136,46 @@
           </div>
         </div>
 
+
+        <!-- AgroBot Card -->
+        <div id="bot-card" style="display:none;margin-top:1.25rem;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.25);border-radius:16px;padding:1.25rem;animation:fadeIn 0.4s ease">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+            <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--emerald-bright),#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <i data-lucide="bot" style="width:17px;height:17px;color:white"></i>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:0.9rem;color:var(--text-primary)">AgroBot — Mshauri Wako</div>
+              <div style="font-size:0.72rem;color:var(--text-muted)">Uchambuzi wa orodha yako</div>
+            </div>
+            <div id="bot-alama" style="margin-left:auto;font-size:1.3rem;font-weight:800;color:var(--emerald-bright)"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:0.6rem">
+            <div id="bot-bei-row" style="display:flex;align-items:flex-start;gap:9px;padding:0.65rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:10px">
+              <i id="bot-bei-icon" data-lucide="tag" style="width:15px;height:15px;margin-top:2px;flex-shrink:0;color:var(--emerald-bright)"></i>
+              <div><div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:2px">Bei</div><div id="bot-bei-text" style="font-size:0.85rem;color:var(--text-primary)"></div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:9px;padding:0.65rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:10px">
+              <i data-lucide="archive" style="width:15px;height:15px;margin-top:2px;flex-shrink:0;color:var(--amber-warm)"></i>
+              <div><div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:2px">Hifadhi</div><div id="bot-hifadhi" style="font-size:0.85rem;color:var(--text-primary)"></div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:9px;padding:0.65rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:10px">
+              <i data-lucide="shield-alert" style="width:15px;height:15px;margin-top:2px;flex-shrink:0;color:#f59e0b"></i>
+              <div><div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:2px">Ugonjwa wa Kuangalia</div><div id="bot-ugonjwa" style="font-size:0.85rem;color:var(--text-primary)"></div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem">
+              <div style="padding:0.65rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:10px">
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:3px">Soko Bora</div>
+                <div id="bot-soko" style="font-size:0.83rem;color:var(--emerald-bright);font-weight:600"></div>
+              </div>
+              <div style="padding:0.65rem 0.75rem;background:rgba(255,255,255,0.04);border-radius:10px">
+                <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:3px">Hatua ya Haraka</div>
+                <div id="bot-hatua" style="font-size:0.83rem;color:var(--text-primary)"></div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin-top:0.75rem">Unakwenda dashboard baada ya sekunde 6...</div>
+        </div>
+
         <div class="server-error" id="form-error"><i data-lucide="x-circle" style="width:16px;height:16px;flex-shrink:0"></i><span id="error-msg"></span></div>
         <div class="server-success" id="form-success"><i data-lucide="check-circle" style="width:16px;height:16px;flex-shrink:0"></i><span id="success-msg"></span></div>
 
@@ -229,12 +270,34 @@ document.getElementById('add-form').addEventListener('submit',async e=>{
     const res=await fetch('/dashboard/add',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crop_name,quantity,unit,price,location,description,image_url})});
     const data=await res.json();
     if(res.ok){
-      document.getElementById('success-msg').textContent=data.message+' Unaweza kuongeza nyingine au kurudi dashboard.';
+      document.getElementById('success-msg').textContent='Orodha imeongezwa! AgroBot inachunguza...';
       document.getElementById('form-success').style.display='flex';
       lucide.createIcons();
+      // Ita AgroBot
+      try{
+        const advRes=await fetch('/api/listing-advice',{method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({crop_name:crop_name,price_tzs:Number(price),quantity:Number(quantity),unit:unit,region:location})});
+        const advData=await advRes.json();
+        if(advRes.ok&&advData.advice){
+          const a=advData.advice;
+          const colors={nzuri:'#10b981',juu:'#f59e0b',chini:'#f43f5e'};
+          const icons={nzuri:'check-circle',juu:'trending-up',chini:'trending-down'};
+          document.getElementById('bot-bei-text').textContent=a.ujumbe_bei||'';
+          const ic=document.getElementById('bot-bei-icon');
+          ic.setAttribute('data-lucide',icons[a.hali_bei]||'tag');
+          ic.style.color=colors[a.hali_bei]||'var(--emerald-bright)';
+          document.getElementById('bot-hifadhi').textContent=a.ushauri_hifadhi||'';
+          document.getElementById('bot-ugonjwa').textContent=a.onyo_ugonjwa||'';
+          document.getElementById('bot-soko').textContent=a.soko_bora||'';
+          document.getElementById('bot-hatua').textContent=a.hatua_haraka||'';
+          document.getElementById('bot-alama').textContent=a.alama?`${a.alama}/100`:'';
+          document.getElementById('bot-card').style.display='block';
+          lucide.createIcons();
+        }
+      }catch(e){console.warn('AgroBot:',e);}
       document.getElementById('add-form').reset();
       document.getElementById('preview').classList.remove('show');
-      setTimeout(()=>window.location.href='/dashboard',2500);
+      setTimeout(()=>window.location.href='/dashboard',6000);
     }else{
       document.getElementById('error-msg').textContent=data.error;
       document.getElementById('form-error').style.display='flex';

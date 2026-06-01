@@ -386,5 +386,7 @@
     document.addEventListener("DOMContentLoaded", initIcons);
   </script>
   {% block extra_scripts %}{% endblock %}
+  <script src="/static/js/agrobot.js"></script>
+  <div id="agrobot-auth" data-auth="{{ '1' if current_user.is_authenticated else '0' }}" style="display:none"></div>
 </body>
 </html>

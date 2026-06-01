@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% block title %}Mshauri wa Kilimo — AgroLink Tanzania{% endblock %}
+{% block extra_head %}
+<style>
+.ms-hero{padding:3rem 0 2rem;text-align:center;position:relative;overflow:hidden}
+.ms-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(16,185,129,0.12) 0%,transparent 70%);pointer-events:none}
+.ms-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:0.5rem}
+.ms-title .glow{background:linear-gradient(135deg,var(--emerald-bright),#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ms-sub{color:var(--text-secondary);font-size:0.95rem;max-width:500px;margin:0 auto 2rem}
+.ms-wrap{max-width:1100px;margin:0 auto;padding:0 1.5rem}
+.ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;max-width:1100px;margin:0 auto;padding:0 1.5rem 3rem}
+.ms-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;cursor:pointer;transition:all 0.22s;text-decoration:none;display:block;position:relative;z-index:1}
+.ms-card:hover{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.ms-card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;flex-shrink:0}
+.ms-card-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ms-card-title{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:0.4rem}
+.ms-card-desc{font-size:0.82rem;color:var(--text-secondary);line-height:1.6}
+.ms-card-tags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.85rem}
+.ms-tag{font-size:0.68rem;padding:0.2rem 0.6rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7;border-radius:20px;cursor:pointer;transition:all 0.18s;font-family:inherit}
+.ms-tag:hover{background:rgba(16,185,129,0.22);color:#a7f3d0}
+.ms-section{max-width:1100px;margin:0 auto 1rem;padding:0 1.5rem;display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
+.ms-section svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+.ms-section::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07)}
+.ms-back{display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-size:0.82rem;text-decoration:none;transition:color 0.2s;margin-bottom:1.5rem}
+.ms-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.ms-back:hover{color:var(--emerald-bright)}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ms-hero">
+  <div style="max-width:700px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1">
+    <div class="hero-badge" style="margin-bottom:1rem">
+      <i data-lucide="book-open" style="width:13px;height:13px"></i>Maktaba ya Kilimo
+    </div>
+    <h1 class="ms-title">Mshauri wa <span class="glow">Kilimo Tanzania</span></h1>
+    <p class="ms-sub">Bonyeza mada yoyote — AgroBot atakujibu moja kwa moja. Taarifa zinatoka vyanzo vya kilimo Tanzania.</p>
+    <a href="javascript:history.back()" class="ms-back">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Rudi Nyuma
+    </a>
+  </div>
+</div>
+
+<!-- ── MAGONJWA YA MAZAO ─────────────────────────────────────────────── -->
+<div class="ms-section">
+  <svg viewBox="0 0 24 24" style="color:#f59e0b"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  Magonjwa ya Mazao
+</div>
+<div class="ms-grid">
+
+  <a href="#" class="ms-card" onclick="openBot('magonjwa ya nyanya');return false;">
+    <div class="ms-card-icon" style="background:rgba(239,68,68,0.12);color:#f87171">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 6V3"/><path d="M9 4c0 0 1 2 3 2s3-2 3-2"/></svg>
+    </div>
+    <div class="ms-card-title">Magonjwa ya Nyanya</div>
+    <div class="ms-card-desc">Early Blight, Late Blight, Fusarium Wilt, Blossom End Rot na dawa zake Tanzania.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('early blight nyanya');event.stopPropagation()">Early Blight</span>
+      <span class="ms-tag" onclick="openBot('fusarium wilt nyanya');event.stopPropagation()">Fusarium Wilt</span>
+      <span class="ms-tag" onclick="openBot('tuta absoluta');event.stopPropagation()">Tuta Absoluta</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('mahindi yanaliwa na wadudu');return false;">
+    <div class="ms-card-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24">
+      <svg viewBox="0 0 24 24"><path d="M12 2c0 0-5 4-5 10s5 10 5 10 5-4 5-10S12 2 12 2z"/><line x1="12" y1="2" x2="12" y2="22"/><path d="M7 7c2 1 5 1 10 0"/><path d="M7 12c2 1 5 1 10 0"/><path d="M7 17c2 1 5 1 10 0"/></svg>
+    </div>
+    <div class="ms-card-title">Magonjwa ya Mahindi</div>
+    <div class="ms-card-desc">Viwavijeshi (Fall Armyworm), Funza wa Mabua, Blight, Streak Virus na udhibiti wake.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('viwavijeshi');event.stopPropagation()">Fall Armyworm</span>
+      <span class="ms-tag" onclick="openBot('mahindi njano');event.stopPropagation()">Njano ya Majani</span>
+      <span class="ms-tag" onclick="openBot('funza mahindi');event.stopPropagation()">Funza</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('magonjwa ya viazi');return false;">
+    <div class="ms-card-icon" style="background:rgba(139,92,246,0.12);color:#a78bfa">
+      <svg viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="8" ry="5"/><path d="M8 8c0-2 2-4 4-4s4 2 4 4"/><circle cx="10" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="14" cy="14" r="1" fill="currentColor" stroke="none"/></svg>
+    </div>
+    <div class="ms-card-title">Magonjwa ya Viazi</div>
+    <div class="ms-card-desc">Late Blight, Scab Disease, Vidonda vya Mizizi na jinsi ya kuyazuia.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('blight ya viazi');event.stopPropagation()">Late Blight</span>
+      <span class="ms-tag" onclick="openBot('viazi kuoza');event.stopPropagation()">Uoza</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('magonjwa ya mpunga');return false;">
+    <div class="ms-card-icon" style="background:rgba(16,185,129,0.12);color:#34d399">
+      <svg viewBox="0 0 24 24"><path d="M12 22V8"/><path d="M8 12l4-4 4 4"/><path d="M5 16l7-2 7 2"/><path d="M3 20l9-2 9 2"/></svg>
+    </div>
+    <div class="ms-card-title">Magonjwa ya Mpunga</div>
+    <div class="ms-card-desc">Rice Blast, Bacterial Leaf Blight, Brown Spot na dawa zinazopatikana Tanzania.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('blast ya mpunga');event.stopPropagation()">Rice Blast</span>
+      <span class="ms-tag" onclick="openBot('njano ya mpunga');event.stopPropagation()">Njano ya Majani</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('magonjwa ya maharage');return false;">
+    <div class="ms-card-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa">
+      <svg viewBox="0 0 24 24"><path d="M3 12c0-5 3-9 9-9s9 4 9 9-3 9-9 9-9-4-9-9z"/><path d="M8 11c0-2 1.5-3.5 4-3.5"/><path d="M12 16c2.5 0 4-1.5 4-3.5"/></svg>
+    </div>
+    <div class="ms-card-title">Magonjwa ya Maharage</div>
+    <div class="ms-card-desc">Kutu, Ndui ya Maharage (Anthracnose), Mnyauko wa Bakteria na udhibiti.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('kutu ya maharage');event.stopPropagation()">Kutu</span>
+      <span class="ms-tag" onclick="openBot('anthracnose maharage');event.stopPropagation()">Anthracnose</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('wadudu');return false;">
+    <div class="ms-card-icon" style="background:rgba(239,68,68,0.1);color:#f87171">
+      <svg viewBox="0 0 24 24"><path d="M9 9h6v8a3 3 0 0 1-6 0z"/><path d="M9 9a3 3 0 0 1 6 0"/><path d="M6 12H3"/><path d="M18 12h3"/><path d="M6 17H3"/><path d="M18 17h3"/><path d="M6 7l-2-2"/><path d="M18 7l2-2"/></svg>
+    </div>
+    <div class="ms-card-title">Wadudu Waharibifu</div>
+    <div class="ms-card-desc">Aphids, Thrips, Whitefly, Spider Mites, Cutworm na dawa zao.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('aphid');event.stopPropagation()">Aphids</span>
+      <span class="ms-tag" onclick="openBot('thrips');event.stopPropagation()">Thrips</span>
+      <span class="ms-tag" onclick="openBot('whitefly');event.stopPropagation()">Whitefly</span>
+    </div>
+  </a>
+
+</div>
+
+<!-- ── KILIMO CHA MAZAO ──────────────────────────────────────────────── -->
+<div class="ms-section">
+  <svg viewBox="0 0 24 24" style="color:#10b981"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+  Kilimo cha Mazao
+</div>
+<div class="ms-grid">
+
+  <a href="#" class="ms-card" onclick="openBot('kilimo cha mahindi');return false;">
+    <div class="ms-card-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24">
+      <svg viewBox="0 0 24 24"><path d="M12 2c0 0-5 4-5 10s5 10 5 10 5-4 5-10S12 2 12 2z"/><line x1="12" y1="2" x2="12" y2="22"/><path d="M7 7c2 1 5 1 10 0"/><path d="M7 12c2 1 5 1 10 0"/></svg>
+    </div>
+    <div class="ms-card-title">Kilimo cha Mahindi</div>
+    <div class="ms-card-desc">Mbegu bora, nafasi ya kupanda, mbolea, msimu na mavuno yanayotarajiwa Tanzania.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('mbegu za mahindi');event.stopPropagation()">Mbegu</span>
+      <span class="ms-tag" onclick="openBot('mbolea ya mahindi');event.stopPropagation()">Mbolea</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('kilimo cha nyanya');return false;">
+    <div class="ms-card-icon" style="background:rgba(239,68,68,0.12);color:#f87171">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7"/><path d="M12 6V3"/><path d="M9 4c0 0 1 2 3 2s3-2 3-2"/></svg>
+    </div>
+    <div class="ms-card-title">Kilimo cha Nyanya</div>
+    <div class="ms-card-desc">Mbegu bora, vitalu, nafasi, umwagiliaji, mbolea na msimu bora wa kuuza.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('nyanya mbegu');event.stopPropagation()">Mbegu</span>
+      <span class="ms-tag" onclick="openBot('nyanya msimu');event.stopPropagation()">Msimu</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('kilimo cha parachichi');return false;">
+    <div class="ms-card-icon" style="background:rgba(16,185,129,0.12);color:#34d399">
+      <svg viewBox="0 0 24 24"><path d="M12 2c3 2 5 6 5 10a5 5 0 0 1-10 0c0-4 2-8 5-10z"/><circle cx="12" cy="14" r="2.5"/></svg>
+    </div>
+    <div class="ms-card-title">Kilimo cha Parachichi</div>
+    <div class="ms-card-desc">Aina ya Hass, miche iliyopandikizwa, magonjwa, na masoko ya export Ulaya na UAE.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('hass avocado');event.stopPropagation()">Hass</span>
+      <span class="ms-tag" onclick="openBot('parachichi export');event.stopPropagation()">Export</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('kilimo cha alizeti');return false;">
+    <div class="ms-card-icon" style="background:rgba(245,158,11,0.1);color:#fbbf24">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+    </div>
+    <div class="ms-card-title">Kilimo cha Alizeti</div>
+    <div class="ms-card-desc">Mbegu bora (AGUARA 4, HYSUN 33), magonjwa, ndege, na uhifadhi wa mbegu.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('mbegu za alizeti');event.stopPropagation()">Mbegu</span>
+      <span class="ms-tag" onclick="openBot('magonjwa ya alizeti');event.stopPropagation()">Magonjwa</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('kilimo cha korosho');return false;">
+    <div class="ms-card-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa">
+      <svg viewBox="0 0 24 24"><path d="M12 2C7 2 3 6 3 11c0 4 2.5 7.5 6 9l3 2 3-2c3.5-1.5 6-5 6-9 0-5-4-9-9-9z"/><path d="M9 11l2 2 4-4"/></svg>
+    </div>
+    <div class="ms-card-title">Kilimo cha Korosho</div>
+    <div class="ms-card-desc">Maeneo bora Tanzania, kupanda, magonjwa, bei na masoko ya export.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('korosho magonjwa');event.stopPropagation()">Magonjwa</span>
+      <span class="ms-tag" onclick="openBot('korosho bei');event.stopPropagation()">Bei</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('kilimo cha vitunguu');return false;">
+    <div class="ms-card-icon" style="background:rgba(236,72,153,0.1);color:#f472b6">
+      <svg viewBox="0 0 24 24"><path d="M12 2c-2 3-4 6-4 9a4 4 0 0 0 8 0c0-3-2-6-4-9z"/><path d="M8 14c-2 1-3 3-3 5h14c0-2-1-4-3-5"/></svg>
+    </div>
+    <div class="ms-card-title">Kilimo cha Vitunguu</div>
+    <div class="ms-card-desc">Mbegu bora, vitalu, magonjwa (Purple Blotch, Thrips), na kuvuna vizuri.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('vitunguu magonjwa');event.stopPropagation()">Magonjwa</span>
+      <span class="ms-tag" onclick="openBot('vitunguu msimu');event.stopPropagation()">Msimu</span>
+    </div>
+  </a>
+
+</div>
+
+<!-- ── MASOKO NA BIASHARA ────────────────────────────────────────────── -->
+<div class="ms-section">
+  <svg viewBox="0 0 24 24" style="color:#f59e0b"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+  Masoko na Biashara
+</div>
+<div class="ms-grid">
+
+  <a href="#" class="ms-card" onclick="openBot('bei ya mazao');return false;">
+    <div class="ms-card-icon" style="background:rgba(16,185,129,0.12);color:#34d399">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+    </div>
+    <div class="ms-card-title">Bei za Soko Tanzania</div>
+    <div class="ms-card-desc">Bei za wastani za mazao yote — mahindi, nyanya, viazi, mpunga, maharage, parachichi.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('bei ya mahindi');event.stopPropagation()">Mahindi</span>
+      <span class="ms-tag" onclick="openBot('bei ya nyanya');event.stopPropagation()">Nyanya</span>
+      <span class="ms-tag" onclick="openBot('bei ya parachichi');event.stopPropagation()">Parachichi</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('masoko Tanzania');return false;">
+    <div class="ms-card-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa">
+      <svg viewBox="0 0 24 24"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0"/><path d="M5 9v11h14V9"/><path d="M10 14h4v6h-4z"/></svg>
+    </div>
+    <div class="ms-card-title">Masoko Makubwa Tanzania</div>
+    <div class="ms-card-desc">Kariakoo, Tandale, Kilombero, Mwanjelwa — masoko makubwa na jinsi ya kufikia wanunuzi.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('Kariakoo');event.stopPropagation()">Kariakoo</span>
+      <span class="ms-tag" onclick="openBot('Mbeya soko');event.stopPropagation()">Mbeya</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('export');return false;">
+    <div class="ms-card-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    </div>
+    <div class="ms-card-title">Kuuza Nje ya Tanzania</div>
+    <div class="ms-card-desc">Jinsi ya kuanza export — leseni, viwango vya kimataifa, TAHA, GlobalGAP, masoko ya Ulaya.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('TAHA');event.stopPropagation()">TAHA</span>
+      <span class="ms-tag" onclick="openBot('GlobalGAP');event.stopPropagation()">GlobalGAP</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('mkopo wa kilimo');return false;">
+    <div class="ms-card-icon" style="background:rgba(16,185,129,0.1);color:#34d399">
+      <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+    </div>
+    <div class="ms-card-title">Mikopo ya Kilimo</div>
+    <div class="ms-card-desc">CRDB, NMB, TADB, SACCOS — mikopo yenye masharti mazuri kwa wakulima Tanzania.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('CRDB');event.stopPropagation()">CRDB</span>
+      <span class="ms-tag" onclick="openBot('TADB');event.stopPropagation()">TADB</span>
+      <span class="ms-tag" onclick="openBot('SACCOS');event.stopPropagation()">SACCOS</span>
+    </div>
+  </a>
+
+</div>
+
+<!-- ── MBINU ZA KILIMO ───────────────────────────────────────────────── -->
+<div class="ms-section">
+  <svg viewBox="0 0 24 24" style="color:#6ee7b7"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>
+  Mbinu za Kilimo
+</div>
+<div class="ms-grid" style="padding-bottom:6rem">
+
+  <a href="#" class="ms-card" onclick="openBot('mbolea');return false;">
+    <div class="ms-card-icon" style="background:rgba(16,185,129,0.12);color:#34d399">
+      <svg viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+    </div>
+    <div class="ms-card-title">Mbolea na Virutubisho</div>
+    <div class="ms-card-desc">DAP, UREA, CAN, NPK, Samadi — mbolea gani, kiasi gani, wakati gani kwa zao gani.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('DAP');event.stopPropagation()">DAP</span>
+      <span class="ms-tag" onclick="openBot('UREA');event.stopPropagation()">UREA</span>
+      <span class="ms-tag" onclick="openBot('samadi');event.stopPropagation()">Samadi</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('kuhifadhi mazao');return false;">
+    <div class="ms-card-icon" style="background:rgba(59,130,246,0.12);color:#60a5fa">
+      <svg viewBox="0 0 24 24"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+    </div>
+    <div class="ms-card-title">Hifadhi ya Mazao</div>
+    <div class="ms-card-desc">Jinsi ya kuhifadhi mahindi, maharage, nyanya, viazi na mpunga bila kupoteza mazao.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('PICS bag');event.stopPropagation()">PICS Bag</span>
+      <span class="ms-tag" onclick="openBot('ACTELLIC DUST');event.stopPropagation()">Actellic Dust</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('umwagiliaji');return false;">
+    <div class="ms-card-icon" style="background:rgba(59,130,246,0.1);color:#60a5fa">
+      <svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+    </div>
+    <div class="ms-card-title">Umwagiliaji Bora</div>
+    <div class="ms-card-desc">Drip irrigation, wakati bora wa kumwagilia, ishara za kukosa au kuwa na maji mengi.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('drip irrigation');event.stopPropagation()">Drip</span>
+      <span class="ms-tag" onclick="openBot('maji shambani');event.stopPropagation()">Maji</span>
+    </div>
+  </a>
+
+  <a href="#" class="ms-card" onclick="openBot('udongo');return false;">
+    <div class="ms-card-icon" style="background:rgba(139,92,246,0.1);color:#a78bfa">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+    </div>
+    <div class="ms-card-title">Usimamizi wa Udongo</div>
+    <div class="ms-card-desc">pH ya udongo, chokaa, samadi/compost, mmomonyoko na jinsi ya kuboresha rutuba.</div>
+    <div class="ms-card-tags">
+      <span class="ms-tag" onclick="openBot('pH ya udongo');event.stopPropagation()">pH</span>
+      <span class="ms-tag" onclick="openBot('chokaa');event.stopPropagation()">Chokaa</span>
+    </div>
+  </a>
+
+</div>
+
+<script>
+function openBot(query){
+  const panel=document.getElementById("agrobot-panel");
+  if(panel){
+    panel.classList.add("open");
+    setTimeout(()=>{if(typeof abotSend==="function")abotSend(query);},200);
+  }
+}
+</script>
+{% endblock %}

@@ -1505,6 +1505,253 @@ def api_prediction_crops():
     )
 
 
+
+
+# ── MSHAURI PAGE ──────────────────────────────────────────────────────────────
+
+@app.route("/mshauri")
+def mshauri():
+    return render_template("mshauri.html")
+
+# ── LISTING ADVICE BOT ───────────────────────────────────────────────────────
+
+CROP_KNOWLEDGE = {
+    "mahindi": {
+        "magonjwa": ["blight ya mahindi", "kutu ya mahindi", "funza wa masikio"],
+        "hifadhi": "Kausha hadi unyevu 13%. Hifadhi kwenye magunia makavu. Tumia ACTELLIC DUST.",
+        "bei_min": 400, "bei_max": 900, "onyo_bei": 350,
+        "msimu": "Machi-Mei na Agosti-Oktoba",
+        "soko": "Dar es Salaam, Arusha, Moshi",
+    },
+    "nyanya": {
+        "magonjwa": ["late blight", "ugonjwa wa kutu", "virus ya nyanya"],
+        "hifadhi": "Ziuze ndani ya siku 3-5. Usizihifadhi kwenye jokofu zikiwa kijani.",
+        "bei_min": 800, "bei_max": 2500, "onyo_bei": 600,
+        "msimu": "Juni-Septemba (baridi — ubora bora)",
+        "soko": "Dar es Salaam, Zanzibar, Mombasa",
+    },
+    "viazi": {
+        "magonjwa": ["blight ya viazi", "vidonda vya mizizi"],
+        "hifadhi": "Hifadhi mahali penye ubaridi na giza. Yanaishi wiki 4-8.",
+        "bei_min": 500, "bei_max": 1200, "onyo_bei": 400,
+        "msimu": "Julai-Septemba",
+        "soko": "Dar es Salaam, Dodoma, Iringa",
+    },
+    "mpunga": {
+        "magonjwa": ["blast ya mpunga", "njano ya majani"],
+        "hifadhi": "Kausha hadi unyevu 12-14%. Hifadhi ghala kavu. Angalia panya.",
+        "bei_min": 700, "bei_max": 1500, "onyo_bei": 600,
+        "msimu": "Machi-Juni na Oktoba-Januari",
+        "soko": "Dar es Salaam, Mwanza, Morogoro",
+    },
+    "maharage": {
+        "magonjwa": ["kutu ya maharage", "anthracnose", "mosaic virus"],
+        "hifadhi": "Kausha vizuri. Tumia majivu ya kuni kuchanganya — inazuia wadudu bila dawa.",
+        "bei_min": 1200, "bei_max": 2800, "onyo_bei": 1000,
+        "msimu": "Mei-Agosti",
+        "soko": "Dar es Salaam, Nairobi, Kampala",
+    },
+    "ndizi": {
+        "magonjwa": ["Panama disease", "sigatoka nyeusi", "bunchy top"],
+        "hifadhi": "Zikata zikiwa bado kijani. Hifadhi mahali penye baridi.",
+        "bei_min": 300, "bei_max": 800, "onyo_bei": 250,
+        "msimu": "Wakati wowote — mazao mwaka mzima",
+        "soko": "Dar es Salaam, Zanzibar, Mombasa",
+    },
+    "kabichi": {
+        "magonjwa": ["blackrot", "aphid", "caterpillar"],
+        "hifadhi": "Hifadhi mahali penye ubaridi. Inadumu wiki 1-2.",
+        "bei_min": 400, "bei_max": 900, "onyo_bei": 300,
+        "msimu": "Juni-Agosti (baridi)",
+        "soko": "Dar es Salaam, Arusha, Moshi",
+    },
+    "pilipili": {
+        "magonjwa": ["anthracnose", "bacterial spot", "virus ya pilipili"],
+        "hifadhi": "Hifadhi joto 7-10C. Inadumu wiki 2-3.",
+        "bei_min": 1500, "bei_max": 4000, "onyo_bei": 1200,
+        "msimu": "Mwaka mzima — baridi ni bora",
+        "soko": "Dar es Salaam, Zanzibar, Mombasa",
+    },
+    "ufuta": {
+        "magonjwa": ["phytophthora", "cercospora leaf spot"],
+        "hifadhi": "Kausha vizuri. Hifadhi magunia makavu.",
+        "bei_min": 2000, "bei_max": 4500, "onyo_bei": 1800,
+        "msimu": "Julai-Oktoba",
+        "soko": "Dar es Salaam, Mtwara, Lindi",
+    },
+    "mwembe": {
+        "magonjwa": ["anthracnose ya mwembe", "uoza wa tunda", "nzi wa matunda"],
+        "hifadhi": "Yachume yakiwa magumu. Yaiva siku 5-7 joto la kawaida.",
+        "bei_min": 400, "bei_max": 1200, "onyo_bei": 300,
+        "msimu": "Oktoba-Desemba na Machi-Mei",
+        "soko": "Dar es Salaam, Zanzibar, Pwani",
+    },
+}
+
+GEMINI_TEXT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent"
+
+
+@app.route("/api/listing-advice", methods=["POST"])
+@login_required
+@require_active_account
+@limiter.limit("20 per hour")
+def listing_advice():
+    """
+    Dummy bot ya AgroLink — inatumia CROP_KNOWLEDGE dictionary peke yake.
+    Hakuna API call, hakuna gharama, inajibu papo hapo kwa Kiswahili kamili.
+    """
+    data = request.get_json() or {}
+    crop_raw = sanitize(data.get("crop_name", ""), max_length=100).lower().strip()
+    price_tzs  = float(data.get("price_tzs", 0) or 0)
+    quantity   = float(data.get("quantity", 0) or 0)
+    unit       = sanitize(data.get("unit", "kg"), max_length=20)
+    region     = sanitize(data.get("region", ""), max_length=80)
+
+    if not crop_raw:
+        return jsonify({"error": "Jina la zao linahitajika."}), 400
+
+    # ── Tafuta zao kwenye dictionary ─────────────────────────────────────────
+    crop_data = None
+    matched_key = None
+    for key, val in CROP_KNOWLEDGE.items():
+        if key in crop_raw or crop_raw in key:
+            crop_data = val
+            matched_key = key
+            break
+
+    current_month = MONTH_NAMES_SW[datetime.utcnow().month - 1]
+
+    # ── Kama zao halijulikani ─────────────────────────────────────────────────
+    if not crop_data:
+        advice = {
+            "hali_bei": "nzuri",
+            "ujumbe_bei": (
+                f"Hongoa kwa kuwasilisha {crop_raw} kwenye soko la AgroLink! "
+                f"Hakikisha bei yako ya TZS {price_tzs:,.0f} inalingana na bei za "
+                f"wakulima wengine wa {region or 'mkoa wako'} ili upate wanunuzi haraka."
+            ),
+            "ushauri_hifadhi": (
+                f"Hifadhi {crop_raw} mahali penye ubaridi, hewa ya kutosha na mbali na unyevu. "
+                f"Chunguza mazao yako kila siku 2-3 ili kugundua matatizo mapema. "
+                f"Tumia magunia safi au vyombo vilivyofungwa kuzuia wadudu na viumbe vingine."
+            ),
+            "onyo_ugonjwa": (
+                f"Angalia dalili za magonjwa kama madoa ya kahawia, uoza, au majani ya njano "
+                f"kwenye {crop_raw} wako. Ikiwa utaona dalili hizo, wasiliana na mtaalamu wa "
+                f"kilimo wa wilaya yako haraka iwezekanavyo."
+            ),
+            "soko_bora": (
+                f"Masoko makubwa ya Tanzania kama Dar es Salaam, Arusha na Mwanza "
+                f"yanaweza kuwa ya faida kwa {crop_raw}. Angalia bei za soko la karibu nawe "
+                f"kwenye ukurasa wa Bei ya AI wa AgroLink."
+            ),
+            "hatua_haraka": (
+                f"Piga picha nzuri zaidi za {crop_raw} wako na uweke maelezo kamili "
+                f"kwenye orodha yako — orodha zenye picha nzuri zinapata wanunuzi "
+                f"mara tatu zaidi kuliko zile bila picha!"
+            ),
+            "alama": 70,
+        }
+        return jsonify({"success": True, "advice": advice})
+
+    # ── Uchambuzi wa bei ──────────────────────────────────────────────────────
+    bei_min = crop_data["bei_min"]
+    bei_max = crop_data["bei_max"]
+    onyo    = crop_data["onyo_bei"]
+
+    # Normalize bei kwa kg ili tulinganishe
+    price_per_kg = price_tzs
+    unit_lower = unit.lower()
+    if unit_lower == "tani":
+        price_per_kg = price_tzs / 1000
+    elif unit_lower == "gunia":
+        price_per_kg = price_tzs / 100
+    elif unit_lower == "debe":
+        price_per_kg = price_tzs / 20
+
+    if price_per_kg < onyo:
+        hali_bei = "chini"
+        ujumbe_bei = (
+            f"Bei yako ya TZS {price_tzs:,.0f} kwa {unit} ni chini sana ya wastani wa soko. "
+            f"Wakulima wengine wa {matched_key} wanauza kati ya TZS {bei_min:,} hadi "
+            f"TZS {bei_max:,} kwa kilo. Fikiria kuongeza bei yako ili usipoteze faida — "
+            f"unaweza kupoteza hadi TZS {(onyo - price_per_kg) * quantity:,.0f} kwa orodha hii."
+        )
+        alama = 45
+    elif price_per_kg > bei_max * 1.3:
+        hali_bei = "juu"
+        ujumbe_bei = (
+            f"Bei yako ya TZS {price_tzs:,.0f} kwa {unit} ni juu zaidi ya wastani wa soko. "
+            f"Bei ya kawaida ya {matched_key} ni TZS {bei_min:,} hadi TZS {bei_max:,} kwa kilo. "
+            f"Bei ya juu inaweza kufukuza wanunuzi — fikiria kupunguza kidogo au "
+            f"elezea vizuri ubora wa pekee wa zao lako kwenye maelezo."
+        )
+        alama = 60
+    else:
+        hali_bei = "nzuri"
+        ujumbe_bei = (
+            f"Hongera! Bei yako ya TZS {price_tzs:,.0f} kwa {unit} iko vizuri sana "
+            f"ndani ya wastani wa soko la {matched_key} (TZS {bei_min:,}–{bei_max:,}/kg). "
+            f"Una nafasi nzuri ya kupata wanunuzi haraka hasa ukiwa na picha nzuri "
+            f"na maelezo kamili ya ubora wa zao lako."
+        )
+        alama = 88
+
+    # ── Ushauri wa kuhifadhi ──────────────────────────────────────────────────
+    ushauri_hifadhi = (
+        f"{crop_data['hifadhi']} "
+        f"Una kiasi cha {quantity:,.0f} {unit} — hakikisha hifadhi yako ina nafasi "
+        f"ya kutosha na hewa ya kutosha. Msimu bora wa kuuza {matched_key} ni "
+        f"{crop_data['msimu']}."
+    )
+
+    # ── Onyo la ugonjwa ───────────────────────────────────────────────────────
+    magonjwa = crop_data["magonjwa"]
+    onyo_ugonjwa = (
+        f"Katika {current_month}, angalia hasa ugonjwa wa '{magonjwa[0]}' kwenye "
+        f"{matched_key} wako. Magonjwa mengine ya kawaida ni {magonjwa[1]} na "
+        f"{magonjwa[2]}. Chunguza majani, shina na matunda kila siku 2-3 "
+        f"na uwasiliane na Daktari wa Zao wetu ukiona dalili yoyote."
+    )
+
+    # ── Soko bora ─────────────────────────────────────────────────────────────
+    soko_bora = (
+        f"Masoko bora ya {matched_key} sasa ni {crop_data['soko']}. "
+        f"{'Mkoa wako wa ' + region + ' una soko zuri — wasiliana na wanunuzi wa karibu kwanza.' if region else 'Wasiliana na wanunuzi wa mkoa mkubwa karibu nawe.'}"
+    )
+
+    # ── Hatua ya haraka ───────────────────────────────────────────────────────
+    if hali_bei == "chini":
+        hatua_haraka = (
+            f"Haraka iwezekanavyo: ongeza bei yako hadi angalau TZS {onyo:,}/kg "
+            f"au elezea sababu ya bei hiyo kwenye maelezo (mfano: 'bei ya haraka — "
+            f"lazima niuze leo'). Unaweza kubadilisha orodha yako kutoka dashboard."
+        )
+    elif hali_bei == "juu":
+        hatua_haraka = (
+            f"Ongeza maelezo ya kina ya ubora wa {matched_key} wako — "
+            f"elezea jinsi ulivyolima, kama ni organic, au sifa nyingine za pekee "
+            f"ili kuwashawishi wanunuzi bei yako ina thamani."
+        )
+    else:
+        hatua_haraka = (
+            f"Shiriki orodha yako kwa marafiki na vikundi vya WhatsApp vya kilimo "
+            f"vya {region or 'mkoa wako'} — orodha mpya zinaweza kupata wanunuzi "
+            f"ndani ya masaa 24 za kwanza hasa ukiitangaza mwenyewe."
+        )
+
+    advice = {
+        "hali_bei":       hali_bei,
+        "ujumbe_bei":     ujumbe_bei,
+        "ushauri_hifadhi": ushauri_hifadhi,
+        "onyo_ugonjwa":   onyo_ugonjwa,
+        "soko_bora":      soko_bora,
+        "hatua_haraka":   hatua_haraka,
+        "alama":          alama,
+    }
+    return jsonify({"success": True, "advice": advice})
+
+
 # ── IMAGE UPLOAD ──────────────────────────────────────────────────────────────
 
 
