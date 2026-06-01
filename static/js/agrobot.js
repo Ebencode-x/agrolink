@@ -185,12 +185,112 @@ r:"Mfumo upo imara! ✅ AgroBot v3.0 imeupokea ujumbe wako. Niko tayari kukusaid
 
 const DEFAULT="Samahani, sijapata jibu sahihi. 🤔 Jaribu kuuliza kuhusu:<br>• <em>Magonjwa ya mazao</em> (nyanya, mahindi, viazi, muhogo...)<br>• <em>Bei za soko</em> Tanzania<br>• <em>Kuhifadhi mazao</em> baada ya kuvuna<br>• <em>Mbolea</em> na virutubisho<br>• <em>Kilimo</em> cha zao fulani<br>• <em>Masoko</em> na wanunuzi<br><br>Au bonyeza <strong>'Jua Zaidi'</strong> hapo juu kwa mada zote! 👆";
 
-// ── ENGINE ─────────────────────────────────────────────────────────────────
-function getReply(msg){
-  const m=msg.toLowerCase().trim();
-  for(const e of KB){for(const kw of e.k){if(m.includes(kw))return e.r;}}
-  return DEFAULT;
-}
+  // ── SMART ENGINE v2 — Scoring + Fuzzy Matching ───────────────────────────
+
+  // Normalize: ondoa sarufi, badilisha variations za kawaida
+  function normalize(text){
+    return text.toLowerCase().trim()
+      // Kiswahili verb variations
+      .replace(/kunyauka|unyaufu|anyauka|inyauka/g,"mnyauko")
+      .replace(/kuoza|inaoza|zinaoza|uoza/g,"kuoza")
+      .replace(/kukauka|inakauka|zinakauka|kukauka/g,"kukauka")
+      .replace(/yanaliwa|inaliwa|inashambuliwa|inashambuliwa/g,"yanaliwa")
+      .replace(/madoa|doa|vidonda/g,"madoa")
+      .replace(/njano|ya njano|kugeuka njano/g,"njano")
+      .replace(/kahawia|rangi ya kahawia/g,"kahawia")
+      .replace(/wadudu|mdudu|visumbufu/g,"wadudu")
+      .replace(/magonjwa|ugonjwa|maradhi/g,"magonjwa")
+      .replace(/dawa|tiba|matibabu/g,"dawa")
+      .replace(/kupanda|kupanda mbegu|kilimo cha/g,"kilimo")
+      .replace(/bei gani|bei ya|bei za|gharama/g,"bei")
+      .replace(/ncha ya|ncha za|kwenye ncha/g,"ncha")
+      .replace(/majani|jani/g,"majani")
+      .replace(/mmea|mimea|miche/g,"mmea")
+      .replace(/shamba|mashamba/g,"shamba");
+  }
+
+  // Gawanya sentensi na utoe maneno muhimu
+  function extractTokens(text){
+    const normalized = normalize(text);
+    // Ondoa stop words za Kiswahili
+    const stopWords = new Set([
+      "na","ya","wa","la","za","kwa","ni","au","ama","hii","hizi","hilo",
+      "hayo","yake","yangu","yako","yetu","zake","zangu","zako","zetu",
+      "pia","sana","kabisa","tu","kidogo","zaidi","lakini","ingawa",
+      "kwenye","katika","kutoka","hadi","mpaka","baada","kabla",
+      "vipi","nini","gani","je","ndiyo","hapana","sijui","naona",
+      "nimesikia","nimejua","ninajua","naweza","inaweza","unaweza",
+      "yangu","wangu","lake","lako","letu","yao","zao","wao","wake",
+      "okay","sawa","asante","tafadhali","naomba","nataka","niambie",
+      "kuhusu","habari","hali","hata","pale","hapo","hapa","kule",
+      "ule","ile","zile","vile","hizi","hizi","zizi","vivi"
+    ]);
+    return normalized.split(/\s+/).filter(t => t.length > 2 && !stopWords.has(t));
+  }
+
+  // Hesabu score kati ya message na entry moja ya KB
+  function scoreEntry(tokens, fullMsg, entry){
+    let score = 0;
+    const msg = normalize(fullMsg);
+
+    for(const kw of entry.k){
+      const normKw = normalize(kw);
+
+      // Exact match kwenye full message — score ya juu
+      if(msg.includes(normKw)){
+        score += 10 + normKw.split(" ").length * 2; // maneno mengi = score zaidi
+        continue;
+      }
+
+      // Token matching — kila token inayopatikana kwenye keyword
+      const kwTokens = normKw.split(/\s+/);
+      let tokenMatches = 0;
+      for(const t of tokens){
+        if(normKw.includes(t) || t.includes(normKw)){
+          tokenMatches++;
+        }
+        // Partial match — angalau herufi 4 zinazolingana
+        if(t.length >= 4 && normKw.length >= 4){
+          if(normKw.startsWith(t.substring(0,4)) || t.startsWith(normKw.substring(0,4))){
+            tokenMatches += 0.5;
+          }
+        }
+      }
+      if(tokenMatches > 0){
+        score += tokenMatches * 3;
+      }
+
+      // Keyword tokens zinazopatikana kwenye message tokens
+      for(const kwt of kwTokens){
+        if(kwt.length < 3) continue;
+        for(const t of tokens){
+          if(t === kwt) score += 4;
+          else if(t.includes(kwt) || kwt.includes(t)) score += 2;
+        }
+      }
+    }
+    return score;
+  }
+
+  function getReply(msg){
+    if(!msg || msg.trim().length === 0) return DEFAULT;
+
+    const tokens = extractTokens(msg);
+    let bestScore = 0;
+    let bestReply = null;
+
+    for(const entry of KB){
+      const score = scoreEntry(tokens, msg, entry);
+      if(score > bestScore){
+        bestScore = score;
+        bestReply = entry.r;
+      }
+    }
+
+    // Threshold ya chini — kama hakuna match ya kutosha, rudisha DEFAULT
+    if(bestScore < 3) return DEFAULT;
+    return bestReply;
+  }
 
 // ── STORAGE ───────────────────────────────────────────────────────────────
 function saveH(h){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(h.slice(-MAX_H)));}catch(e){}}
@@ -289,7 +389,7 @@ function build(){
       <div id="abot-know-more-left">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
         <div>
-          <div id="abot-know-more-text">Unataka Kujua Zaidi? 📚</div>
+          <div id="abot-know-more-text">Unataka Kujua Zaidi?</div>
           <div id="abot-know-more-sub">Angalia mada zote za kilimo →</div>
         </div>
       </div>
