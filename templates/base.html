@@ -391,5 +391,7 @@
   {% block extra_scripts %}{% endblock %}
   <script src="/static/js/agrobot.js"></script>
   <div id="agrobot-auth" data-auth="{{ '1' if current_user.is_authenticated else '0' }}" style="display:none"></div>
+  <div id="agrobot-user" data-name="{{ current_user.full_name.split()[0] if current_user.is_authenticated and current_user.full_name else '' }}" style="display:none"></div>
+  <div id="agrobot-user" data-name="{{ current_user.full_name.split()[0] if current_user.is_authenticated and current_user.full_name else '' }}" style="display:none"></div>
 </body>
 </html>

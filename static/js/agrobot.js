@@ -300,7 +300,7 @@ r:"Mfumo upo imara! ✅ AgroBot v4.0 imeupokea ujumbe wako. Nina KB ya mazao 30+
 r:"Mimi ni AgroBot — bot ya keyword-based iliyojengwa maalum kwa kilimo cha Tanzania! 🌱 Sijaundwa kwa ChatGPT lakini nimetengezwa na timu ya AgroLink. Ninajifunza kila wakati!"},
 ];
 
-const DEFAULT="Samahani, sijapata jibu sahihi kwa swali hilo. 🤔<br><br>Jaribu kuuliza kuhusu:<br>• <em>Mazao ya chakula</em>: mahindi, nyanya, viazi, mpunga, maharage, muhogo, ndizi...<br>• <em>Cash crops</em>: kahawa, chai, korosho, pamba, tumbaku, mkonge, pareto, alizeti, ufuta<br>• <em>Magonjwa ya mazao</em> + dawa<br>• <em>Bei za soko</em> Tanzania 2025/2026<br>• <em>Mbolea, mbegu bora, umwagiliaji</em><br>• <em>Kuhifadhi mazao, masoko, export, mikopo</em><br><br>Au bonyeza <strong>'Jua Zaidi'</strong> hapo juu kwa mada zote! 👆";
+const DEFAULT="<strong>Mada hii iko nje ya eneo langu.</strong> 🌾<br><br>Mimi ni AgroBot — msaidizi wa kilimo peke yake. Ninaweza kukusaidia na mambo kama:<br>• Magonjwa ya mazao na dawa zake<br>• Bei za soko Tanzania 2025/2026<br>• Kilimo cha mazao: mahindi, nyanya, kahawa, korosho...<br>• Mbolea, mbegu bora, umwagiliaji<br>• Masoko, export, mikopo ya kilimo<br><br>Kwa maswali ya <em>mitambo, magari, vifaa vya ujenzi</em> na mambo mengine — tafadhali wasiliana na mtaalamu husika.<br><br><a href='/mshauri' style='color:#6ee7b7;font-weight:700'>→ Angalia mada zote ninazoweza kukusaidia nazo</a>";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SMART ENGINE v3 — Enhanced Scoring + Fuzzy + Multilingual
@@ -432,6 +432,22 @@ function clearH(){try{localStorage.removeItem(STORAGE_KEY);}catch(e){}}
 
 // ── AUTH ──────────────────────────────────────────────────────────────────
 function isLoggedIn(){const el=document.getElementById("agrobot-auth");return el&&el.dataset.auth==="1";}
+function getUserName(){const el=document.getElementById("agrobot-user");return el&&el.dataset.name?el.dataset.name:"";}
+function getTimeGreeting(){
+  const h=new Date().getHours();
+  if(h>=5&&h<12)return"Habari za asubuhi";
+  if(h>=12&&h<17)return"Habari za mchana";
+  if(h>=17&&h<21)return"Habari za jioni";
+  return"Habari za usiku";
+}
+function getUserName(){const el=document.getElementById("agrobot-user");return el&&el.dataset.name?el.dataset.name:"";}
+function getTimeGreeting(){
+  const h=new Date().getHours();
+  if(h>=5&&h<12)return "Habari za asubuhi";
+  if(h>=12&&h<17)return "Habari za mchana";
+  if(h>=17&&h<21)return "Habari za jioni";
+  return "Habari za usiku";
+}
 
 // ── CSS ───────────────────────────────────────────────────────────────────
 const CSS=`
@@ -560,7 +576,14 @@ function abotOpen(){
   setTimeout(()=>{
     const box=document.getElementById("abot-messages");
     if(!box.children.length){
-      if(!renderH())addMsg("Habari! Mimi ni <strong>AgroBot v4.0</strong> — msaidizi wako wa kilimo hapa AgroLink Tanzania. 🌿<br>Nina taarifa za mazao <strong>30+</strong> ikiwemo cash crops (kahawa, chai, korosho, pamba, tumbaku, mkonge, pareto) na bei za <strong>2025/2026</strong>. Niulize chochote!","bot");
+      if(!renderH()){
+      const name=getUserName();
+      const greet=getTimeGreeting();
+      const welcome=name
+        ? `${greet} <strong>${name}</strong>! 🌿 Mimi ni <strong>AgroBot v4.0</strong> msaidizi wako wa kilimo.<br>Nina taarifa za mazao <strong>30+</strong>, cash crops na bei za <strong>2025/2026</strong>. Niulize chochote!`
+        : `Habari! Mimi ni <strong>AgroBot v4.0</strong> — msaidizi wako wa kilimo hapa AgroLink Tanzania. 🌿<br>Nina taarifa za mazao <strong>30+</strong> ikiwemo cash crops na bei za <strong>2025/2026</strong>. Niulize chochote!`;
+      addMsg(welcome,"bot");
+    }
     }
     box.scrollTop=box.scrollHeight;
   },50);
