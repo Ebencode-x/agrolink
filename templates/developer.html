@@ -54,14 +54,55 @@
   .cta-card{max-width:700px;margin:0 auto;padding:3rem;border-radius:var(--radius-lg);position:relative;overflow:hidden}
   .cta-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(16,185,129,0.1),transparent 70%)}
   @media(max-width:768px){
-    .about-grid{grid-template-columns:1fr!important;text-align:center}
-    .about-role{justify-content:center}
-    .links-section{justify-content:center}
-    .cert-grid{grid-template-columns:1fr!important}
-    .stats-row{grid-template-columns:1fr!important}
-    .avatar-circle{width:160px;height:160px}
-    .avatar-initials{font-size:3rem}
-    .about-name{font-size:1.8rem}
+    /* Hero */
+    .about-hero{min-height:auto;padding:2rem 1rem 1.5rem}
+    .about-grid{grid-template-columns:1fr!important;gap:1.5rem;text-align:center}
+    .about-role{justify-content:center;font-size:0.85rem}
+    .about-name{font-size:1.6rem}
+    .about-bio{font-size:0.88rem;line-height:1.7}
+    /* Avatar */
+    .avatar-wrap{gap:1rem}
+    .avatar-circle{width:120px;height:120px}
+    .avatar-initials{font-size:2.2rem}
+    .avatar-placeholder{font-size:0.65rem}
+    /* Certs */
+    .cert-grid{grid-template-columns:1fr!important;gap:0.5rem}
+    .cert-card{font-size:0.75rem;padding:0.5rem 0.7rem}
+    /* Links */
+    .links-section{justify-content:center;gap:0.5rem}
+    .profile-link{padding:0.55rem 1rem;font-size:0.8rem}
+    /* Stats — horizontal scroll cards on mobile */
+    .stats-row{
+      display:flex!important;
+      flex-direction:row!important;
+      overflow-x:auto;
+      gap:0.75rem;
+      padding:1rem!important;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+    }
+    .stats-row::-webkit-scrollbar{display:none}
+    .stat-card{
+      min-width:160px;
+      flex-shrink:0;
+      scroll-snap-align:start;
+      padding:1.25rem 1rem;
+    }
+    .stat-card-value{font-size:1.8rem}
+    .stat-card-label{font-size:0.75rem}
+    /* Mission */
+    .mission-section{padding:2rem 1rem}
+    .mission-grid{grid-template-columns:1fr!important;gap:1rem;margin-top:1.5rem}
+    .mission-card{padding:1.25rem}
+    /* Tech */
+    .tech-section{padding:2rem 1rem}
+    .tech-grid{gap:0.5rem}
+    .tech-badge{font-size:0.75rem;padding:0.4rem 0.75rem}
+    /* CTA */
+    .cta-section{padding:2rem 1rem}
+    .cta-card{padding:1.75rem 1.25rem}
+    .cta-card h2{font-size:1.4rem}
+    .cta-card p{font-size:0.85rem}
   }
 </style>
 {% endblock %}
