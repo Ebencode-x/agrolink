@@ -167,15 +167,18 @@
       .nav-desktop-user{display:none}
       .nav-hamburger{display:flex}
       .footer-grid{grid-template-columns:1fr 1fr;gap:2rem}
+      /* Disable heavy animations on mobile */
+      .orb{display:none!important}
+      .bg-canvas{background-attachment:scroll!important}
+      .reveal{opacity:1!important;transform:none!important;transition:none!important}
+      /* AgroBot — sticky bottom right, no scroll needed */
+      #agrobot-bubble{position:fixed!important;bottom:20px!important;right:16px!important;z-index:9999!important}
+      #agrobot-panel{position:fixed!important;top:0!important;bottom:0!important;right:-100vw!important;width:100vw!important;height:100%!important;border-left:none!important;z-index:10000!important}
+      #agrobot-panel.open{right:0!important}
     }
     @media(max-width:480px){
       .footer-grid{grid-template-columns:1fr;gap:1.5rem}
-    }
-    @media(max-width:480px){
-      #agrobot-panel{width:100vw!important;right:-100vw!important;border-left:none}
-      #agrobot-panel.open{right:0!important}
-      #agrobot-bubble{bottom:16px;right:16px}
-      #agrobot-bubble-inner{width:50px;height:50px}
+      #agrobot-bubble-inner{width:50px!important;height:50px!important}
     }
   </style>
   {% block extra_head %}{% endblock %}
@@ -397,7 +400,6 @@
   {% block extra_scripts %}{% endblock %}
   <script src="/static/js/agrobot.js"></script>
   <div id="agrobot-auth" data-auth="{{ '1' if current_user.is_authenticated else '0' }}" style="display:none"></div>
-  <div id="agrobot-user" data-name="{{ current_user.full_name.split()[0] if current_user.is_authenticated and current_user.full_name else '' }}" style="display:none"></div>
   <div id="agrobot-user" data-name="{{ current_user.full_name.split()[0] if current_user.is_authenticated and current_user.full_name else '' }}" style="display:none"></div>
 </body>
 </html>

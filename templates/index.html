@@ -64,7 +64,47 @@
   .social-link.linkedin{background:rgba(10,102,194,0.15);border:1px solid rgba(10,102,194,0.3);color:#93c5fd}
   .social-link.github{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary)}
   .social-link:hover{transform:translateY(-2px);filter:brightness(1.15)}
-  @media(max-width:900px){.hero{grid-template-columns:1fr;min-height:auto;padding-top:3rem}.hero-visual{order:-1}}
+  /* ── MOBILE RESPONSIVE ── */
+  @media(max-width:768px){
+    /* Hero — single column, no animation lag */
+    .hero{
+      grid-template-columns:1fr!important;
+      min-height:auto;
+      padding:1.5rem 1rem 2rem;
+      gap:1.5rem;
+    }
+    .hero-content{animation:none!important}
+    .hero-visual{order:-1;gap:1rem}
+    .hero-title{font-size:2rem!important}
+    .hero-subtitle{font-size:0.92rem;margin-bottom:1.5rem}
+    .hero-actions{gap:0.75rem}
+    .hero-actions a{padding:0.75rem 1.4rem;font-size:0.88rem}
+    .hero-stats{gap:1.25rem;margin-top:1.75rem;padding-top:1.5rem}
+    .stat-value{font-size:1.4rem}
+    /* Weather card compact */
+    .weather-temp{font-size:2.5rem!important}
+    /* Features — single column */
+    .features-grid{grid-template-columns:1fr!important;gap:1rem}
+    .feature-card{padding:1.25rem}
+    .feature-card:hover{transform:none!important}
+    /* Listings — single column */
+    .listings-grid{grid-template-columns:1fr!important;gap:1rem}
+    .listing-card{padding:1.25rem}
+    .listing-card:hover{transform:none!important}
+    /* Sections padding */
+    section{padding:3rem 1rem!important}
+    .section-title{font-size:1.6rem!important}
+    /* About section — REMOVE card, show simple bio */
+    #kuhusu{padding:2.5rem 1rem!important}
+    .about-grid-mobile{display:flex!important;flex-direction:column!important;gap:1.5rem!important}
+    .about-avatar-col{display:none!important}
+    .about-desktop-grid{grid-template-columns:1fr!important;gap:1.5rem!important}
+  }
+  @media(max-width:480px){
+    .hero-title{font-size:1.75rem!important}
+    .hero-stats{flex-wrap:wrap;gap:1rem}
+    .hero-stats .stat{min-width:calc(50% - 0.5rem)}
+  }
 </style>
 {% endblock %}
 
@@ -273,59 +313,55 @@
   </div>
 </section>
 
-<!-- ABOUT -->
+<!-- ABOUT — responsive, no tall card on mobile -->
 <section id="kuhusu" style="background:var(--glass-bg);backdrop-filter:blur(20px);border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);padding:5rem clamp(1rem,5vw,4rem);max-width:100%">
-  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1fr 1.5fr;gap:4rem;align-items:center">
-    <div class="reveal">
-      <div class="about-avatar glass" style="max-width:340px;min-height:340px;padding:0;overflow:hidden;border-radius:var(--radius-lg);position:relative">
-        <!-- Background farm image -->
-        <div style="position:absolute;inset:0;z-index:0">
-          <img
-            src="https://picsum.photos/seed/farm-dev/700/700"
-            alt="Kilimo Tanzania"
-            style="width:100%;height:100%;object-fit:cover;filter:brightness(0.35) saturate(0.7)"
-            onerror="this.parentElement.style.background='linear-gradient(135deg,#022c22,#064e3b)'"
-          />
-        </div>
-        <!-- Gradient overlay -->
-        <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(160deg,rgba(6,78,59,0.5) 0%,rgba(2,20,12,0.85) 100%)"></div>
-        <!-- Rotating glow -->
-        <div class="about-avatar" style="position:absolute;inset:0;z-index:2;background:none;border:none;max-width:100%"></div>
-        <!-- Content -->
-        <div style="position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:340px;padding:2rem;gap:0.75rem">
-          <!-- Initials circle -->
-          <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(245,158,11,0.2));border:2px solid rgba(52,211,153,0.4);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(10px);margin-bottom:0.5rem">
-            <div class="avatar-initials" style="font-size:1.8rem">ERM</div>
+  <div style="max-width:1400px;margin:0 auto">
+    <!-- Desktop: grid 2-col. Mobile: single col via CSS -->
+    <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:4rem;align-items:center" class="about-desktop-grid">
+      <!-- Avatar col — hidden on mobile via CSS -->
+      <div class="reveal about-avatar-col">
+        <div class="about-avatar glass" style="max-width:340px;min-height:340px;padding:0;overflow:hidden;border-radius:var(--radius-lg);position:relative">
+          <div style="position:absolute;inset:0;z-index:0">
+            <img src="https://picsum.photos/seed/farm-dev/700/700" alt="Kilimo Tanzania"
+              style="width:100%;height:100%;object-fit:cover;filter:brightness(0.35) saturate(0.7)"
+              onerror="this.parentElement.style.background='linear-gradient(135deg,#022c22,#064e3b)'"/>
           </div>
-          <div style="font-family:var(--font-display);font-weight:800;font-size:1.1rem;text-align:center;color:var(--text-primary)">Ebenezer Richard Masanja</div>
-          <div style="font-size:0.8rem;color:var(--emerald-glow);font-weight:600;text-align:center">ICT Student & Full-Stack Developer</div>
-          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem">
-            <span style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);color:var(--sky-pale);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.7rem;font-weight:700">MUST Mbeya</span>
-            <span style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.7rem;font-weight:700">Flask • PostgreSQL</span>
-            <span style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--amber-light);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.7rem;font-weight:700">Cisco Certified</span>
+          <div style="position:absolute;inset:0;z-index:1;background:linear-gradient(160deg,rgba(6,78,59,0.5) 0%,rgba(2,20,12,0.85) 100%)"></div>
+          <div style="position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:340px;padding:2rem;gap:0.75rem">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(245,158,11,0.2));border:2px solid rgba(52,211,153,0.4);display:flex;align-items:center;justify-content:center;margin-bottom:0.5rem">
+              <div class="avatar-initials" style="font-size:1.8rem">ERM</div>
+            </div>
+            <div style="font-family:var(--font-display);font-weight:800;font-size:1.1rem;text-align:center;color:var(--text-primary)">Ebenezer Richard Masanja</div>
+            <div style="font-size:0.8rem;color:var(--emerald-glow);font-weight:600;text-align:center">ICT Student & Full-Stack Developer</div>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem">
+              <span style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);color:var(--sky-pale);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.7rem;font-weight:700">MUST Mbeya</span>
+              <span style="background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.7rem;font-weight:700">Flask • PostgreSQL</span>
+              <span style="background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--amber-light);padding:0.2rem 0.6rem;border-radius:50px;font-size:0.7rem;font-weight:700">Cisco Certified</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="reveal">
-      <div class="section-eyebrow">Msanidi wa AgroLink</div>
-      <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:0.5rem">Ebenezer Richard Masanja</div>
-      <div style="font-size:0.95rem;color:var(--emerald-bright);font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px">
-        <i data-lucide="graduation-cap" style="width:16px;height:16px"></i>
-        Mwanafunzi wa ICT — MUST Mbeya | Full-Stack Developer
-      </div>
-      <p style="font-size:0.95rem;color:var(--text-secondary);line-height:1.8;margin-bottom:2rem">
-        Mimi ni mwanafunzi wa mwaka wa kwanza wa ICT katika Chuo Kikuu cha Mbeya cha Sayansi na Teknolojia (MUST). Nina shauku kubwa ya kujenga mifumo ya teknolojia inayosuluhisha matatizo ya kweli kwa jamii ya Tanzania. AgroLink Tanzania ni mradi wangu wa kwanza wa uzalishaji.
-      </p>
-      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem">
-        {% for cert in ['freeCodeCamp — Responsive Web Design','Cisco — Cybersecurity','Cisco — Endpoint Security','Cisco — Network Defense','Python — Flask','PostgreSQL'] %}
-        <span class="cert-chip">{{ cert }}</span>
-        {% endfor %}
-      </div>
-      <div style="display:flex;gap:1rem;flex-wrap:wrap">
-        <a href="https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399" target="_blank" class="social-link linkedin"><i data-lucide="linkedin" style="width:18px;height:18px"></i>LinkedIn</a>
-        <a href="https://github.com/Ebencode-x" target="_blank" class="social-link github"><i data-lucide="github" style="width:18px;height:18px"></i>GitHub</a>
-        <a href="mailto:admin@agrolink.co.tz" class="social-link github"><i data-lucide="mail" style="width:18px;height:18px"></i>Barua Pepe</a>
+      <!-- Bio col — always visible -->
+      <div class="reveal">
+        <div class="section-eyebrow">Msanidi wa AgroLink</div>
+        <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;margin-bottom:0.5rem">Ebenezer Richard Masanja</div>
+        <div style="font-size:0.95rem;color:var(--emerald-bright);font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:6px">
+          <i data-lucide="graduation-cap" style="width:16px;height:16px"></i>
+          Mwanafunzi wa ICT — MUST Mbeya | Full-Stack Developer
+        </div>
+        <p style="font-size:0.95rem;color:var(--text-secondary);line-height:1.8;margin-bottom:2rem">
+          Mimi ni mwanafunzi wa mwaka wa kwanza wa ICT katika Chuo Kikuu cha Mbeya cha Sayansi na Teknolojia (MUST). Nina shauku kubwa ya kujenga mifumo ya teknolojia inayosuluhisha matatizo ya kweli kwa jamii ya Tanzania. AgroLink Tanzania ni mradi wangu wa kwanza wa uzalishaji.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:2rem">
+          {% for cert in ['freeCodeCamp — Responsive Web Design','Cisco — Cybersecurity','Cisco — Endpoint Security','Cisco — Network Defense','Python — Flask','PostgreSQL'] %}
+          <span class="cert-chip">{{ cert }}</span>
+          {% endfor %}
+        </div>
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <a href="https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399" target="_blank" class="social-link linkedin"><i data-lucide="linkedin" style="width:18px;height:18px"></i>LinkedIn</a>
+          <a href="https://github.com/Ebencode-x" target="_blank" class="social-link github"><i data-lucide="github" style="width:18px;height:18px"></i>GitHub</a>
+          <a href="mailto:admin@agrolink.co.tz" class="social-link github"><i data-lucide="mail" style="width:18px;height:18px"></i>Barua Pepe</a>
+        </div>
       </div>
     </div>
   </div>
