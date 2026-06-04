@@ -453,9 +453,12 @@ async function deleteListing(id, btn){
     btn.disabled=false;
   }
 }
+// active category tracked globally
+let _activeCategory = "all";
+
 function filterListings(){
   const search=(document.getElementById("search-input")?.value||"").toLowerCase().trim();
-  const cat=(document.getElementById("category-filter")?.value||"all").toLowerCase().trim();
+  const cat=_activeCategory;
   const region=(document.getElementById("region-filter")?.value||"all").toLowerCase().trim();
   const cards=document.querySelectorAll(".listing-card");
   let visible=0;
@@ -496,6 +499,7 @@ function filterListings(){
   if(countEl) countEl.innerHTML=`Orodha <strong style="color:var(--text-primary)">${visible}</strong> zinapatikana`;
 }
 function filterCategory(cat,btn){
+  _activeCategory=cat.toLowerCase().trim();
   document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
   const cards=document.querySelectorAll(".listing-card");
