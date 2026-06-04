@@ -257,32 +257,18 @@
           <div><div style="font-size:0.72rem;color:var(--text-muted)">Kiasi</div><div class="listing-meta-value">{{ "{:,.0f}".format(l.quantity_kg) }} kg</div></div>
           <div><div style="font-size:0.72rem;color:var(--text-muted)">Bei</div><div class="listing-meta-value">TZS {{ "{:,.0f}".format(l.price_tzs) }}/kg</div></div>
         </div>
-        <button class="listing-contact-btn"><i data-lucide="phone" style="width:14px;height:14px"></i>{{ l.contact }}</button>
+        <a href="{{ url_for('login') }}" class="listing-contact-btn" style="display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none"><i data-lucide="lock" style="width:14px;height:14px"></i>Ingia Kuwasiliana</a>
       </div>
       {% endfor %}
     {% else %}
-      {% for title,crop,qty,price,region,contact in [
-        ('Mahindi Mazuri — Mbeya 2025','Mahindi','500','850','Mbeya','+255712000001'),
-        ('Nyanya Mpya — Arusha','Nyanya','200','1,100','Arusha','+255712000002'),
-        ('Kahawa Arabica Premium','Kahawa','1,000','4,500','Kilimanjaro','+255712000003')
-      ] %}
-      <div class="listing-card glass">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1rem">
-          <span class="listing-crop-badge"><i data-lucide="sprout" style="width:12px;height:12px;display:inline;vertical-align:middle"></i> {{ crop }}</span>
-          <span style="display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted)"><i data-lucide="map-pin" style="width:12px;height:12px"></i>{{ region }}</span>
-        </div>
-        <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.5rem">{{ title }}</div>
-        <div style="display:flex;gap:1.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--glass-border)">
-          <div><div style="font-size:0.72rem;color:var(--text-muted)">Kiasi</div><div class="listing-meta-value">{{ qty }} kg</div></div>
-          <div><div style="font-size:0.72rem;color:var(--text-muted)">Bei</div><div class="listing-meta-value">TZS {{ price }}/kg</div></div>
-        </div>
-        <button class="listing-contact-btn"><i data-lucide="phone" style="width:14px;height:14px"></i>{{ contact }}</button>
+      <div style="text-align:center;padding:2rem;color:var(--text-muted);grid-column:1/-1">
+        <i data-lucide="package-open" style="width:36px;height:36px;margin-bottom:0.75rem;opacity:0.4"></i>
+        <p style="font-size:0.9rem">Hakuna orodha bado. <a href="{{ url_for('register') }}" style="color:var(--emerald-glow);text-decoration:none;font-weight:600">Jisajili</a> na uwe wa kwanza kuuza!</p>
       </div>
-      {% endfor %}
     {% endif %}
   </div>
   <div style="text-align:center;margin-top:2.5rem">
-    <a href="/listings" class="btn-primary"><i data-lucide="arrow-right" style="width:18px;height:18px"></i>Angalia Orodha Zote</a>
+    <a href="{{ url_for('login') }}" class="btn-primary"><i data-lucide="log-in" style="width:18px;height:18px"></i>Ingia Kuona Orodha Zote</a>
   </div>
 </section>
 
