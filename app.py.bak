@@ -444,20 +444,12 @@ def index():
     listings = (
         MarketListing.query.filter_by(is_available=True)
         .order_by(MarketListing.posted_at.desc())
-        .limit(6)
+        .limit(8)
         .all()
     )
     weather = get_weather("Mbeya")
-    # Platform stats — live kutoka DB
-    from sqlalchemy import func, distinct
-    stats = {
-        "users": db.session.query(func.count(User.id)).scalar() or 0,
-        "listings": db.session.query(func.count(MarketListing.id)).filter_by(is_available=True).scalar() or 0,
-        "regions": db.session.query(func.count(distinct(MarketListing.region))).filter_by(is_available=True).scalar() or 0,
-        "crops": db.session.query(func.count(distinct(MarketListing.crop_name))).filter_by(is_available=True).scalar() or 0,
-    }
     return render_template(
-        "index.html", crops=crops, listings=listings, weather=weather, stats=stats
+        "index.html", crops=crops, listings=listings, weather=weather
     )
 
 

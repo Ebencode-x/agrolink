@@ -32,7 +32,7 @@ Built mobile-first, designed specifically for smartphone users in Tanzania's far
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
@@ -161,7 +161,7 @@ ICT Student — Mbeya University of Science and Technology (MUST), Tanzania
 
 ---
 
-## License
+## Licenses
 
 MIT License — see [LICENSE](LICENSE) for details.
 
