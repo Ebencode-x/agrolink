@@ -150,7 +150,7 @@ GEMINI_API_KEY=your-gemini-api-key
 - [x] Real-time weather service
 - [x] AI crop disease diagnosis (Gemini Vision)
 - [x] AgroBot Kiswahili chatbot
-- [ ] Pagination for marketplace
+- [x] Pagination for marketplace
 - [ ] Search and filter by crop/region
 - [ ] SMS notifications for buyer inquiries
 - [ ] WhatsApp share button per listing
