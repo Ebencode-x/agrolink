@@ -1,38 +1,29 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: "[BUG]:"
-labels: bug, duplicate, enhancement
+name: Bug Report
+about: Report a problem with AgroLink Tanzania
+title: "[BUG] "
+labels: bug
 assignees: Ebencode-x
-
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## What happened?
+<!-- A clear description of the bug -->
 
-**To Reproduce**
-Steps to reproduce the behavior:
+## Steps to reproduce
 1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+2. Click on '...'
+3. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Expected behavior
+<!-- What should have happened instead? -->
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Screenshots
+<!-- If applicable, add screenshots -->
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Environment
+- Device: (e.g. Mobile / Desktop)
+- Browser: (e.g. Chrome, Firefox)
+- Page affected: (e.g. /market/listings, /dashboard)
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+## Additional context
+<!-- Any other information that might help -->
