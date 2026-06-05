@@ -22,6 +22,8 @@ Built mobile-first, designed specifically for smartphone users in Tanzania's far
 
 - **Soko la Mazao** — Farmers post crop listings with photos, quantities, and prices. Buyers browse and contact sellers directly via phone or WhatsApp.
 - **Bei ya AI** — Smart price prediction engine for 12 crops across all 25 Tanzania regions, with seasonal and regional market intelligence. Powered by a caching layer with 6-hour TTL.
+- **Daktari wa Zao** — AI crop disease diagnosis via photo upload, powered by Gemini Vision AI.
+- **AgroBot** — Kiswahili-first farming assistant chatbot with 200+ keyword coverage across 15+ crops.
 - **Hali ya Hewa** — Real-time weather data for 20+ Tanzanian cities via OpenWeatherMap API, with 30-minute intelligent caching.
 - **Seller Ratings** — Star-based trust system allowing buyers to rate sellers per listing — one rating per buyer per listing enforced at DB level.
 - **Listing Reports** — Community moderation — users can report suspicious or fraudulent listings.
@@ -32,7 +34,7 @@ Built mobile-first, designed specifically for smartphone users in Tanzania's far
 
 ---
 
-## Tech stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -41,6 +43,7 @@ Built mobile-first, designed specifically for smartphone users in Tanzania's far
 | ORM | SQLAlchemy + Flask-Migrate |
 | Auth | Flask-Login, Flask-Bcrypt |
 | Storage | Supabase Storage (crop images) |
+| AI | Gemini Vision AI (crop diagnosis), Smart Price Engine |
 | Weather | OpenWeatherMap API |
 | Deployment | Render (Web Service) |
 | Frontend | Jinja2 Templates, Vanilla JS, Lucide Icons |
@@ -65,7 +68,8 @@ Built mobile-first, designed specifically for smartphone users in Tanzania's far
 ---
 
 ## Project Structure
-<div>
+
+```
 agrolink/
 ├── app.py                  # Main Flask app — models, routes, services
 ├── requirements.txt        # Python dependencies
@@ -81,7 +85,8 @@ agrolink/
 │   ├── market/             # Listings marketplace, price intelligence
 │   └── admin/              # Admin panel
 └── migrations/             # Alembic migration files
-</div>
+```
+
 ---
 
 ## Getting Started
@@ -98,7 +103,8 @@ agrolink/
 git clone https://github.com/Ebencode-x/agrolink.git
 cd agrolink
 python -m venv venv
-source venv/Scripts/activate
+source venv/bin/activate      # Linux/macOS
+# source venv/Scripts/activate  # Windows
 pip install -r requirements.txt
 flask db upgrade
 python app.py
@@ -112,6 +118,7 @@ DATABASE_URL=postgresql://user:password@host:5432/dbname
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
 OPENWEATHER_API_KEY=your-openweathermap-api-key
+GEMINI_API_KEY=your-gemini-api-key
 ```
 
 ---
@@ -141,7 +148,8 @@ OPENWEATHER_API_KEY=your-openweathermap-api-key
 - [x] Community listing reports
 - [x] AI price prediction with caching
 - [x] Real-time weather service
-- [ ] Image upload for listings
+- [x] AI crop disease diagnosis (Gemini Vision)
+- [x] AgroBot Kiswahili chatbot
 - [ ] Pagination for marketplace
 - [ ] Search and filter by crop/region
 - [ ] SMS notifications for buyer inquiries
@@ -157,11 +165,11 @@ OPENWEATHER_API_KEY=your-openweathermap-api-key
 ICT Student — Mbeya University of Science and Technology (MUST), Tanzania
 
 [![GitHub](https://img.shields.io/badge/GitHub-Ebencode--x-181717?style=flat-square&logo=github)](https://github.com/Ebencode-x)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Ebenezer%20Masanja-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/ebenezer-richard-masanja-a49437399)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-ebenezer--masanja-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/ebenezer-masanja/)
 
 ---
 
-## Licenses
+## License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
