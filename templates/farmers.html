@@ -2,54 +2,129 @@
 {% block title %}Wakulima — AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
-  .farmers-hero{position:relative;padding:5rem 0 3rem;overflow:hidden;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(16,185,129,0.18) 0%,transparent 70%)}
-  .farmers-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(16,185,129,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.05) 1px,transparent 1px);background-size:40px 40px;pointer-events:none}
-  .farmers-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.3),transparent)}
-  .hero-inner{position:relative;z-index:1;text-align:center;max-width:640px;margin:0 auto;padding:0 1.5rem}
-  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.35rem 1rem;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem}
-  .hero-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1rem}
-  .hero-title .glow{background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .hero-sub{color:var(--text-secondary);font-size:1rem;line-height:1.7;margin-bottom:2.5rem}
-  .search-bar{display:flex;gap:0.75rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:0.5rem;backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
-  .search-bar input{flex:1;background:transparent;border:none;outline:none;color:var(--text-primary);font-size:0.95rem;padding:0.5rem 0.75rem}
-  .search-bar input::placeholder{color:var(--text-muted)}
-  .search-bar select{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:10px;color:var(--text-secondary);font-size:0.85rem;padding:0.5rem 0.75rem;outline:none;cursor:pointer}
-  .search-bar select option{background:#0a1f0f;color:white}
-  .search-bar button{background:linear-gradient(135deg,var(--emerald-bright),#059669);border:none;border-radius:10px;color:white;padding:0.6rem 1.25rem;font-weight:600;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all var(--transition);white-space:nowrap}
-  .search-bar button:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(16,185,129,0.4)}
-  .results-section{padding:3rem 0 5rem}
-  .results-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:gap}
+  .farmers-hero{
+    background:var(--brand-dark);
+    padding:4rem clamp(1rem,5vw,3rem) 3rem;
+    border-bottom:3px solid var(--brand-mid);
+  }
+  .farmers-hero-inner{
+    max-width:640px;margin:0 auto;text-align:center;
+  }
+  .farmers-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(45,106,79,0.30);
+    border:1px solid rgba(212,163,115,0.40);
+    color:var(--brand-light);
+    padding:0.32rem 1rem;border-radius:50px;
+    font-size:0.74rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+    margin-bottom:1.5rem;
+  }
+  .farmers-title{
+    font-family:var(--font-display);
+    font-size:clamp(2rem,5vw,3rem);
+    font-weight:800;line-height:1.15;
+    color:var(--text-on-dark);
+    margin-bottom:1rem;
+  }
+  .farmers-title .accent{color:var(--brand-green)}
+  .farmers-sub{
+    color:rgba(254,250,224,0.65);
+    font-size:0.98rem;line-height:1.7;
+    margin-bottom:2.5rem;
+  }
+  .search-bar{
+    display:flex;gap:0.6rem;
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:var(--radius-md);
+    padding:0.5rem;
+  }
+  .search-bar input{
+    flex:1;background:transparent;border:none;outline:none;
+    color:var(--text-on-dark);font-size:0.9rem;
+    padding:0.45rem 0.6rem;font-family:var(--font-body);
+  }
+  .search-bar input::placeholder{color:rgba(254,250,224,0.38)}
+  .search-bar select{
+    background:rgba(45,106,79,0.25);
+    border:1px solid rgba(45,106,79,0.40);
+    border-radius:var(--radius-sm);
+    color:var(--text-on-dark);
+    font-size:0.82rem;padding:0.45rem 0.6rem;
+    outline:none;cursor:pointer;font-family:var(--font-body);
+  }
+  .search-bar select option{background:var(--brand-dark);color:var(--text-on-dark)}
+  .search-bar button{
+    background:var(--brand-mid);border:none;
+    border-radius:var(--radius-sm);
+    color:var(--text-on-dark);
+    padding:0.55rem 1.1rem;
+    font-family:var(--font-display);font-weight:600;font-size:0.85rem;
+    cursor:pointer;display:flex;align-items:center;gap:6px;
+    transition:background var(--transition);white-space:nowrap;
+  }
+  .search-bar button:hover{background:#163d2a}
+  .results-section{padding:3rem clamp(1rem,5vw,3rem) 5rem}
+  .results-inner{max-width:1200px;margin:0 auto}
+  .results-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:0.5rem}
   .results-count{font-size:0.88rem;color:var(--text-muted)}
-  .results-count span{color:var(--emerald-bright);font-weight:700}
-  .farmers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
-  .farmer-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;transition:all 0.25s;position:relative;overflow:hidden;cursor:pointer}
-  .farmer-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(16,185,129,0.08) 0%,transparent 70%);opacity:0;transition:opacity 0.25s}
-  .farmer-card:hover{border-color:rgba(16,185,129,0.35);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
-  .farmer-card:hover::before{opacity:1}
-  .farmer-avatar{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,rgba(16,185,129,0.3),rgba(5,150,105,0.5));display:flex;align-items:center;justify-content:center;margin-bottom:1rem;border:1px solid rgba(16,185,129,0.2)}
-  .farmer-name{font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.3rem;color:var(--text-primary)}
-  .farmer-region{display:inline-flex;align-items:center;gap:5px;font-size:0.78rem;color:var(--emerald-bright);background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);border-radius:50px;padding:0.2rem 0.65rem;margin-bottom:0.85rem}
-  .farmer-stats{display:flex;gap:1rem;padding-top:0.85rem;border-top:1px solid rgba(255,255,255,0.06)}
-  .farmer-stat{display:flex;align-items:center;gap:5px;font-size:0.78rem;color:var(--text-muted)}
-  .farmer-stat strong{color:var(--text-primary);font-weight:600}
-  .empty-state{text-align:center;padding:5rem 2rem;color:var(--text-muted)}
-  .empty-icon{width:72px;height:72px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;color:var(--text-muted)}
-  .empty-state h3{font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem}
-  .active-filter{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.25);border-radius:50px;padding:0.3rem 0.85rem;font-size:0.8rem;color:var(--emerald-bright);margin-bottom:1rem}
+  .results-count span{color:var(--brand-mid);font-weight:700}
+  .active-filter{
+    display:inline-flex;align-items:center;gap:6px;
+    background:rgba(45,106,79,0.10);border:1px solid rgba(45,106,79,0.25);
+    border-radius:50px;padding:0.3rem 0.85rem;
+    font-size:0.8rem;color:var(--brand-mid);margin-bottom:1rem;
+  }
   .active-filter a{color:var(--text-muted);margin-left:4px;text-decoration:none;transition:color var(--transition)}
   .active-filter a:hover{color:#ef4444}
+  .farmers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+  .farmer-card{
+    background:var(--bg-card);border:1px solid var(--border);
+    border-radius:var(--radius-md);padding:1.5rem;
+    transition:border-color var(--transition),box-shadow var(--transition);
+  }
+  .farmer-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md)}
+  .farmer-avatar{
+    width:48px;height:48px;border-radius:12px;
+    background:rgba(45,106,79,0.10);border:1px solid rgba(45,106,79,0.22);
+    display:flex;align-items:center;justify-content:center;
+    margin-bottom:1rem;color:var(--brand-mid);
+  }
+  .farmer-name{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:0.35rem}
+  .farmer-region{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:0.76rem;color:var(--brand-mid);
+    background:rgba(45,106,79,0.08);border:1px solid rgba(45,106,79,0.18);
+    border-radius:50px;padding:0.2rem 0.65rem;margin-bottom:0.85rem;
+  }
+  .farmer-stats{display:flex;gap:1rem;padding-top:0.85rem;border-top:1px solid var(--border)}
+  .farmer-stat{display:flex;align-items:center;gap:5px;font-size:0.78rem;color:var(--text-muted)}
+  .farmer-stat strong{color:var(--text-primary);font-weight:600}
+  .empty-state{
+    text-align:center;padding:5rem 2rem;color:var(--text-muted);
+    background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);
+  }
+  .empty-state h3{font-family:var(--font-display);font-size:1.2rem;font-weight:700;color:var(--text-primary);margin:0.75rem 0 0.5rem}
+  @media(max-width:480px){
+    .search-bar{flex-direction:column}
+    .search-bar button{justify-content:center}
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <section class="farmers-hero">
-  <div class="hero-inner">
-    <div class="hero-badge"><i data-lucide="users" style="width:13px;height:13px"></i>Jamii ya Wakulima</div>
-    <h1 class="hero-title">Tafuta <span class="glow">Wakulima</span><br/>wa Tanzania</h1>
-    <p class="hero-sub">Unganika na wakulima kutoka mikoa yote — tafuta kwa jina au mkoa wao.</p>
+  <div class="farmers-hero-inner">
+    <div class="farmers-badge">
+      <i data-lucide="users" style="width:13px;height:13px"></i>Jamii ya Wakulima
+    </div>
+    <h1 class="farmers-title">
+      Tafuta Wakulima<br/><span class="accent">wa Tanzania</span>
+    </h1>
+    <p class="farmers-sub">Unganika na wakulima kutoka mikoa yote — tafuta kwa jina au mkoa wao.</p>
     <form method="GET" action="/farmers">
       <div class="search-bar">
-        <i data-lucide="search" style="width:18px;height:18px;color:var(--text-muted);align-self:center;flex-shrink:0;margin-left:0.5rem"></i>
+        <i data-lucide="search" style="width:16px;height:16px;color:rgba(254,250,224,0.45);align-self:center;flex-shrink:0;margin-left:0.25rem"></i>
         <input type="text" name="q" value="{{ q }}" placeholder="Tafuta jina la mkulima..."/>
         <select name="region">
           <option value="">Mikoa Yote</option>
@@ -57,19 +132,21 @@
           <option value="{{ r }}" {% if r==region %}selected{% endif %}>{{ r }}</option>
           {% endfor %}
         </select>
-        <button type="submit"><i data-lucide="search" style="width:15px;height:15px"></i>Tafuta</button>
+        <button type="submit">
+          <i data-lucide="search" style="width:14px;height:14px"></i>Tafuta
+        </button>
       </div>
     </form>
   </div>
 </section>
 
 <section class="results-section">
-  <div class="container">
+  <div class="results-inner">
     {% if q or region %}
     <div class="active-filter">
       <i data-lucide="filter" style="width:13px;height:13px"></i>
       {% if q %}Jina: <strong>{{ q }}</strong>{% endif %}
-      {% if region %} &nbsp;Mkoa: <strong>{{ region }}</strong>{% endif %}
+      {% if region %}&nbsp;Mkoa: <strong>{{ region }}</strong>{% endif %}
       <a href="/farmers" title="Futa filter"><i data-lucide="x" style="width:12px;height:12px"></i></a>
     </div>
     {% endif %}
@@ -81,7 +158,7 @@
       {% for farmer in farmers %}
       <div class="farmer-card">
         <div class="farmer-avatar">
-          <i data-lucide="user" style="width:24px;height:24px;color:var(--emerald-bright)"></i>
+          <i data-lucide="user" style="width:22px;height:22px"></i>
         </div>
         <div class="farmer-name">{{ farmer.full_name }}</div>
         {% if farmer.region %}
@@ -90,17 +167,23 @@
         </div>
         {% endif %}
         <div class="farmer-stats">
-          <div class="farmer-stat"><i data-lucide="package" style="width:13px;height:13px"></i><strong>{{ farmer.listings|length if farmer.listings is defined else 0 }}</strong> Mazao</div>
-          <div class="farmer-stat"><i data-lucide="calendar" style="width:13px;height:13px"></i>{{ farmer.created_at.strftime('%b %Y') if farmer.created_at else '—' }}</div>
+          <div class="farmer-stat">
+            <i data-lucide="package" style="width:13px;height:13px"></i>
+            <strong>{{ farmer.listings|length if farmer.listings is defined else 0 }}</strong>&nbsp;Mazao
+          </div>
+          <div class="farmer-stat">
+            <i data-lucide="calendar" style="width:13px;height:13px"></i>
+            {{ farmer.created_at.strftime("%b %Y") if farmer.created_at else "—" }}
+          </div>
         </div>
       </div>
       {% endfor %}
     </div>
     {% else %}
     <div class="empty-state">
-      <div class="empty-icon"><i data-lucide="user-x" style="width:32px;height:32px"></i></div>
+      <i data-lucide="user-x" style="width:36px;height:36px;opacity:0.35"></i>
       <h3>Hakuna Wakulima Waliopatikana</h3>
-      <p>Jaribu kubadilisha maneno ya utafutaji au mkoa.</p>
+      <p style="font-size:0.9rem">Jaribu kubadilisha maneno ya utafutaji au mkoa.</p>
     </div>
     {% endif %}
   </div>

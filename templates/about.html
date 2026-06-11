@@ -2,63 +2,63 @@
 {% block title %}Kuhusu AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
-  .about-hero{position:relative;padding:5rem 0 3rem;overflow:hidden;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(16,185,129,0.18) 0%,transparent 70%)}
-  .about-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(16,185,129,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,0.05) 1px,transparent 1px);background-size:40px 40px}
-  .about-hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,0.3),transparent)}
-  .hero-inner{position:relative;z-index:1;text-align:center;max-width:700px;margin:0 auto;padding:0 1.5rem}
-  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.35rem 1rem;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem}
-  .hero-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.15;margin-bottom:1rem}
-  .hero-title .glow{background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .hero-sub{color:var(--text-secondary);font-size:1rem;line-height:1.8;margin-bottom:2.5rem}
+  .about-hero{background:var(--brand-dark);padding:5rem clamp(1rem,5vw,3rem) 4rem;border-bottom:3px solid var(--brand-mid)}
+
+
+  .hero-inner{text-align:center;max-width:700px;margin:0 auto}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,0.30);border:1px solid rgba(212,163,115,0.40);color:var(--brand-light);padding:0.35rem 1rem;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem}
+  .hero-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1rem}
+  .hero-title .accent{color:var(--brand-green)}
+  .hero-sub{color:rgba(254,250,224,0.65);font-size:1rem;line-height:1.8;margin-bottom:2.5rem}
   .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-  .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.75rem;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;border-radius:50px;font-weight:700;font-size:0.9rem;text-decoration:none;transition:all var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35)}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(16,185,129,0.5)}
-  .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:0.8rem 1.75rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:var(--text-primary);border-radius:50px;font-weight:600;font-size:0.9rem;text-decoration:none;transition:all var(--transition)}
-  .btn-ghost:hover{background:rgba(255,255,255,0.12);transform:translateY(-2px)}
-  .stats-section{padding:4rem 0;max-width:900px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem}
+  .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:0.78rem 1.6rem;background:var(--brand-mid);color:var(--text-on-dark);border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.9rem;text-decoration:none;transition:all var(--transition);box-shadow:0 4px 14px rgba(45,106,79,0.28);border:none}
+  .btn-primary:hover{background:#163d2a;transform:translateY(-1px)}
+  .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:0.78rem 1.6rem;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.20);color:var(--text-on-dark);border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.9rem;text-decoration:none;transition:all var(--transition)}
+  .btn-ghost:hover{background:rgba(255,255,255,0.15)}
+  .stats-section{padding:4rem clamp(1rem,5vw,3rem);background:var(--bg-alt);border-bottom:1px solid var(--border)}
   .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem}
-  .stat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.75rem;text-align:center;transition:all 0.25s}
-  .stat-card:hover{border-color:rgba(16,185,129,0.3);transform:translateY(-3px)}
-  .stat-num{font-family:var(--font-display);font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.4rem}
+  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;text-align:center;transition:border-color var(--transition),box-shadow var(--transition)}
+  .stat-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md)}
+  .stat-num{font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:var(--brand-mid);margin-bottom:0.4rem}
   .stat-label{font-size:0.82rem;color:var(--text-muted)}
-  .mission-section{padding:4rem 0;max-width:1100px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem}
-  .section-eyebrow{font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--emerald-bright);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
-  .section-title{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-bottom:1rem}
+  .mission-section{padding:4rem clamp(1rem,5vw,3rem);max-width:1200px;margin:0 auto}
+  .section-eyebrow{font-size:0.74rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand-mid);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
+  .section-title{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:var(--text-primary);margin-bottom:1rem}
   .section-sub{color:var(--text-secondary);font-size:0.95rem;line-height:1.8;max-width:600px;margin-bottom:2.5rem}
   .mission-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
-  .mission-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:2rem;position:relative;overflow:hidden;transition:all 0.25s}
-  .mission-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--emerald-bright),var(--amber-warm))}
-  .mission-card:hover{border-color:rgba(16,185,129,0.25);transform:translateY(-3px)}
+  .mission-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:2rem;position:relative;overflow:hidden;transition:border-color var(--transition),box-shadow var(--transition)}
+  .mission-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand-mid)}
+  .mission-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md)}
   .mission-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
-  .mission-icon.green{background:rgba(16,185,129,0.15);color:var(--emerald-bright)}
-  .mission-icon.amber{background:rgba(245,158,11,0.15);color:var(--amber-warm)}
-  .mission-icon.sky{background:rgba(14,165,233,0.15);color:#0ea5e9}
-  .mission-icon.red{background:rgba(244,63,94,0.15);color:#f43f5e}
-  .mission-title{font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:0.5rem}
+  .mission-icon.green{background:rgba(45,106,79,0.10);color:var(--brand-mid);border:1px solid rgba(45,106,79,0.20)}
+  .mission-icon.amber{background:rgba(212,163,115,0.12);color:var(--brand-earth);border:1px solid rgba(212,163,115,0.25)}
+  .mission-icon.sky{background:rgba(147,197,253,0.10);color:#3b82f6;border:1px solid rgba(147,197,253,0.20)}
+  .mission-icon.red{background:rgba(244,63,94,0.08);color:#f43f5e;border:1px solid rgba(244,63,94,0.18)}
+  .mission-title{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:0.5rem}
   .mission-desc{font-size:0.875rem;color:var(--text-secondary);line-height:1.7}
-  .tech-section{padding:4rem 0;max-width:1100px;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem}
+  .tech-section{padding:4rem clamp(1rem,5vw,3rem);background:var(--bg-alt);border-top:1px solid var(--border)}
   .tech-grid{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.5rem}
   .tech-badge{display:inline-flex;align-items:center;gap:6px;padding:0.5rem 1rem;border-radius:50px;font-size:0.82rem;font-weight:600;border:1px solid}
   .tech-python{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd}
-  .tech-flask{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--emerald-glow)}
+  .tech-flask{background:rgba(45,106,79,0.10);border-color:rgba(45,106,79,0.25);color:var(--brand-mid)}
   .tech-pg{background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.3);color:#7dd3fc}
-  .tech-html{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--amber-light)}
+  .tech-html{background:rgba(212,163,115,0.10);border-color:rgba(212,163,115,0.25);color:#92400e}
   .tech-render{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);color:#c4b5fd}
-  .cta-section{padding:5rem 1.5rem;text-align:center;position:relative;overflow:hidden}
-  .cta-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 50%,rgba(16,185,129,0.1) 0%,transparent 70%)}
-  .cta-card{position:relative;z-index:1;max-width:600px;margin:0 auto;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:3rem 2rem}
-  .developer-card{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:1rem 1.25rem;margin-top:2rem;text-decoration:none;transition:all 0.25s;max-width:320px;margin-left:auto;margin-right:auto}
-  .developer-card:hover{border-color:rgba(16,185,129,0.3);transform:translateY(-2px)}
-  .dev-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--emerald-bright),var(--amber-warm));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:0.9rem;color:white;flex-shrink:0}
-  .dev-name{font-weight:700;font-size:0.9rem;color:var(--text-primary)}
-  .dev-role{font-size:0.75rem;color:var(--text-muted)}
+  .cta-section{padding:5rem clamp(1rem,5vw,3rem);text-align:center;background:var(--brand-dark);border-top:3px solid var(--brand-mid)}
+
+  .cta-card{max-width:580px;margin:0 auto}
+  .developer-card{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-top:2rem;text-decoration:none;transition:border-color var(--transition);max-width:320px;margin-left:auto;margin-right:auto}
+  .developer-card:hover{border-color:rgba(212,163,115,0.50)}
+  .dev-avatar{width:44px;height:44px;border-radius:12px;background:var(--brand-mid);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:0.88rem;color:var(--text-on-dark);flex-shrink:0}
+  .dev-name{font-weight:700;font-size:0.9rem;color:var(--text-on-dark)}
+  .dev-role{font-size:0.75rem;color:rgba(254,250,224,0.50)}
 </style>
 {% endblock %}
 {% block content %}
 <section class="about-hero">
   <div class="hero-inner">
     <div class="hero-badge"><i data-lucide="sprout" style="width:13px;height:13px"></i>Jukwaa la Kilimo</div>
-    <h1 class="hero-title">Tunaunganisha <span class="glow">Wakulima</span><br/>na Masoko ya Tanzania</h1>
+    <h1 class="hero-title">Tunaunganisha <span class="accent">Wakulima</span><br/>na Masoko ya Tanzania</h1>
     <p class="hero-sub">AgroLink Tanzania ni jukwaa la kidijitali linalounganisha wakulima, mawakala, na masoko ya Tanzania — bei za kweli, watu wa kweli, wakati halisi.</p>
     <div class="hero-btns">
       <a href="/register" class="btn-primary"><i data-lucide="user-plus" style="width:16px;height:16px"></i>Jiunge Bure</a>
@@ -132,10 +132,10 @@
 
 <section class="cta-section">
   <div class="cta-card">
-    <div class="section-eyebrow" style="justify-content:center"><i data-lucide="heart" style="width:13px;height:13px"></i>Jiunge Nasi</div>
-    <h2 class="section-title">Anza Leo — Bure Kabisa</h2>
-    <p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.8;margin-bottom:1.5rem">Jiunge na maelfu ya wakulima wa Tanzania wanaotumia AgroLink kupata bei bora na masoko mapya.</p>
-    <a href="/register" class="btn-primary" style="margin:0 auto"><i data-lucide="user-plus" style="width:16px;height:16px"></i>Jiunge Bure Sasa</a>
+    <div class="section-eyebrow" style="justify-content:center;color:var(--brand-green)"><i data-lucide="heart" style="width:13px;height:13px"></i>Jiunge Nasi</div>
+    <h2 class="section-title" style="color:var(--text-on-dark)">Anza Leo — Bure Kabisa</h2>
+    <p style="color:rgba(254,250,224,0.62);font-size:0.9rem;line-height:1.8;margin-bottom:1.5rem">Jiunge na maelfu ya wakulima wa Tanzania wanaotumia AgroLink kupata bei bora na masoko mapya.</p>
+    <a href="/register" class="btn-primary" style="display:inline-flex;margin:0 auto"><i data-lucide="user-plus" style="width:16px;height:16px"></i>Jiunge Bure Sasa</a>
     <a href="/developer" class="developer-card">
       <div class="dev-avatar">ERM</div>
       <div>

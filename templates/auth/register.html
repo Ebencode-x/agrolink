@@ -2,33 +2,33 @@
 {% block title %}Jiunge — AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
-  .register-layout{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:2rem clamp(1rem,4vw,3rem)}
+  .register-layout{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:2rem clamp(1rem,4vw,3rem);background:var(--bg-page)}
   .register-container{width:100%;max-width:960px;display:grid;grid-template-columns:320px 1fr;gap:2rem;align-items:start}
-  .sidebar-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:2rem;box-shadow:0 12px 40px rgba(0,0,0,0.4);position:sticky;top:90px}
-  .sidebar-logo-icon{width:42px;height:42px;background:linear-gradient(135deg,var(--emerald-bright),var(--amber-warm));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 16px rgba(16,185,129,0.35)}
+  .sidebar-card{background:var(--brand-dark);border:1px solid rgba(45,106,79,0.3);border-radius:var(--radius-lg);padding:2rem;position:sticky;top:80px}
+  .sidebar-logo-icon{width:42px;height:42px;background:var(--brand-mid);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--text-on-dark)}
   .benefit-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:0.85rem}
-  .benefit-icon{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(16,185,129,0.15);color:var(--emerald-bright);margin-top:1px}
-  .register-form-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(28px);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-lg);padding:2.5rem;box-shadow:0 16px 56px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.1);animation:card-in 0.5s cubic-bezier(0.4,0,0.2,1) both}
+  .benefit-icon{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(45,106,79,0.25);color:var(--brand-light);margin-top:1px}
+  .register-form-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem;box-shadow:var(--shadow-md);animation:card-in 0.4s ease both}
   @keyframes card-in{from{opacity:0;transform:translateY(24px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
   .form-divider{display:flex;align-items:center;gap:0.75rem;margin:1.5rem 0 1.25rem;font-size:0.78rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted)}
-  .form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--glass-border)}
+  .form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--border)}
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
   .role-selector{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
   .role-option input[type=radio]{position:absolute;opacity:0;width:0;height:0}
-  .role-label{display:flex;flex-direction:column;align-items:center;gap:8px;padding:1.1rem 0.75rem;border-radius:var(--radius-sm);background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);cursor:pointer;transition:all var(--transition);text-align:center}
-  .role-label:hover{background:rgba(255,255,255,0.08);border-color:rgba(16,185,129,0.4)}
-  .role-option input:checked+.role-label{background:rgba(16,185,129,0.14);border-color:var(--emerald-bright);box-shadow:0 0 0 1px var(--emerald-bright) inset}
-  .form-select{background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:0.75rem 1rem 0.75rem 2.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;width:100%;transition:border-color var(--transition);cursor:pointer}
-  .form-select:focus{border-color:var(--emerald-bright)}
-  .form-select option{background:#064e3b}
+  .role-label{display:flex;flex-direction:column;align-items:center;gap:8px;padding:1.1rem 0.75rem;border-radius:var(--radius-sm);background:var(--bg-page);border:1.5px solid var(--border);cursor:pointer;transition:all var(--transition);text-align:center}
+  .role-label:hover{background:rgba(45,106,79,0.05);border-color:var(--brand-mid)}
+  .role-option input:checked+.role-label{background:rgba(45,106,79,0.08);border-color:var(--brand-mid);box-shadow:0 0 0 1px var(--brand-mid) inset}
+  .form-select{background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem 0.75rem 2.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.95rem;outline:none;width:100%;transition:border-color var(--transition);cursor:pointer}
+  .form-select:focus{border-color:var(--brand-mid)}
+  .form-select option{background:var(--bg-card);color:var(--text-primary)}
   .strength-bar-wrap{display:flex;gap:4px;margin-top:6px}
-  .strength-bar{height:3px;flex:1;border-radius:2px;background:rgba(255,255,255,0.1);transition:background 0.3s ease}
-  .btn-submit{width:100%;justify-content:center;padding:0.95rem;font-size:1rem;margin-top:1rem;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;border:none;border-radius:50px;font-family:var(--font-display);font-weight:600;cursor:pointer;transition:all var(--transition);box-shadow:0 4px 20px rgba(16,185,129,0.35)}
-  .btn-submit:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(16,185,129,0.5)}
+  .strength-bar{height:3px;flex:1;border-radius:2px;background:var(--border);transition:background 0.3s ease}
+  .btn-submit{width:100%;justify-content:center;padding:0.9rem;font-size:0.95rem;margin-top:1rem;display:flex;align-items:center;gap:8px;background:var(--brand-mid);color:var(--text-on-dark);border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;cursor:pointer;transition:all var(--transition);box-shadow:0 4px 14px rgba(45,106,79,0.28)}
+  .btn-submit:hover{background:#163d2a;transform:translateY(-1px)}
   .btn-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none}
   .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;display:none}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .server-error{background:rgba(244,63,94,0.1);border:1px solid rgba(244,63,94,0.3);border-radius:10px;padding:0.75rem 1rem;font-size:0.85rem;color:#fda4af;display:none;align-items:center;gap:8px;margin-top:0.5rem}
+  .server-error{background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.25);border-radius:var(--radius-sm);padding:0.75rem 1rem;font-size:0.85rem;color:#be1230;display:none;align-items:center;gap:8px;margin-top:0.5rem}
   @media(max-width:860px){.register-container{grid-template-columns:1fr}.register-sidebar{display:none}.form-row{grid-template-columns:1fr}}
 </style>
 {% endblock %}
@@ -39,25 +39,25 @@
     <aside class="register-sidebar">
       <div class="sidebar-card">
         <div style="display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:800;font-size:1.2rem;margin-bottom:1.5rem">
-          <div class="sidebar-logo-icon">🌾</div>
-          AgroLink<span style="color:var(--emerald-glow)">TZ</span>
+          <div class="sidebar-logo-icon"><i data-lucide="sprout" style="width:22px;height:22px"></i></div>
+          AgroLink<span style="color:var(--brand-light)">TZ</span>
         </div>
-        <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;line-height:1.3;margin-bottom:0.75rem">Jiunge na <span style="background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Familia ya Wakulima</span></div>
-        <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.7;margin-bottom:1.75rem">Akaunti bure. Dakika 2. Ufikiaji kamili wa jukwaa la kisasa la kilimo.</p>
+        <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;line-height:1.3;margin-bottom:0.75rem;color:var(--text-on-dark)">Jiunge na <span style="color:var(--brand-green)">Familia ya Wakulima</span></div>
+        <p style="font-size:0.875rem;color:rgba(254,250,224,0.65);line-height:1.7;margin-bottom:1.75rem">Akaunti bure. Dakika 2. Ufikiaji kamili wa jukwaa la kisasa la kilimo.</p>
         {% for icon,text in [('trending-up','<strong>Bei za Soko</strong> — Taarifa za bei kutoka masoko yote Tanzania.'),('cloud-sun','<strong>Hali ya Hewa</strong> — Utabiri wa siku 5 zijazo kwa mji wako.'),('store','<strong>Soko la Mazao</strong> — Weka orodha ya mazao yako na wasiliana na wanunuzi.'),('shield-check','<strong>Usalama</strong> — Data yako inalindwa kwa Cisco Security Standards.')] %}
         <div class="benefit-item">
           <div class="benefit-icon"><i data-lucide="{{ icon }}" style="width:15px;height:15px"></i></div>
-          <div style="font-size:0.83rem;color:var(--text-secondary);line-height:1.5">{{ text|safe }}</div>
+          <div style="font-size:0.83rem;color:rgba(254,250,224,0.70);line-height:1.5">{{ text|safe }}</div>
         </div>
         {% endfor %}
-        <div style="background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:var(--radius-sm);padding:1rem;margin-top:1.5rem;text-align:center;font-size:0.82rem;color:var(--text-secondary)">
-          Una akaunti tayari? <a href="{{ url_for('login') }}" style="color:var(--emerald-bright);font-weight:600;text-decoration:none">Ingia hapa &rarr;</a>
+        <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-sm);padding:1rem;margin-top:1.5rem;text-align:center;font-size:0.82rem;color:rgba(254,250,224,0.60)">
+          Una akaunti tayari? <a href="{{ url_for('login') }}" style="color:var(--brand-green);font-weight:600;text-decoration:none">Ingia hapa &rarr;</a>
         </div>
       </div>
     </aside>
     <main>
       <div class="register-form-card">
-        <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:0.4rem">Fungua Akaunti Yako 🌱</div>
+        <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;margin-bottom:0.4rem;color:var(--text-primary);display:flex;align-items:center;gap:10px"><i data-lucide="user-plus" style="width:22px;height:22px;color:var(--brand-mid)"></i>Fungua Akaunti Yako</div>
         <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:0">Jaza fomu hii ili uanze safari yako ya kilimo cha kisasa.</p>
         <form id="register-form" novalidate style="margin-top:0">
           
@@ -108,16 +108,16 @@
               <div class="role-option" style="position:relative">
                 <input type="radio" name="role" id="role-farmer" value="farmer" checked/>
                 <label class="role-label" for="role-farmer">
-                  <span style="font-size:1.5rem">👨‍🌾</span>
-                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem">Mkulima</span>
+                  <div style="width:36px;height:36px;border-radius:10px;background:rgba(45,106,79,0.10);border:1px solid rgba(45,106,79,0.20);display:flex;align-items:center;justify-content:center;color:var(--brand-mid)"><i data-lucide="sprout" style="width:18px;height:18px"></i></div>
+                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--text-primary)">Mkulima</span>
                   <span style="font-size:0.72rem;color:var(--text-muted)">Ninazalisha au kuuza mazao</span>
                 </label>
               </div>
               <div class="role-option" style="position:relative">
                 <input type="radio" name="role" id="role-agent" value="agent"/>
                 <label class="role-label" for="role-agent">
-                  <span style="font-size:1.5rem">🤝</span>
-                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem">Wakala / Mnunuzi</span>
+                  <div style="width:36px;height:36px;border-radius:10px;background:rgba(212,163,115,0.10);border:1px solid rgba(212,163,115,0.20);display:flex;align-items:center;justify-content:center;color:var(--brand-earth)"><i data-lucide="users" style="width:18px;height:18px"></i></div>
+                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--text-primary)">Wakala / Mnunuzi</span>
                   <span style="font-size:0.72rem;color:var(--text-muted)">Ninunua au kusambaza</span>
                 </label>
               </div>
@@ -147,8 +147,8 @@
             </div>
           </div>
           <div style="display:flex;align-items:flex-start;gap:10px;font-size:0.83rem;color:var(--text-secondary);margin-top:1.25rem">
-            <input type="checkbox" id="terms" style="width:16px;height:16px;margin-top:1px;flex-shrink:0;accent-color:var(--emerald-bright);cursor:pointer"/>
-            <label for="terms">Nakubali <a href="/terms" style="color:var(--emerald-bright);text-decoration:none;font-weight:600">Masharti ya Matumizi</a> na <a href="/terms" style="color:var(--emerald-bright);text-decoration:none;font-weight:600">Sera ya Faragha</a> ya AgroLink Tanzania.</label>
+            <input type="checkbox" id="terms" style="width:16px;height:16px;margin-top:1px;flex-shrink:0;accent-color:var(--brand-mid);cursor:pointer"/>
+            <label for="terms">Nakubali <a href="/terms" style="color:var(--brand-mid);text-decoration:none;font-weight:600">Masharti ya Matumizi</a> na <a href="/terms" style="color:var(--brand-mid);text-decoration:none;font-weight:600">Sera ya Faragha</a> ya AgroLink Tanzania.</label>
           </div>
           <span class="form-error" id="terms-error"></span>
           <div class="server-error" id="server-error"><i data-lucide="x-circle" style="width:16px;height:16px;flex-shrink:0"></i><span id="server-error-msg"></span></div>
@@ -158,7 +158,7 @@
             <span id="submit-text">Fungua Akaunti Yangu</span>
           </button>
           <p style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:6px">
-            <i data-lucide="shield" style="width:12px;height:12px;color:var(--emerald-bright)"></i>
+            <i data-lucide="shield" style="width:12px;height:12px;color:var(--brand-mid)"></i>
             Data yako inalindwa — Cisco Security Standards
           </p>
         </form>
