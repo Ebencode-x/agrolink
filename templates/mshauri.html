@@ -2,28 +2,27 @@
 {% block title %}Mshauri wa Kilimo — AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
-.ms-hero{padding:3rem 0 2rem;text-align:center;position:relative;overflow:hidden}
-.ms-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(16,185,129,0.12) 0%,transparent 70%);pointer-events:none}
-.ms-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:0.5rem}
-.ms-title .glow{background:linear-gradient(135deg,var(--emerald-bright),#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ms-hero{padding:3rem 0 2rem;text-align:center;background:var(--bg-page)}
+.ms-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:var(--text-primary);margin-bottom:0.5rem}
+.ms-title .glow{color:var(--brand-mid)}
 .ms-sub{color:var(--text-secondary);font-size:0.95rem;max-width:500px;margin:0 auto 2rem}
 .ms-wrap{max-width:1100px;margin:0 auto;padding:0 1.5rem}
 .ms-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem;max-width:1100px;margin:0 auto;padding:0 1.5rem 3rem}
-.ms-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.5rem;cursor:pointer;transition:all 0.22s;text-decoration:none;display:block;position:relative;z-index:1}
-.ms-card:hover{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.3);transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,0.4)}
+.ms-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.5rem;cursor:pointer;transition:all var(--transition);text-decoration:none;display:block;position:relative;z-index:1;box-shadow:var(--shadow-sm)}
+.ms-card:hover{border-color:var(--brand-mid);transform:translateY(-2px);box-shadow:var(--shadow-md)}
 .ms-card-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;flex-shrink:0}
 .ms-card-icon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ms-card-title{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:0.4rem}
 .ms-card-desc{font-size:0.82rem;color:var(--text-secondary);line-height:1.6}
 .ms-card-tags{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.85rem}
-.ms-tag{font-size:0.68rem;padding:0.2rem 0.6rem;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7;border-radius:20px;cursor:pointer;transition:all 0.18s;font-family:inherit}
-.ms-tag:hover{background:rgba(16,185,129,0.22);color:#a7f3d0}
-.ms-section{max-width:1100px;margin:0 auto 1rem;padding:0 1.5rem;display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em}
+.ms-tag{font-size:0.68rem;padding:0.2rem 0.6rem;background:var(--bg-surface);border:1px solid var(--border-strong);color:var(--brand-mid);border-radius:var(--radius-sm);cursor:pointer;transition:all var(--transition);font-family:inherit}
+.ms-tag:hover{background:var(--brand-mid);color:#fff;border-color:var(--brand-mid)}
+.ms-section{max-width:1100px;margin:0 auto 1rem;padding:0 1.5rem;display:flex;align-items:center;gap:8px;font-family:var(--font-display);font-size:0.8rem;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.1em}
 .ms-section svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
-.ms-section::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07)}
+.ms-section::after{content:'';flex:1;height:1px;background:var(--border)}
 .ms-back{display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);font-size:0.82rem;text-decoration:none;transition:color 0.2s;margin-bottom:1.5rem}
 .ms-back svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
-.ms-back:hover{color:var(--emerald-bright)}
+.ms-back:hover{color:var(--brand-mid)}
 </style>
 {% endblock %}
 
@@ -43,7 +42,7 @@
 
 <!-- ── MAGONJWA YA MAZAO ─────────────────────────────────────────────── -->
 <div class="ms-section">
-  <svg viewBox="0 0 24 24" style="color:#f59e0b"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+  <svg viewBox="0 0 24 24" style="color:var(--accent-dark)"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
   Magonjwa ya Mazao
 </div>
 <div class="ms-grid">
@@ -127,7 +126,7 @@
 
 <!-- ── KILIMO CHA MAZAO ──────────────────────────────────────────────── -->
 <div class="ms-section">
-  <svg viewBox="0 0 24 24" style="color:#10b981"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+  <svg viewBox="0 0 24 24" style="color:var(--brand-mid)"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
   Kilimo cha Mazao
 </div>
 <div class="ms-grid">
@@ -208,7 +207,7 @@
 
 <!-- ── MASOKO NA BIASHARA ────────────────────────────────────────────── -->
 <div class="ms-section">
-  <svg viewBox="0 0 24 24" style="color:#f59e0b"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+  <svg viewBox="0 0 24 24" style="color:var(--accent-dark)"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
   Masoko na Biashara
 </div>
 <div class="ms-grid">
@@ -267,7 +266,7 @@
 
 <!-- ── MBINU ZA KILIMO ───────────────────────────────────────────────── -->
 <div class="ms-section">
-  <svg viewBox="0 0 24 24" style="color:#6ee7b7"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>
+  <svg viewBox="0 0 24 24" style="color:var(--brand-light)"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>
   Mbinu za Kilimo
 </div>
 <div class="ms-grid" style="padding-bottom:6rem">
