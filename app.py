@@ -34,6 +34,7 @@ from security import (
 import base64
 import json as json_lib
 import re
+import enum
 
 load_dotenv()
 
@@ -287,6 +288,43 @@ class WeatherLog(db.Model):
     icon = db.Column(db.String(20))
     fetched_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# ── Phone Masking: Conversation + Message Models ─────────────────────────────
+
+class ConvStatus(enum.Enum):
+    active   = "active"
+    closed   = "closed"
+    blocked  = "blocked"
+
+class Conversation(db.Model):
+    __tablename__ = "conversations"
+    id          = db.Column(db.Integer, primary_key=True)
+    listing_id  = db.Column(db.Integer, db.ForeignKey("market_listings.id"), nullable=False)
+    buyer_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    seller_id   = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    status      = db.Column(db.Enum(ConvStatus), default=ConvStatus.active, nullable=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at  = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    messages    = db.relationship("Message", backref="conversation", lazy=True,
+                                  order_by="Message.sent_at")
+    listing     = db.relationship("MarketListing", backref="conversations", lazy=True)
+    buyer       = db.relationship("User", foreign_keys=[buyer_id],
+                                  backref="bought_conversations", lazy=True)
+    seller      = db.relationship("User", foreign_keys=[seller_id],
+                                  backref="sold_conversations", lazy=True)
+    __table_args__ = (
+        db.UniqueConstraint("listing_id", "buyer_id", name="uq_listing_buyer"),
+    )
+
+class Message(db.Model):
+    __tablename__ = "messages"
+    id              = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey("conversations.id"), nullable=False)
+    sender_id       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    body            = db.Column(db.Text, nullable=False)
+    is_read         = db.Column(db.Boolean, default=False)
+    sent_at         = db.Column(db.DateTime, default=datetime.utcnow)
+    sender          = db.relationship("User", foreign_keys=[sender_id], lazy=True)
 
 # ── Login Manager ─────────────────────────────────────────────────────────────
 
@@ -2013,4 +2051,153 @@ if __name__ == "__main__":
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is missing (Render/Supabase not configured)")
+
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PHONE MASKING — Messaging API
+# Buyers wanawasiliana na sellers bila kuona phone number
+# ════════════════════════════════════════════════════════════════════════════
+
+@app.route("/api/conversations/start", methods=["POST"])
+@login_required
+@require_active_account
+@limiter.limit("10 per hour")
+def start_conversation():
+    """Buyer anaanzisha mazungumzo kuhusu listing."""
+    data       = request.get_json() or {}
+    listing_id = data.get("listing_id")
+    first_msg  = sanitize(data.get("message", ""), max_length=1000).strip()
+
+    if not listing_id or not first_msg:
+        return jsonify({"error": "listing_id na message vinahitajika."}), 400
+
+    listing = MarketListing.query.get(listing_id)
+    if not listing or not listing.is_available:
+        return jsonify({"error": "Bidhaa hii haipatikani."}), 404
+
+    if listing.seller_id == current_user.id:
+        return jsonify({"error": "Huwezi kuwasiliana nawe mwenyewe."}), 400
+
+    # Angalia kama conversation tayari ipo
+    conv = Conversation.query.filter_by(
+        listing_id=listing_id, buyer_id=current_user.id
+    ).first()
+
+    if not conv:
+        conv = Conversation(
+            listing_id=listing_id,
+            buyer_id=current_user.id,
+            seller_id=listing.seller_id,
+        )
+        db.session.add(conv)
+        db.session.flush()  # pata conv.id kabla ya message
+
+    msg = Message(
+        conversation_id=conv.id,
+        sender_id=current_user.id,
+        body=first_msg,
+    )
+    db.session.add(msg)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "conversation_id": conv.id,
+        "message": "Ujumbe wako umetumwa. Muuzaji atajibu hivi karibuni."
+    }), 201
+
+
+@app.route("/api/conversations/<int:conv_id>/messages", methods=["GET"])
+@login_required
+@require_active_account
+def get_messages(conv_id):
+    """Pata ujumbe wote wa mazungumzo — buyer au seller tu."""
+    conv = Conversation.query.get_or_404(conv_id)
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return jsonify({"error": "Hauruhusiwi."}), 403
+
+    # Mark messages as read
+    Message.query.filter_by(
+        conversation_id=conv_id, is_read=False
+    ).filter(Message.sender_id != current_user.id).update({"is_read": True})
+    db.session.commit()
+
+    msgs = [
+        {
+            "id":        m.id,
+            "body":      m.body,
+            "sender":    m.sender.full_name,
+            "is_mine":   m.sender_id == current_user.id,
+            "is_read":   m.is_read,
+            "sent_at":   m.sent_at.strftime("%d %b %Y, %H:%M"),
+        }
+        for m in conv.messages
+    ]
+    return jsonify({
+        "conversation_id": conv.id,
+        "listing_title":   conv.listing.title,
+        "messages":        msgs,
+        "status":          conv.status.value,
+    })
+
+
+@app.route("/api/conversations/<int:conv_id>/reply", methods=["POST"])
+@login_required
+@require_active_account
+@limiter.limit("60 per hour")
+def reply_message(conv_id):
+    """Buyer au seller anajibu kwenye mazungumzo."""
+    conv = Conversation.query.get_or_404(conv_id)
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return jsonify({"error": "Hauruhusiwi."}), 403
+    if conv.status != ConvStatus.active:
+        return jsonify({"error": "Mazungumzo haya yamefungwa."}), 400
+
+    data = request.get_json() or {}
+    body = sanitize(data.get("message", ""), max_length=1000).strip()
+    if not body:
+        return jsonify({"error": "Ujumbe hauwezi kuwa wazi."}), 400
+
+    msg = Message(conversation_id=conv.id, sender_id=current_user.id, body=body)
+    conv.updated_at = datetime.utcnow()
+    db.session.add(msg)
+    db.session.commit()
+
+    return jsonify({"success": True, "message_id": msg.id})
+
+
+@app.route("/api/conversations/mine", methods=["GET"])
+@login_required
+@require_active_account
+def my_conversations():
+    """Orodha ya mazungumzo yote ya mtumiaji (kama buyer na seller)."""
+    as_buyer = Conversation.query.filter_by(buyer_id=current_user.id).all()
+    as_seller = Conversation.query.filter_by(seller_id=current_user.id).all()
+
+    def fmt(conv, role):
+        other = conv.seller if role == "buyer" else conv.buyer
+        unread = Message.query.filter_by(
+            conversation_id=conv.id, is_read=False
+        ).filter(Message.sender_id != current_user.id).count()
+        last_msg = conv.messages[-1] if conv.messages else None
+        return {
+            "id":            conv.id,
+            "role":          role,
+            "listing_title": conv.listing.title,
+            "listing_id":    conv.listing_id,
+            "other_name":    other.full_name,
+            "other_region":  other.region or "",
+            "unread":        unread,
+            "last_message":  last_msg.body[:80] if last_msg else "",
+            "last_at":       last_msg.sent_at.strftime("%d %b, %H:%M") if last_msg else "",
+            "status":        conv.status.value,
+        }
+
+    result = (
+        [fmt(c, "buyer")  for c in as_buyer] +
+        [fmt(c, "seller") for c in as_seller]
+    )
+    result.sort(key=lambda x: x["last_at"], reverse=True)
+    return jsonify({"conversations": result, "total": len(result)})
 
