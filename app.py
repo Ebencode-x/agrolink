@@ -971,39 +971,66 @@ Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
   "season_advice": "ushauri kulingana na msimu wa kilimo Tanzania (Kiswahili)",
   "confidence_pct": 85
 }}"""
-    try:
-        payload = {
-            "contents": [{"parts": [
-                {"text": prompt},
-                {"inline_data": {"mime_type": mime_type, "data": img_b64}}
-            ]}],
-            "generationConfig": {"temperature": 0.2, "maxOutputTokens": 1024},
-        }
-        resp = requests.post(
-            f"{GEMINI_VISION_URL}?key={GEMINI_API_KEY}",
-            json=payload, timeout=30,
-        )
-        resp.raise_for_status()
-        gemini_data = resp.json()
-        raw_text = (
-            gemini_data.get("candidates", [{}])[0]
-            .get("content", {}).get("parts", [{}])[0].get("text", "")
-        )
-        raw_text = re.sub(r"```json|```", "", raw_text).strip()
-        analysis = json_lib.loads(raw_text)
-        for field in ["crop_detected","severity","diagnosis","prevention","season_advice"]:
-            if field in analysis:
-                analysis[field] = str(analysis[field])[:600]
-        return jsonify({"success": True, "analysis": analysis})
-    except json_lib.JSONDecodeError:
-        return jsonify({"error": "AI ilirudi na jibu lisilo sahihi. Jaribu tena."}), 500
-    except requests.exceptions.Timeout:
-        return jsonify({"error": "Muda wa kusubiri umepita. Jaribu tena."}), 504
-    except Exception as exc:
-        print(f"Gemini error: {exc}")
-        if "429" in str(exc):
-            return jsonify({"error": "Huduma ya AI ina watu wengi sasa. Subiri sekunde 30 kisha jaribu tena."}), 429
-        return jsonify({"error": "Hitilafu ya AI. Jaribu tena baadaye."}), 500
+    payload = {
+        "contents": [{"parts": [
+            {"text": prompt},
+            {"inline_data": {"mime_type": mime_type, "data": img_b64}}
+        ]}],
+        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 1024},
+    }
+
+    # ── Retry logic: max 3 attempts, exponential backoff ─────────────────────
+    import time as _time
+    last_exc = None
+    for attempt in range(1, 4):
+        try:
+            resp = requests.post(
+                f"{GEMINI_VISION_URL}?key={GEMINI_API_KEY}",
+                json=payload, timeout=45,
+            )
+            # Log non-200 responses for debugging
+            if not resp.ok:
+                print(f"[Gemini Vision] attempt {attempt} — HTTP {resp.status_code}: {resp.text[:300]}")
+            if resp.status_code == 429:
+                wait = 2 ** attempt  # 2s, 4s, 8s
+                print(f"[Gemini Vision] rate-limited, retrying in {wait}s...")
+                _time.sleep(wait)
+                last_exc = Exception(f"429 rate limit (attempt {attempt})")
+                continue
+            resp.raise_for_status()
+            gemini_data = resp.json()
+            raw_text = (
+                gemini_data.get("candidates", [{}])[0]
+                .get("content", {}).get("parts", [{}])[0].get("text", "")
+            )
+            raw_text = re.sub(r"```json|```", "", raw_text).strip()
+            analysis = json_lib.loads(raw_text)
+            for field in ["crop_detected","severity","diagnosis","prevention","season_advice"]:
+                if field in analysis:
+                    analysis[field] = str(analysis[field])[:600]
+            return jsonify({"success": True, "analysis": analysis})
+        except json_lib.JSONDecodeError as e:
+            print(f"[Gemini Vision] JSON parse error (attempt {attempt}): {e}")
+            return jsonify({"error": "AI ilirudi na jibu lisilo sahihi. Jaribu tena."}), 500
+        except requests.exceptions.Timeout:
+            print(f"[Gemini Vision] timeout (attempt {attempt})")
+            last_exc = Exception("timeout")
+            if attempt < 3:
+                _time.sleep(2 ** attempt)
+                continue
+            return jsonify({"error": "Muda wa kusubiri umepita. Jaribu tena."}), 504
+        except Exception as exc:
+            print(f"[Gemini Vision] error (attempt {attempt}): {exc}")
+            last_exc = exc
+            if attempt < 3:
+                _time.sleep(2 ** attempt)
+                continue
+
+    # All retries exhausted
+    print(f"[Gemini Vision] all retries failed. Last error: {last_exc}")
+    if last_exc and "429" in str(last_exc):
+        return jsonify({"error": "Huduma ya AI ina watu wengi sasa. Subiri sekunde 30 kisha jaribu tena."}), 429
+    return jsonify({"error": "Hitilafu ya AI baada ya majaribio 3. Jaribu tena baadaye."}), 500
 
 @app.route("/api/prices")
 def api_prices():
