@@ -3,64 +3,84 @@
 
 {% block extra_head %}
 <style>
+  /* ── Forest & Harvest — AI Daktari ── */
   .ai-page{max-width:1100px;margin:0 auto;padding:2.5rem clamp(1rem,4vw,3rem) 5rem}
-  .ai-eyebrow{display:inline-flex;align-items:center;gap:7px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow);padding:0.3rem 0.9rem;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:1rem}
-  .ai-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;margin-bottom:0.6rem}
-  .ai-title .accent{background:linear-gradient(135deg,var(--emerald-glow),var(--amber-warm));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .ai-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--bg-surface);border:1px solid var(--border-strong);color:var(--brand-mid);padding:0.3rem 0.9rem;border-radius:var(--radius-sm);font-size:0.75rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:1rem}
+  .ai-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text-primary);margin-bottom:0.6rem}
+  .ai-title .accent{color:var(--brand-mid)}
   .ai-subtitle{font-size:0.95rem;color:var(--text-secondary);max-width:580px;line-height:1.7;margin-bottom:2.5rem}
+
   .ai-grid{display:grid;grid-template-columns:1fr 1.15fr;gap:1.75rem;align-items:start}
-  .upload-panel{padding:2rem;border-radius:var(--radius-lg)}
-  .upload-zone{border:2px dashed rgba(16,185,129,0.35);border-radius:16px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all 0.25s ease;background:rgba(16,185,129,0.04);position:relative;overflow:hidden}
-  .upload-zone:hover,.upload-zone.drag-over{border-color:var(--emerald-bright);background:rgba(16,185,129,0.09)}
+
+  /* Upload panel */
+  .upload-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-sm)}
+  .upload-zone{border:2px dashed var(--border-strong);border-radius:var(--radius-md);padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all var(--transition);background:var(--bg-subtle);position:relative;overflow:hidden}
+  .upload-zone:hover,.upload-zone.drag-over{border-color:var(--brand-mid);background:var(--bg-surface)}
   .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-  .upload-icon{width:56px;height:56px;border-radius:16px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--emerald-bright)}
-  .upload-text{font-family:var(--font-display);font-weight:700;font-size:0.95rem;margin-bottom:0.3rem}
+  .upload-icon{width:56px;height:56px;border-radius:var(--radius-sm);background:var(--bg-surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;color:var(--brand-mid)}
+  .upload-text{font-family:var(--font-display);font-weight:700;font-size:0.95rem;color:var(--text-primary);margin-bottom:0.3rem}
   .upload-hint{font-size:0.78rem;color:var(--text-muted)}
-  .preview-wrap{margin-top:1.25rem;display:none;border-radius:12px;overflow:hidden;border:1px solid var(--glass-border)}
+  .preview-wrap{margin-top:1.25rem;display:none;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)}
   .preview-wrap img{width:100%;max-height:260px;object-fit:cover;display:block}
-  .preview-label{padding:0.6rem 0.75rem;background:rgba(0,0,0,0.3);font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+  .preview-label{padding:0.6rem 0.75rem;background:var(--bg-surface);font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;border-top:1px solid var(--border)}
+
   .crop-hint-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1.25rem 0 1rem}
-  .crop-hint{padding:0.3rem 0.75rem;border-radius:50px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.04);font-size:0.75rem;color:var(--text-secondary);cursor:pointer;transition:all 0.2s}
-  .crop-hint:hover{border-color:var(--emerald-bright);color:var(--emerald-glow)}
-  .context-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:12px;padding:0.7rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.875rem;resize:vertical;min-height:80px;outline:none;transition:border-color 0.2s;margin-bottom:1.1rem}
-  .context-input:focus{border-color:var(--emerald-bright);background:rgba(255,255,255,0.09)}
+  .crop-hint{padding:0.3rem 0.75rem;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-subtle);font-size:0.75rem;color:var(--text-secondary);cursor:pointer;transition:all var(--transition)}
+  .crop-hint:hover{border-color:var(--brand-mid);color:var(--brand-mid);background:var(--bg-surface)}
+
+  .context-input{width:100%;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.7rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.875rem;resize:vertical;min-height:80px;outline:none;transition:border-color var(--transition);margin-bottom:1.1rem;box-sizing:border-box}
+  .context-input:focus{border-color:var(--brand-mid)}
   .context-input::placeholder{color:var(--text-muted)}
-  .ai-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--emerald-bright),#059669);color:white;border:none;border-radius:12px;padding:0.9rem 1.5rem;font-family:var(--font-display);font-weight:700;font-size:0.95rem;cursor:pointer;transition:all 0.25s ease}
-  .ai-submit:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(16,185,129,0.45)}
+
+  .ai-submit{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);padding:0.9rem 1.5rem;font-family:var(--font-display);font-weight:700;font-size:0.95rem;cursor:pointer;transition:all var(--transition);box-shadow:var(--shadow-sm)}
+  .ai-submit:hover{background:var(--brand-dark);transform:translateY(-1px);box-shadow:var(--shadow-md)}
   .ai-submit:disabled{opacity:0.55;cursor:not-allowed;transform:none;box-shadow:none}
   .spin{animation:spin 0.8s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .result-panel{border-radius:var(--radius-lg);min-height:400px;display:flex;flex-direction:column}
+
+  /* Result panel */
+  .result-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);min-height:400px;display:flex;flex-direction:column;box-shadow:var(--shadow-sm)}
+
   .state-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1.5rem;text-align:center;gap:1rem;color:var(--text-muted)}
-  .state-empty-icon{width:64px;height:64px;border-radius:20px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.12);display:flex;align-items:center;justify-content:center;color:rgba(16,185,129,0.35)}
+  .state-empty-icon{width:64px;height:64px;border-radius:var(--radius-sm);background:var(--bg-surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--brand-light)}
+
   .state-loading{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.25rem;padding:3rem;text-align:center}
-  .loading-ring{width:48px;height:48px;border:3px solid rgba(16,185,129,0.15);border-top-color:var(--emerald-bright);border-radius:50%;animation:spin 0.9s linear infinite}
+  .loading-ring{width:48px;height:48px;border:3px solid var(--border);border-top-color:var(--brand-mid);border-radius:50%;animation:spin 0.9s linear infinite}
   .loading-steps{display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem}
   .loading-step{font-size:0.8rem;color:var(--text-muted);display:flex;align-items:center;gap:7px}
-  .loading-step.active{color:var(--emerald-glow)}
+  .loading-step.active{color:var(--brand-mid)}
+
   .ai-result{display:none;padding:1.75rem;flex-direction:column;gap:1.1rem}
   .result-header{display:flex;align-items:center;gap:10px;margin-bottom:0.25rem}
-  .result-badge{display:inline-flex;align-items:center;gap:5px;padding:0.25rem 0.75rem;border-radius:50px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
-  .badge-danger{background:rgba(244,63,94,0.15);border:1px solid rgba(244,63,94,0.3);color:#fda4af}
-  .badge-warning{background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);color:var(--amber-light)}
-  .badge-healthy{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow)}
-  .result-crop-name{font-family:var(--font-display);font-weight:800;font-size:1.15rem}
-  .r-card{background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:12px;padding:1.1rem 1.2rem}
+  .result-badge{display:inline-flex;align-items:center;gap:5px;padding:0.25rem 0.75rem;border-radius:var(--radius-sm);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
+  .badge-danger{background:var(--danger-bg);border:1px solid rgba(192,57,43,0.25);color:var(--danger)}
+  .badge-warning{background:var(--warning-bg);border:1px solid rgba(232,184,75,0.3);color:var(--accent-dark)}
+  .badge-healthy{background:var(--success-bg);border:1px solid rgba(46,107,71,0.25);color:var(--success)}
+  .result-crop-name{font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:var(--text-primary)}
+
+  .r-card{background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.1rem 1.2rem}
   .r-card-title{display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.65rem}
-  .r-card-title svg{color:var(--emerald-bright)}
+  .r-card-title svg{color:var(--brand-mid)}
   .r-card-body{font-size:0.875rem;color:var(--text-secondary);line-height:1.7}
+
   .dawa-list{display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem}
   .dawa-item{display:flex;align-items:flex-start;gap:8px;font-size:0.85rem;color:var(--text-secondary);line-height:1.5}
-  .dawa-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald-bright);flex-shrink:0;margin-top:6px}
+  .dawa-dot{width:7px;height:7px;border-radius:50%;background:var(--brand-mid);flex-shrink:0;margin-top:6px}
+
   .tag-list{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem}
-  .tag{padding:0.25rem 0.65rem;border-radius:50px;font-size:0.73rem;font-weight:600}
-  .tag-blue{background:rgba(14,165,233,0.12);border:1px solid rgba(14,165,233,0.2);color:var(--sky-pale)}
-  .tag-amber{background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);color:var(--amber-light)}
-  .conf-wrap{height:5px;background:rgba(255,255,255,0.08);border-radius:5px;overflow:hidden;margin-top:0.5rem}
-  .conf-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--emerald-bright),var(--emerald-glow));transition:width 0.6s ease}
-  .ai-error{display:none;margin:1.5rem;padding:1.25rem;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);border-radius:12px;color:#fda4af;font-size:0.875rem;align-items:center;gap:8px}
-  .ai-disclaimer{margin-top:1.25rem;padding:0.9rem 1rem;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);border-radius:12px;display:flex;gap:8px;align-items:flex-start}
-  .ai-disclaimer p{font-size:0.77rem;color:var(--text-muted);line-height:1.6}
+  .tag{padding:0.25rem 0.65rem;border-radius:var(--radius-sm);font-size:0.73rem;font-weight:600}
+  .tag-blue{background:#f0f9ff;border:1px solid #bae6fd;color:#0369a1}
+  .tag-amber{background:var(--warning-bg);border:1px solid rgba(232,184,75,0.3);color:var(--accent-dark)}
+
+  .conf-wrap{height:5px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:0.5rem}
+  .conf-fill{height:100%;border-radius:5px;background:var(--brand-mid);transition:width 0.6s ease}
+
+  .ai-error{display:none;margin:1.5rem;padding:1.25rem;background:var(--danger-bg);border:1px solid rgba(192,57,43,0.25);border-radius:var(--radius-sm);color:var(--danger);font-size:0.875rem;align-items:center;gap:8px}
+
+  .ai-disclaimer{margin-top:1.25rem;padding:0.9rem 1rem;background:var(--warning-bg);border:1px solid rgba(232,184,75,0.25);border-radius:var(--radius-sm);display:flex;gap:8px;align-items:flex-start}
+  .ai-disclaimer svg{color:var(--accent-dark)}
+  .ai-disclaimer p{font-size:0.77rem;color:var(--text-secondary);line-height:1.6}
+
   @media(max-width:768px){.ai-grid{grid-template-columns:1fr}.result-panel{min-height:auto}}
 </style>
 {% endblock %}
@@ -77,9 +97,9 @@
   </div>
 
   <div class="ai-grid">
-    <div class="glass upload-panel reveal">
+    <div class="upload-panel reveal">
       <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
         Pakia Picha ya Zao
       </div>
       <div class="upload-zone" id="upload-zone">
@@ -112,12 +132,12 @@
         Chunguza Zao Langu
       </button>
       <div class="ai-disclaimer">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--amber-warm)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dark)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <p>Matokeo ni ushauri wa awali wa AI. Kwa tatizo kubwa, wasiliana na mtaalamu wa kilimo au ugani wa serikali.</p>
       </div>
     </div>
 
-    <div class="glass result-panel">
+    <div class="result-panel">
       <div class="state-empty" id="state-empty">
         <div class="state-empty-icon">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -125,10 +145,10 @@
         <div style="font-family:var(--font-display);font-weight:700;font-size:1rem">Daktari wa Zao</div>
         <p style="font-size:0.85rem;max-width:230px;line-height:1.65">Pakia picha ya zao lako — AI itachambua na kutoa ushauri wa kitaalamu.</p>
         <div style="display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:240px;margin-top:0.5rem">
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Utambuzi wa magonjwa</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dawa na matibabu</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Kinga na uzuiaji</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Ushauri wa msimu</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Utambuzi wa magonjwa</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dawa na matibabu</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Kinga na uzuiaji</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Ushauri wa msimu</div>
         </div>
       </div>
       <div class="state-loading" id="state-loading">
@@ -154,8 +174,8 @@
           <div class="r-card-body" id="r-diagnosis"></div>
           <div class="tag-list" id="r-symptoms"></div>
         </div>
-        <div class="r-card" style="border-color:rgba(16,185,129,0.2)">
-          <div class="r-card-title" style="color:var(--emerald-glow)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-bright)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Dawa na Matibabu</div>
+        <div class="r-card" style="border-color:var(--border-strong)">
+          <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Dawa na Matibabu</div>
           <div class="dawa-list" id="r-treatment"></div>
         </div>
         <div class="r-card">
