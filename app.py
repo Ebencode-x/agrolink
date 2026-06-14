@@ -593,7 +593,7 @@ def register():
             return jsonify({"error": "Email tayari imetumika."}), 409
 
         # ── Validate role ─────────────────────────────────────────────────────
-        if role not in ("farmer", "agent"):
+        if role not in ("farmer", "agent", "buyer"):
             role = "farmer"
 
         # ── Create user ───────────────────────────────────────────────────────
@@ -2200,4 +2200,218 @@ def my_conversations():
     )
     result.sort(key=lambda x: x["last_at"], reverse=True)
     return jsonify({"conversations": result, "total": len(result)})
+
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# B2B BUYER PORTAL
+# Hotels, supermarkets, wholesalers wanaweza kutuma bulk orders
+# ════════════════════════════════════════════════════════════════════════════
+
+def require_buyer(f):
+    """Decorator: route inahitaji role ya buyer au admin."""
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return jsonify({"error": "Ingia kwanza."}), 401
+        if current_user.role not in ("buyer", "admin"):
+            return jsonify({"error": "Sehemu hii ni kwa wanunuzi wa biashara tu."}), 403
+        return f(*args, **kwargs)
+    return decorated
+
+
+@app.route("/b2b")
+@login_required
+@require_active_account
+def b2b_portal():
+    """B2B Buyer Portal — landing page."""
+    if current_user.role not in ("buyer", "admin"):
+        return redirect(url_for("index"))
+    # Bulk listings: zinazopatikana na quantity >= 100kg
+    bulk_listings = (
+        MarketListing.query
+        .filter_by(is_available=True)
+        .filter(MarketListing.quantity_kg >= 100)
+        .order_by(MarketListing.posted_at.desc())
+        .limit(50)
+        .all()
+    )
+    # Mazungumzo ya buyer huyu
+    my_convs = (
+        Conversation.query
+        .filter_by(buyer_id=current_user.id)
+        .order_by(Conversation.updated_at.desc())
+        .limit(10)
+        .all()
+    )
+    unread_total = sum(
+        Message.query.filter_by(conversation_id=c.id, is_read=False)
+        .filter(Message.sender_id != current_user.id).count()
+        for c in my_convs
+    )
+    return render_template(
+        "b2b/portal.html",
+        listings=bulk_listings,
+        conversations=my_convs,
+        unread_total=unread_total,
+    )
+
+
+@app.route("/api/b2b/listings", methods=["GET"])
+@login_required
+@require_active_account
+def b2b_listings():
+    """API: Listings za bulk (>=100kg) na filters."""
+    crop    = request.args.get("crop", "").strip().lower()
+    region  = request.args.get("region", "").strip()
+    min_qty = float(request.args.get("min_qty", 100))
+    page    = int(request.args.get("page", 1))
+    per_page = 20
+
+    q = MarketListing.query.filter_by(is_available=True).filter(
+        MarketListing.quantity_kg >= min_qty
+    )
+    if crop:
+        q = q.filter(MarketListing.crop_name.ilike(f"%{crop}%"))
+    if region:
+        q = q.filter(MarketListing.region.ilike(f"%{region}%"))
+
+    total = q.count()
+    listings = q.order_by(MarketListing.posted_at.desc()).offset(
+        (page - 1) * per_page
+    ).limit(per_page).all()
+
+    return jsonify({
+        "listings": [
+            {
+                "id":          l.id,
+                "title":       l.title,
+                "crop_name":   l.crop_name,
+                "quantity_kg": l.quantity_kg,
+                "unit":        l.unit,
+                "price_tzs":   l.price_tzs,
+                "region":      l.region,
+                "description": l.description or "",
+                "image_url":   l.image_url or "",
+                "posted_at":   l.posted_at.strftime("%d %b %Y"),
+                "seller_name": l.seller.full_name,
+                "seller_verified": l.seller.is_verified,
+            }
+            for l in listings
+        ],
+        "total":    total,
+        "page":     page,
+        "pages":    (total + per_page - 1) // per_page,
+    })
+
+
+@app.route("/api/b2b/inquiry", methods=["POST"])
+@login_required
+@require_active_account
+@limiter.limit("20 per hour")
+def b2b_inquiry():
+    """
+    Bulk inquiry — buyer anatuma ombi la kununua kiasi kikubwa.
+    Inafungua Conversation na kutuma ujumbe wa kwanza wa kina.
+    """
+    data        = request.get_json() or {}
+    listing_id  = data.get("listing_id")
+    quantity_kg = float(data.get("quantity_kg", 0))
+    delivery    = sanitize(data.get("delivery_location", ""), max_length=200)
+    timeline    = sanitize(data.get("timeline", ""), max_length=100)
+    notes       = sanitize(data.get("notes", ""), max_length=500)
+
+    if not listing_id or quantity_kg <= 0:
+        return jsonify({"error": "listing_id na quantity_kg vinahitajika."}), 400
+    if quantity_kg < 50:
+        return jsonify({"error": "Kiwango cha chini cha B2B ni kg 50."}), 400
+
+    listing = MarketListing.query.get(listing_id)
+    if not listing or not listing.is_available:
+        return jsonify({"error": "Bidhaa hii haipatikani."}), 404
+    if listing.seller_id == current_user.id:
+        return jsonify({"error": "Huwezi kununua bidhaa yako mwenyewe."}), 400
+
+    # Jenga ujumbe wa kina wa B2B
+    total_est = quantity_kg * listing.price_tzs
+    msg_body = (
+        f"OMBI LA BIASHARA (B2B)
+"
+        f"{'─' * 30}
+"
+        f"Mnunuzi: {current_user.full_name}
+"
+        f"Zao: {listing.crop_name}
+"
+        f"Kiasi Kinachohitajika: {quantity_kg:,.0f} kg
+"
+        f"Bei ya Sasa (kwa kg): TZS {listing.price_tzs:,.0f}
+"
+        f"Jumla ya Takriban: TZS {total_est:,.0f}
+"
+        f"Mahali pa Utoaji: {delivery or 'Haijabainishwa'}
+"
+        f"Muda wa Ununuzi: {timeline or 'Haijabainishwa'}
+"
+        f"Maelezo Zaidi: {notes or 'Hakuna'}
+"
+        f"{'─' * 30}
+"
+        f"Tafadhali jibu hapa ili tuendelee na mazungumzo ya biashara."
+    )
+
+    # Tumia masking system — anza au endelea na conversation
+    conv = Conversation.query.filter_by(
+        listing_id=listing_id, buyer_id=current_user.id
+    ).first()
+    if not conv:
+        conv = Conversation(
+            listing_id=listing_id,
+            buyer_id=current_user.id,
+            seller_id=listing.seller_id,
+        )
+        db.session.add(conv)
+        db.session.flush()
+
+    msg = Message(
+        conversation_id=conv.id,
+        sender_id=current_user.id,
+        body=msg_body,
+    )
+    db.session.add(msg)
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "conversation_id": conv.id,
+        "message": f"Ombi lako la kg {quantity_kg:,.0f} limetumwa kwa muuzaji. Atajibu hivi karibuni.",
+        "estimated_total_tzs": total_est,
+    }), 201
+
+
+@app.route("/api/b2b/dashboard-stats", methods=["GET"])
+@login_required
+@require_active_account
+def b2b_dashboard_stats():
+    """Stats za buyer dashboard — mazungumzo, maombi, jumla."""
+    if current_user.role not in ("buyer", "admin"):
+        return jsonify({"error": "Hauruhusiwi."}), 403
+
+    convs = Conversation.query.filter_by(buyer_id=current_user.id).all()
+    total_inquiries = len(convs)
+    active_convs    = sum(1 for c in convs if c.status.value == "active")
+    unread          = sum(
+        Message.query.filter_by(conversation_id=c.id, is_read=False)
+        .filter(Message.sender_id != current_user.id).count()
+        for c in convs
+    )
+
+    return jsonify({
+        "total_inquiries": total_inquiries,
+        "active_conversations": active_convs,
+        "unread_messages": unread,
+        "member_since": current_user.created_at.strftime("%B %Y"),
+        "region": current_user.region or "Haijabainishwa",
+    })
 

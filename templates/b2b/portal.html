@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+{% block title %}Lango la Biashara (B2B) — AgroLink Tanzania{% endblock %}
+
+{% block content %}
+<div class="page-wrapper">
+
+  <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+  <section style="background:var(--brand-dark);padding:2.5rem 0 2rem;">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;">
+          <i data-lucide="building-2" style="color:var(--accent);width:22px;height:22px;"></i>
+          <span style="color:var(--accent);font-family:var(--font-display);font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;">Lango la Biashara</span>
+        </div>
+        <h1 style="font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);font-weight:700;color:var(--text-on-dark);line-height:1.2;">
+          Nunua kwa Wingi, Biashara ya Kweli
+        </h1>
+        <p style="color:#a8c4b0;margin-top:.5rem;font-size:.95rem;">
+          Hotels, migahawa, supermarkets na jumla — pata mazao moja kwa moja kutoka kwa wakulima.
+        </p>
+      </div>
+      <!-- Stats cards -->
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;" id="b2b-stats">
+        <div class="b2b-stat-card">
+          <span class="b2b-stat-num" id="stat-inquiries">—</span>
+          <span class="b2b-stat-label">Maombi Yangu</span>
+        </div>
+        <div class="b2b-stat-card">
+          <span class="b2b-stat-num" id="stat-active">—</span>
+          <span class="b2b-stat-label">Mazungumzo</span>
+        </div>
+        <div class="b2b-stat-card" style="position:relative;">
+          <span class="b2b-stat-num" id="stat-unread">—</span>
+          <span class="b2b-stat-label">Ujumbe Mpya</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Filters ───────────────────────────────────────────────────────────── -->
+  <section style="background:var(--bg-surface);border-bottom:1px solid var(--border);padding:1rem 0;">
+    <div class="container" style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
+      <div style="position:relative;flex:1;min-width:180px;">
+        <i data-lucide="search" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none;"></i>
+        <input id="filter-crop" type="text" placeholder="Tafuta zao..." style="width:100%;padding:.6rem .75rem .6rem 2.2rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);background:var(--bg-card);color:var(--text-primary);outline:none;">
+      </div>
+      <div style="position:relative;flex:1;min-width:160px;">
+        <i data-lucide="map-pin" style="position:absolute;left:.75rem;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none;"></i>
+        <input id="filter-region" type="text" placeholder="Mkoa..." style="width:100%;padding:.6rem .75rem .6rem 2.2rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);background:var(--bg-card);color:var(--text-primary);outline:none;">
+      </div>
+      <div style="display:flex;align-items:center;gap:.4rem;">
+        <i data-lucide="package" style="width:16px;height:16px;color:var(--text-muted);"></i>
+        <select id="filter-qty" style="padding:.6rem .75rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);background:var(--bg-card);color:var(--text-primary);outline:none;">
+          <option value="100">Kuanzia kg 100</option>
+          <option value="500">Kuanzia kg 500</option>
+          <option value="1000">Kuanzia tani 1</option>
+          <option value="5000">Kuanzia tani 5</option>
+        </select>
+      </div>
+      <button onclick="loadListings(1)" style="padding:.6rem 1.2rem;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+        <i data-lucide="filter" style="width:15px;height:15px;"></i> Chuja
+      </button>
+    </div>
+  </section>
+
+  <!-- ── Main content ──────────────────────────────────────────────────────── -->
+  <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;" class="b2b-grid">
+
+      <!-- Listings -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <h2 style="font-family:var(--font-display);font-size:1.05rem;font-weight:600;color:var(--text-primary);">
+            Bidhaa za Wingi Zinazopatikana
+          </h2>
+          <span id="listings-count" style="font-size:.82rem;color:var(--text-muted);"></span>
+        </div>
+        <div id="listings-grid" style="display:grid;gap:1rem;">
+          <!-- filled by JS -->
+        </div>
+        <!-- Pagination -->
+        <div id="pagination" style="display:flex;gap:.5rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;"></div>
+      </div>
+
+      <!-- Sidebar: My conversations -->
+      <div style="position:sticky;top:1rem;">
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);">
+          <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;">
+            <i data-lucide="message-square" style="width:18px;height:18px;color:var(--brand-mid);"></i>
+            <h3 style="font-family:var(--font-display);font-size:.95rem;font-weight:600;color:var(--text-primary);">Mazungumzo Yangu</h3>
+          </div>
+          <div id="conv-list" style="max-height:420px;overflow-y:auto;">
+            {% if conversations %}
+              {% for c in conversations %}
+              <a href="/messages/{{ c.id }}" style="display:block;padding:.9rem 1.2rem;border-bottom:1px solid var(--border);text-decoration:none;transition:background var(--transition);" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background=''">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">
+                  <div style="min-width:0;">
+                    <p style="font-size:.85rem;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.listing.title }}</p>
+                    <p style="font-size:.78rem;color:var(--text-muted);margin-top:.15rem;">{{ c.seller.full_name }}</p>
+                  </div>
+                  {% set unread = c.messages | selectattr('is_read','equalto',False) | selectattr('sender_id','ne',current_user.id) | list | length %}
+                  {% if unread > 0 %}
+                  <span style="background:var(--accent);color:var(--text-on-accent);border-radius:999px;padding:.1rem .5rem;font-size:.72rem;font-weight:700;white-space:nowrap;">{{ unread }}</span>
+                  {% endif %}
+                </div>
+                {% if c.messages %}
+                <p style="font-size:.78rem;color:var(--text-secondary);margin-top:.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ c.messages[-1].body[:60] }}</p>
+                {% endif %}
+              </a>
+              {% endfor %}
+            {% else %}
+              <div style="padding:2rem 1.2rem;text-align:center;">
+                <i data-lucide="inbox" style="width:32px;height:32px;color:var(--border-strong);margin-bottom:.75rem;"></i>
+                <p style="font-size:.85rem;color:var(--text-muted);">Bado hujatuma ombi lolote.</p>
+                <p style="font-size:.78rem;color:var(--text-muted);margin-top:.25rem;">Chagua bidhaa upande wa kushoto.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /b2b-grid -->
+  </div>
+
+</div><!-- /page-wrapper -->
+
+<!-- ── Inquiry Modal ──────────────────────────────────────────────────────── -->
+<div id="inquiry-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(28,61,42,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--bg-card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:500px;overflow:hidden;">
+    <div style="background:var(--brand-dark);padding:1.2rem 1.5rem;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <p style="font-size:.72rem;color:var(--accent);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.2rem;">Ombi la Biashara</p>
+        <h3 id="modal-title" style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-on-dark);"></h3>
+      </div>
+      <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;color:#a8c4b0;padding:.25rem;">
+        <i data-lucide="x" style="width:20px;height:20px;"></i>
+      </button>
+    </div>
+    <div style="padding:1.5rem;">
+      <input type="hidden" id="modal-listing-id">
+      <input type="hidden" id="modal-price">
+
+      <div style="background:var(--bg-surface);border-radius:var(--radius-sm);padding:.9rem 1rem;margin-bottom:1.2rem;border:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.3rem;">
+          <span style="color:var(--text-muted);">Bei kwa kg</span>
+          <span id="modal-unit-price" style="font-weight:600;color:var(--text-primary);"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:.82rem;">
+          <span style="color:var(--text-muted);">Mkoa wa muuzaji</span>
+          <span id="modal-region" style="font-weight:600;color:var(--text-primary);"></span>
+        </div>
+      </div>
+
+      <div style="display:grid;gap:1rem;">
+        <div>
+          <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem;">Kiasi Unachohitaji (kg) *</label>
+          <input id="inq-qty" type="number" min="50" placeholder="Mfano: 500" oninput="calcTotal()" style="width:100%;padding:.65rem .9rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);outline:none;background:var(--bg-card);color:var(--text-primary);">
+          <p id="total-est" style="font-size:.8rem;color:var(--brand-mid);margin-top:.3rem;font-weight:600;"></p>
+        </div>
+        <div>
+          <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem;">Mahali pa Utoaji</label>
+          <input id="inq-delivery" type="text" placeholder="Mfano: Kariakoo, Dar es Salaam" style="width:100%;padding:.65rem .9rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);outline:none;background:var(--bg-card);color:var(--text-primary);">
+        </div>
+        <div>
+          <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem;">Muda wa Ununuzi</label>
+          <input id="inq-timeline" type="text" placeholder="Mfano: Wiki 2 zijazo" style="width:100%;padding:.65rem .9rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);outline:none;background:var(--bg-card);color:var(--text-primary);">
+        </div>
+        <div>
+          <label style="font-size:.82rem;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:.4rem;">Maelezo Zaidi</label>
+          <textarea id="inq-notes" rows="2" placeholder="Mahitaji maalum, ubora unaohitajika, n.k." style="width:100%;padding:.65rem .9rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.9rem;font-family:var(--font-body);outline:none;resize:none;background:var(--bg-card);color:var(--text-primary);"></textarea>
+        </div>
+      </div>
+
+      <div id="modal-msg" style="display:none;margin-top:1rem;padding:.75rem 1rem;border-radius:var(--radius-sm);font-size:.85rem;"></div>
+
+      <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
+        <button onclick="closeModal()" style="flex:1;padding:.75rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;font-family:var(--font-display);font-size:.88rem;font-weight:600;color:var(--text-secondary);cursor:pointer;">Ghairi</button>
+        <button onclick="submitInquiry()" id="submit-btn" style="flex:2;padding:.75rem;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:.88rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.4rem;">
+          <i data-lucide="send" style="width:16px;height:16px;"></i> Tuma Ombi
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.b2b-stat-card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:var(--radius-md);padding:.75rem 1.1rem;text-align:center;min-width:90px;}
+.b2b-stat-num{display:block;font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--accent);}
+.b2b-stat-label{display:block;font-size:.72rem;color:#a8c4b0;margin-top:.1rem;}
+.listing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.1rem 1.2rem;box-shadow:var(--shadow-sm);transition:box-shadow var(--transition),transform var(--transition);}
+.listing-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.badge-verified{display:inline-flex;align-items:center;gap:.25rem;background:#edf7f1;color:var(--brand-mid);border-radius:999px;padding:.15rem .55rem;font-size:.72rem;font-weight:600;}
+@media(max-width:768px){
+  .b2b-grid{grid-template-columns:1fr!important;}
+}
+</style>
+
+<script>
+let currentPage = 1;
+
+async function loadStats() {
+  try {
+    const r = await fetch('/api/b2b/dashboard-stats');
+    if (!r.ok) return;
+    const d = await r.json();
+    document.getElementById('stat-inquiries').textContent = d.total_inquiries;
+    document.getElementById('stat-active').textContent = d.active_conversations;
+    document.getElementById('stat-unread').textContent = d.unread_messages;
+  } catch(e) {}
+}
+
+async function loadListings(page = 1) {
+  currentPage = page;
+  const crop   = document.getElementById('filter-crop').value.trim();
+  const region = document.getElementById('filter-region').value.trim();
+  const qty    = document.getElementById('filter-qty').value;
+  const grid   = document.getElementById('listings-grid');
+  const count  = document.getElementById('listings-count');
+  grid.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);"><i data-lucide="loader-2" style="width:24px;height:24px;animation:spin 1s linear infinite;"></i></div>';
+  lucide.createIcons();
+
+  const params = new URLSearchParams({page, min_qty: qty});
+  if (crop)   params.set('crop', crop);
+  if (region) params.set('region', region);
+
+  try {
+    const r = await fetch(`/api/b2b/listings?${params}`);
+    const d = await r.json();
+    count.textContent = `Bidhaa ${d.total} zinapatikana`;
+    if (!d.listings.length) {
+      grid.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);border:1px dashed var(--border);border-radius:var(--radius-md);"><i data-lucide=\'package-x\' style=\'width:36px;height:36px;margin-bottom:.75rem;\'></i><p>Hakuna bidhaa zinazolingana na vichujio vyako.</p></div>';
+      lucide.createIcons();
+      return;
+    }
+    grid.innerHTML = d.listings.map(l => `
+      <div class="listing-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:.4rem;">
+              <span style="font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--text-primary);">${l.title}</span>
+              ${l.seller_verified ? '<span class="badge-verified"><i data-lucide="badge-check" style="width:11px;height:11px;"></i> Imethibitishwa</span>' : ''}
+            </div>
+            <div style="display:flex;gap:1rem;flex-wrap:wrap;font-size:.82rem;color:var(--text-muted);">
+              <span style="display:flex;align-items:center;gap:.25rem;"><i data-lucide="sprout" style="width:13px;height:13px;"></i> ${l.crop_name}</span>
+              <span style="display:flex;align-items:center;gap:.25rem;"><i data-lucide="map-pin" style="width:13px;height:13px;"></i> ${l.region}</span>
+              <span style="display:flex;align-items:center;gap:.25rem;"><i data-lucide="user" style="width:13px;height:13px;"></i> ${l.seller_name}</span>
+            </div>
+            ${l.description ? `<p style="font-size:.82rem;color:var(--text-secondary);margin-top:.5rem;">${l.description}</p>` : ''}
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--brand-mid);">TZS ${l.price_tzs.toLocaleString()}<span style="font-size:.7rem;font-weight:400;color:var(--text-muted);">/kg</span></div>
+            <div style="font-size:.8rem;color:var(--text-muted);margin-top:.15rem;">
+              <i data-lucide="package" style="width:12px;height:12px;vertical-align:middle;"></i> ${l.quantity_kg.toLocaleString()} kg
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--border);">
+          <button onclick="openModal(${l.id}, '${l.title.replace(/'/g,"\\'")}', ${l.price_tzs}, '${l.region}')"
+            style="padding:.55rem 1.2rem;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-size:.82rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+            <i data-lucide="send" style="width:14px;height:14px;"></i> Tuma Ombi la Biashara
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    // Pagination
+    const pg = document.getElementById('pagination');
+    pg.innerHTML = '';
+    for (let i = 1; i <= d.pages; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      btn.onclick = () => loadListings(i);
+      btn.style.cssText = `padding:.4rem .8rem;border-radius:var(--radius-sm);border:1px solid var(--border);font-family:var(--font-display);font-size:.82rem;cursor:pointer;background:${i===page?'var(--brand-mid)':'var(--bg-card)'};color:${i===page?'#fff':'var(--text-primary)'};`;
+      pg.appendChild(btn);
+    }
+    lucide.createIcons();
+  } catch(e) {
+    grid.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--danger);">Hitilafu ya kupakia bidhaa. Jaribu tena.</div>';
+  }
+}
+
+function openModal(id, title, price, region) {
+  document.getElementById('modal-listing-id').value = id;
+  document.getElementById('modal-price').value = price;
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-unit-price').textContent = 'TZS ' + price.toLocaleString();
+  document.getElementById('modal-region').textContent = region;
+  document.getElementById('inq-qty').value = '';
+  document.getElementById('inq-delivery').value = '';
+  document.getElementById('inq-timeline').value = '';
+  document.getElementById('inq-notes').value = '';
+  document.getElementById('total-est').textContent = '';
+  document.getElementById('modal-msg').style.display = 'none';
+  const m = document.getElementById('inquiry-modal');
+  m.style.display = 'flex';
+  setTimeout(() => document.getElementById('inq-qty').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('inquiry-modal').style.display = 'none';
+}
+
+function calcTotal() {
+  const qty   = parseFloat(document.getElementById('inq-qty').value) || 0;
+  const price = parseFloat(document.getElementById('modal-price').value) || 0;
+  const el    = document.getElementById('total-est');
+  if (qty >= 50) {
+    el.textContent = `Jumla ya takriban: TZS ${(qty * price).toLocaleString()}`;
+  } else if (qty > 0) {
+    el.textContent = 'Kiwango cha chini ni kg 50';
+    el.style.color = 'var(--danger)';
+    return;
+  } else {
+    el.textContent = '';
+  }
+  el.style.color = 'var(--brand-mid)';
+}
+
+async function submitInquiry() {
+  const btn     = document.getElementById('submit-btn');
+  const msgEl   = document.getElementById('modal-msg');
+  const listing_id  = document.getElementById('modal-listing-id').value;
+  const quantity_kg = parseFloat(document.getElementById('inq-qty').value);
+  const delivery    = document.getElementById('inq-delivery').value.trim();
+  const timeline    = document.getElementById('inq-timeline').value.trim();
+  const notes       = document.getElementById('inq-notes').value.trim();
+
+  if (!quantity_kg || quantity_kg < 50) {
+    showModalMsg('Ingiza kiasi cha angalau kg 50.', 'danger');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader-2" style="width:16px;height:16px;animation:spin 1s linear infinite;"></i> Inatuma...';
+  lucide.createIcons();
+
+  try {
+    const r = await fetch('/api/b2b/inquiry', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({listing_id, quantity_kg, delivery_location: delivery, timeline, notes})
+    });
+    const d = await r.json();
+    if (d.success) {
+      showModalMsg(`✓ ${d.message}`, 'success');
+      btn.style.display = 'none';
+      loadStats();
+      setTimeout(closeModal, 2500);
+    } else {
+      showModalMsg(d.error || 'Hitilafu. Jaribu tena.', 'danger');
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="send" style="width:16px;height:16px;"></i> Tuma Ombi';
+      lucide.createIcons();
+    }
+  } catch(e) {
+    showModalMsg('Hitilafu ya mtandao. Jaribu tena.', 'danger');
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="send" style="width:16px;height:16px;"></i> Tuma Ombi';
+    lucide.createIcons();
+  }
+}
+
+function showModalMsg(text, type) {
+  const el = document.getElementById('modal-msg');
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? 'var(--success-bg)' : 'var(--danger-bg)';
+  el.style.color = type === 'success' ? 'var(--success)' : 'var(--danger)';
+  el.style.border = `1px solid ${type === 'success' ? 'var(--border-strong)' : '#f5c6c2'}`;
+}
+
+document.getElementById('inquiry-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// spin animation
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+// Init
+loadStats();
+loadListings(1);
+</script>
+{% endblock %}
