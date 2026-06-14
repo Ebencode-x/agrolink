@@ -2174,7 +2174,19 @@ def clear_price_cache():
 
 @app.route("/health")
 def health():
-    return jsonify({"status": "ok", "timestamp": datetime.utcnow().isoformat()})
+    try:
+        total_users    = User.query.filter_by(is_active=True).count()
+        active_listings = MarketListing.query.filter_by(is_available=True).count()
+    except Exception:
+        total_users = active_listings = 0
+    return jsonify({
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat(),
+        "stats": {
+            "total_users": total_users,
+            "active_listings": active_listings,
+        }
+    })
 
 
 @app.errorhandler(404)
