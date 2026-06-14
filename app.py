@@ -125,6 +125,17 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     accepted_terms = db.Column(db.Boolean, default=False)  # ← T&C checkbox
     terms_accepted_at = db.Column(db.DateTime, nullable=True)  # ← wakati wa kukubali
+
+    # ── Trust system ──────────────────────────────────────────────────────────
+    trust_level     = db.Column(db.String(10), default="gray", nullable=False)
+    trust_points    = db.Column(db.Integer, default=0, nullable=False)
+    flag_count      = db.Column(db.Integer, default=0, nullable=False)
+    transaction_count = db.Column(db.Integer, default=0, nullable=False)
+    avg_rating      = db.Column(db.Float, default=0.0, nullable=False)
+    trust_updated_at = db.Column(db.DateTime, nullable=True)
+    can_post_listing = db.Column(db.Boolean, default=False, nullable=False)
+    can_advise      = db.Column(db.Boolean, default=False, nullable=False)
+    can_b2b         = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     crops = db.relationship("Crop", backref="owner", lazy=True)
@@ -337,6 +348,130 @@ def load_user(user_id):
         return None
     return user
 
+# ── Trust Engine ──────────────────────────────────────────────────────────────
+# Inahesabu trust level ya user automatically baada ya kila event muhimu
+
+TRUST_THRESHOLDS = {
+    "gray":  {"points": 0,   "tx": 0,  "rating": 0.0, "flags_max": 99},
+    "green": {"points": 10,  "tx": 1,  "rating": 0.0, "flags_max": 2},
+    "teal":  {"points": 50,  "tx": 5,  "rating": 4.0, "flags_max": 1},
+    "gold":  {"points": 120, "tx": 15, "rating": 4.5, "flags_max": 0},
+}
+
+def trust_engine(user_id):
+    """
+    Recalculates trust level for a user based on:
+    - transaction_count (listings posted + inquiries made)
+    - avg_rating (from SellerRating)
+    - flag_count (from ListingReport against user)
+    - account age
+    Updates user in-place and commits.
+    """
+    user = User.query.get(user_id)
+    if not user:
+        return
+
+    # 1. Hesabu avg rating kutoka SellerRating
+    ratings = SellerRating.query.filter_by(seller_id=user_id).all()
+    if ratings:
+        user.avg_rating = round(sum(r.stars for r in ratings) / len(ratings), 2)
+    else:
+        user.avg_rating = 0.0
+
+    # 2. Hesabu transaction_count (listings zake + conversations kama buyer)
+    listing_count = MarketListing.query.filter_by(
+        seller_id=user_id, is_available=True
+    ).count()
+    conv_count = Conversation.query.filter_by(buyer_id=user_id).count()
+    user.transaction_count = listing_count + conv_count
+
+    # 3. Hesabu flag_count (reports zilizofanywa dhidi ya listings zake)
+    flagged = (
+        db.session.query(ListingReport)
+        .join(MarketListing, ListingReport.listing_id == MarketListing.id)
+        .filter(MarketListing.seller_id == user_id)
+        .count()
+    )
+    user.flag_count = flagged
+
+    # 4. Account age kwa siku
+    age_days = (datetime.utcnow() - user.created_at).days
+
+    # 5. Hesabu trust_points
+    points = 0
+    points += user.transaction_count * 5
+    points += int(user.avg_rating * 8)
+    points += max(0, min(age_days, 60))   # max 60 points kwa umri
+    points -= user.flag_count * 15         # adhabu kwa flags
+    user.trust_points = max(0, points)
+
+    # 6. Amua trust level
+    if user.flag_count >= 3:
+        new_level = "gray"
+    elif (
+        user.trust_points >= TRUST_THRESHOLDS["gold"]["points"]
+        and user.transaction_count >= TRUST_THRESHOLDS["gold"]["tx"]
+        and user.avg_rating >= TRUST_THRESHOLDS["gold"]["rating"]
+        and user.flag_count <= TRUST_THRESHOLDS["gold"]["flags_max"]
+    ):
+        new_level = "gold"
+    elif (
+        user.trust_points >= TRUST_THRESHOLDS["teal"]["points"]
+        and user.transaction_count >= TRUST_THRESHOLDS["teal"]["tx"]
+        and user.avg_rating >= TRUST_THRESHOLDS["teal"]["rating"]
+        and user.flag_count <= TRUST_THRESHOLDS["teal"]["flags_max"]
+    ):
+        new_level = "teal"
+    elif (
+        user.trust_points >= TRUST_THRESHOLDS["green"]["points"]
+        and user.transaction_count >= TRUST_THRESHOLDS["green"]["tx"]
+        and user.flag_count <= TRUST_THRESHOLDS["green"]["flags_max"]
+    ):
+        new_level = "green"
+    else:
+        new_level = "gray"
+
+    user.trust_level = new_level
+
+    # 7. Fungua/funga uwezo kulingana na level
+    user.can_post_listing = new_level in ("green", "teal", "gold")
+    user.can_advise       = new_level in ("teal", "gold")
+    user.can_b2b          = new_level in ("green", "teal", "gold")
+
+    user.trust_updated_at = datetime.utcnow()
+    db.session.commit()
+    return new_level
+
+
+def trust_badge_html(trust_level):
+    """Returns badge HTML for templates (safe to use with |safe filter)"""
+    badges = {
+        "gray":  ('<span class="trust-badge trust-gray">Mpya</span>', "●"),
+        "green": ('<span class="trust-badge trust-green">Mwanachama</span>', "●"),
+        "teal":  ('<span class="trust-badge trust-teal">Mwaminifu</span>', "●"),
+        "gold":  ('<span class="trust-badge trust-gold">Imara</span>', "●"),
+    }
+    return badges.get(trust_level, badges["gray"])
+
+
+
+
+
+# ── Phone Masking Helper ──────────────────────────────────────────────────────
+def mask_phone(phone):
+    """Server-side masking — namba halisi haifiki browser ya guest kamwe"""
+    if not phone:
+        return "***"
+    p = str(phone).strip()
+    if len(p) <= 6:
+        return "***"
+    return p[:3] + "***" + p[-3:]
+
+def get_display_phone(phone):
+    """Returns masked or real phone based on login status"""
+    if current_user.is_authenticated:
+        return phone
+    return mask_phone(phone)
 
 # ── Weather Service (unchanged logic) ────────────────────────────────────────
 
@@ -478,6 +613,17 @@ def get_forecast(city="Mbeya"):
 
 @app.route("/")
 def index():
+    # Auth wall: guest anaona landing page tu
+    if not current_user.is_authenticated:
+        # Preview listings 6 tu — bila contact/phone
+        preview = (
+            MarketListing.query
+            .filter_by(is_available=True)
+            .order_by(MarketListing.posted_at.desc())
+            .limit(6)
+            .all()
+        )
+        return render_template("landing.html", preview_listings=preview)
     crops = Crop.query.order_by(Crop.created_at.desc()).limit(6).all()
     listings = (
         MarketListing.query.filter_by(is_available=True)
@@ -593,7 +739,7 @@ def register():
             return jsonify({"error": "Email tayari imetumika."}), 409
 
         # ── Validate role ─────────────────────────────────────────────────────
-        if role not in ("farmer", "agent", "buyer"):
+        if role not in ("farmer", "agent", "buyer", "member"):
             role = "farmer"
 
         # ── Create user ───────────────────────────────────────────────────────
@@ -605,10 +751,21 @@ def register():
             role=role,
             accepted_terms=True,
             terms_accepted_at=datetime.utcnow(),
+            trust_level="gray",
+            trust_points=0,
+            flag_count=0,
+            transaction_count=0,
+            avg_rating=0.0,
+            can_post_listing=False,
+            can_advise=False,
+            can_b2b=False,
         )
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
+
+        # Initialize trust engine — itahesabu level ya kwanza
+        trust_engine(user.id)
 
         return jsonify({"message": "Akaunti imefunguliwa.", "id": user.id}), 201
 
@@ -804,6 +961,7 @@ def delete_listing(listing_id):
 
 
 @app.route("/listings")
+@login_required
 def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 12  # Listings 12 kwa ukurasa
@@ -838,6 +996,7 @@ def developer():
 
 
 @app.route("/farmers")
+@login_required
 def farmers():
     q = sanitize(request.args.get("q", ""), max_length=100)
     region = sanitize(request.args.get("region", ""), max_length=80)
@@ -970,6 +1129,7 @@ def api_crops():
 
 
 @app.route("/ai-daktari")
+@login_required
 def ai_daktari():
     return render_template("market/ai_daktari.html")
 
@@ -1106,7 +1266,7 @@ def api_listings():
                 "unit": listing.unit,
                 "price_tzs": listing.price_tzs,
                 "region": listing.region,
-                "contact": listing.contact,
+                "contact": listing.contact if current_user.is_authenticated else mask_phone(listing.contact),
                 "posted_at": listing.posted_at.isoformat(),
             }
             for listing in listings
@@ -1592,6 +1752,7 @@ def api_prediction_crops():
 # ── MSHAURI PAGE ──────────────────────────────────────────────────────────────
 
 @app.route("/mshauri")
+@login_required
 def mshauri():
     return render_template("mshauri.html")
 

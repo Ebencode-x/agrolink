@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}KilimoBridge — Soko la Kilimo Tanzania{% endblock %}
+
+{% block content %}
+<section class="landing-hero">
+  <div class="landing-hero__inner">
+    <div class="landing-hero__text">
+      <h1 class="landing-hero__title">
+        Soko la Kilimo<br>
+        <span class="landing-hero__accent">Tanzania</span>
+      </h1>
+      <p class="landing-hero__sub">
+        Unganisha wakulima, wanunuzi, na washauri wa kilimo katika
+        mfumo mmoja wa kuaminiwa.
+      </p>
+      <div class="landing-hero__cta">
+        <a href="{{ url_for('register') }}" class="btn-primary btn-lg">
+          <i data-lucide="user-plus"></i> Jiunge Bure
+        </a>
+        <a href="{{ url_for('login') }}" class="btn-outline btn-lg">
+          <i data-lucide="log-in"></i> Ingia
+        </a>
+      </div>
+    </div>
+
+    <div class="landing-stats">
+      <div class="landing-stat">
+        <span class="landing-stat__num" id="stat-users">—</span>
+        <span class="landing-stat__label">Wakulima na Wanunuzi</span>
+      </div>
+      <div class="landing-stat">
+        <span class="landing-stat__num" id="stat-listings">—</span>
+        <span class="landing-stat__label">Mazao Yanayouzwa</span>
+      </div>
+      <div class="landing-stat">
+        <span class="landing-stat__num" id="stat-regions">25</span>
+        <span class="landing-stat__label">Mikoa ya Tanzania</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Preview ya listings — blurred, kwa ajili ya kionjo tu -->
+<section class="landing-preview">
+  <div class="landing-preview__header">
+    <h2>Orodha za Mazao</h2>
+    <span class="landing-preview__lock">
+      <i data-lucide="lock"></i> Ingia kuona orodha kamili
+    </span>
+  </div>
+  <div class="landing-preview__grid">
+    {% for item in preview_listings %}
+    <div class="listing-card listing-card--blurred">
+      <div class="listing-card__img-wrap">
+        {% if item.image_url %}
+          <img src="{{ item.image_url }}" alt="{{ item.crop_name }}" loading="lazy">
+        {% else %}
+          <div class="listing-card__img-placeholder">
+            <i data-lucide="sprout"></i>
+            <span>{{ item.crop_name | upper }}</span>
+          </div>
+        {% endif %}
+        <div class="listing-card__blur-overlay">
+          <a href="{{ url_for('login') }}" class="btn-primary btn-sm">
+            <i data-lucide="eye"></i> Ingia Kuona
+          </a>
+        </div>
+      </div>
+      <div class="listing-card__body">
+        <div class="listing-card__top">
+          <span class="crop-badge">
+            <i data-lucide="sprout"></i> {{ item.crop_name }}
+          </span>
+          <span class="listing-card__location">
+            <i data-lucide="map-pin"></i> {{ item.region }}
+          </span>
+        </div>
+        <h3 class="listing-card__title listing-card__title--blur">{{ item.title }}</h3>
+        <div class="listing-card__prices">
+          <div class="listing-price">
+            <span class="listing-price__label">BEI / GUNIA</span>
+            <span class="listing-price__value listing-price__value--blur">
+              TZS ***,***
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Features section -->
+<section class="landing-features">
+  <div class="landing-features__grid">
+    <div class="landing-feature">
+      <i data-lucide="shield-check" class="landing-feature__icon"></i>
+      <h3>Usalama wa Kweli</h3>
+      <p>Mfumo wa trust levels unakinga dhidi ya udanganyifu. Kila mtumiaji ana alama ya uaminifu inayoonekana.</p>
+    </div>
+    <div class="landing-feature">
+      <i data-lucide="message-square" class="landing-feature__icon"></i>
+      <h3>Mawasiliano Salama</h3>
+      <p>Ongea na wakulima moja kwa moja kupitia mfumo wetu bila kufichua namba yako ya simu.</p>
+    </div>
+    <div class="landing-feature">
+      <i data-lucide="trending-up" class="landing-feature__icon"></i>
+      <h3>Bei za Soko</h3>
+      <p>Angalia bei halisi za mazao kutoka mikoa yote ya Tanzania kila siku.</p>
+    </div>
+    <div class="landing-feature">
+      <i data-lucide="cpu" class="landing-feature__icon"></i>
+      <h3>Daktari wa Zao</h3>
+      <p>Piga picha ya zao lako — AI itakuambia magonjwa na dawa inayofaa mara moja.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA -->
+<section class="landing-final-cta">
+  <h2>Anza Leo — Bure Kabisa</h2>
+  <p>Jiunge na wakulima na wanunuzi wanaotumia KilimoBridge Tanzania</p>
+  <a href="{{ url_for('register') }}" class="btn-primary btn-lg">
+    <i data-lucide="arrow-right"></i> Anza Sasa
+  </a>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Pata platform stats kwa ajili ya landing page
+  fetch('/health')
+    .then(r => r.json())
+    .then(data => {
+      if (data.stats) {
+        document.getElementById('stat-users').textContent =
+          (data.stats.total_users || 0).toLocaleString();
+        document.getElementById('stat-listings').textContent =
+          (data.stats.active_listings || 0).toLocaleString();
+      }
+    })
+    .catch(() => {});
+</script>
+{% endblock %}
