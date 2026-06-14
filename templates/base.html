@@ -202,6 +202,9 @@
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:14px;height:14px"></i>Admin</a>
         {% endif %}
+        {% if current_user.role in ('buyer', 'admin') %}
+        <a href="/b2b" class="nav-btn nav-btn-primary"><i data-lucide="building-2" style="width:14px;height:14px"></i>B2B Portal</a>
+        {% endif %}
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-danger"><i data-lucide="log-out" style="width:14px;height:14px"></i>Toka</a>
       {% else %}
         <a href="{{ url_for('login') }}" class="nav-btn nav-btn-ghost">Ingia</a>
