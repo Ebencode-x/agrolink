@@ -104,21 +104,29 @@
           <div class="form-divider">Aina ya Akaunti</div>
           <div class="form-group">
             <label class="form-label">Wewe ni nani?</label>
-            <div class="role-selector">
+            <div class="role-selector" style="grid-template-columns:1fr 1fr 1fr">
               <div class="role-option" style="position:relative">
                 <input type="radio" name="role" id="role-farmer" value="farmer" checked/>
                 <label class="role-label" for="role-farmer">
                   <div style="width:36px;height:36px;border-radius:10px;background:rgba(45,106,79,0.10);border:1px solid rgba(45,106,79,0.20);display:flex;align-items:center;justify-content:center;color:var(--brand-mid)"><i data-lucide="sprout" style="width:18px;height:18px"></i></div>
-                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--text-primary)">Mkulima</span>
-                  <span style="font-size:0.72rem;color:var(--text-muted)">Ninazalisha au kuuza mazao</span>
+                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.88rem;color:var(--text-primary)">Mkulima</span>
+                  <span style="font-size:0.70rem;color:var(--text-muted);text-align:center">Nazalisha au kuuza mazao</span>
+                </label>
+              </div>
+              <div class="role-option" style="position:relative">
+                <input type="radio" name="role" id="role-buyer" value="buyer"/>
+                <label class="role-label" for="role-buyer">
+                  <div style="width:36px;height:36px;border-radius:10px;background:rgba(37,99,235,0.08);border:1px solid rgba(37,99,235,0.18);display:flex;align-items:center;justify-content:center;color:#2563eb"><i data-lucide="shopping-basket" style="width:18px;height:18px"></i></div>
+                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.88rem;color:var(--text-primary)">Mnunuzi</span>
+                  <span style="font-size:0.70rem;color:var(--text-muted);text-align:center">Nununua mazao kwa wingi</span>
                 </label>
               </div>
               <div class="role-option" style="position:relative">
                 <input type="radio" name="role" id="role-agent" value="agent"/>
                 <label class="role-label" for="role-agent">
-                  <div style="width:36px;height:36px;border-radius:10px;background:rgba(212,163,115,0.10);border:1px solid rgba(212,163,115,0.20);display:flex;align-items:center;justify-content:center;color:var(--brand-earth)"><i data-lucide="users" style="width:18px;height:18px"></i></div>
-                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--text-primary)">Wakala / Mnunuzi</span>
-                  <span style="font-size:0.72rem;color:var(--text-muted)">Ninunua au kusambaza</span>
+                  <div style="width:36px;height:36px;border-radius:10px;background:rgba(212,163,115,0.10);border:1px solid rgba(212,163,115,0.20);display:flex;align-items:center;justify-content:center;color:var(--brand-earth)"><i data-lucide="briefcase" style="width:18px;height:18px"></i></div>
+                  <span style="font-family:var(--font-display);font-weight:700;font-size:0.88rem;color:var(--text-primary)">Wakala</span>
+                  <span style="font-size:0.70rem;color:var(--text-muted);text-align:center">Nasambaza au kuunganisha</span>
                 </label>
               </div>
             </div>
