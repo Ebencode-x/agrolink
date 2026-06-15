@@ -2379,6 +2379,23 @@ def my_conversations():
 
 
 
+@app.route("/messages")
+@login_required
+@require_active_account
+def messages_inbox():
+    """Inbox — orodha ya mazungumzo yote."""
+    return render_template("messages/inbox.html")
+
+@app.route("/messages/<int:conv_id>")
+@login_required
+@require_active_account
+def messages_thread(conv_id):
+    """Thread ya mazungumzo moja."""
+    conv = Conversation.query.get_or_404(conv_id)
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return redirect(url_for("messages_inbox"))
+    return render_template("messages/thread.html", conv_id=conv_id)
+
 # ════════════════════════════════════════════════════════════════════════════
 # B2B BUYER PORTAL
 # Hotels, supermarkets, wholesalers wanaweza kutuma bulk orders

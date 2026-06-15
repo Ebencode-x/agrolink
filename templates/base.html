@@ -233,6 +233,7 @@
       {% if current_user.is_authenticated %}
         <div class="nav-drawer-greeting">Karibu, {{ current_user.full_name.split()[0] }}!</div>
         <a href="/dashboard" class="nav-btn nav-btn-ghost"><i data-lucide="layout-dashboard" style="width:16px;height:16px"></i>Dashboard</a>
+        <a href="/messages" class="nav-btn nav-btn-ghost"><i data-lucide="message-square" style="width:16px;height:16px"></i>Ujumbe</a>
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:16px;height:16px"></i>Admin</a>
         {% endif %}

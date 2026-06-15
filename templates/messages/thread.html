@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Mazungumzo — AgroLink Tanzania{% endblock %}
+{% block content %}
+<style>
+  .thread-wrap{max-width:680px;margin:0 auto;padding:0 0 0 0;display:flex;flex-direction:column;height:calc(100vh - 62px)}
+  .thread-header{display:flex;align-items:center;gap:0.75rem;padding:0.9rem clamp(0.75rem,4vw,1.5rem);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+  .thread-back{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--border);color:var(--text-primary);text-decoration:none;flex-shrink:0}
+  .thread-info{flex:1;min-width:0}
+  .thread-name{font-weight:700;font-size:0.95rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .thread-listing{font-size:0.75rem;color:var(--brand-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .thread-status{font-size:0.7rem;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;flex-shrink:0}
+  .thread-status.closed{background:#fff5f5;color:#c53030}
+  .msg-list{flex:1;overflow-y:auto;padding:1rem clamp(0.75rem,4vw,1.5rem);display:flex;flex-direction:column;gap:0.75rem}
+  .msg-bubble{max-width:78%;display:flex;flex-direction:column;gap:0.2rem}
+  .msg-bubble.mine{align-self:flex-end;align-items:flex-end}
+  .msg-bubble.theirs{align-self:flex-start;align-items:flex-start}
+  .msg-text{padding:0.65rem 0.9rem;border-radius:16px;font-size:0.88rem;line-height:1.5;word-break:break-word}
+  .msg-bubble.mine .msg-text{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+  .msg-bubble.theirs .msg-text{background:var(--surface);border:1px solid var(--border);color:var(--text-primary);border-bottom-left-radius:4px}
+  .msg-meta{font-size:0.68rem;color:var(--text-muted);padding:0 4px}
+  .thread-composer{padding:0.75rem clamp(0.75rem,4vw,1.5rem);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+  .composer-inner{display:flex;gap:0.5rem;align-items:flex-end}
+  .composer-input{flex:1;border:1px solid var(--border);border-radius:var(--radius-md);padding:0.65rem 0.9rem;font-size:0.88rem;font-family:var(--font-body);background:var(--bg);color:var(--text-primary);resize:none;max-height:120px;outline:none;transition:border-color var(--transition)}
+  .composer-input:focus{border-color:var(--brand-mid)}
+  .composer-send{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--transition)}
+  .composer-send:hover{background:var(--accent-dark)}
+  .composer-send:disabled{opacity:0.5;cursor:not-allowed}
+  .thread-loading{text-align:center;padding:3rem;color:var(--text-muted);font-size:0.9rem}
+  .thread-closed-bar{background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.82rem;color:#856404;text-align:center;margin-bottom:0.5rem}
+</style>
+
+<div class="thread-wrap">
+  <div class="thread-header" id="thread-header">
+    <a href="/messages" class="thread-back">
+      <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+    </a>
+    <div class="thread-info">
+      <div class="thread-name" id="thread-name">...</div>
+      <div class="thread-listing" id="thread-listing">...</div>
+    </div>
+    <span class="thread-status" id="thread-status"></span>
+  </div>
+
+  <div class="msg-list" id="msg-list">
+    <div class="thread-loading">Inapakia ujumbe...</div>
+  </div>
+
+  <div class="thread-composer" id="thread-composer">
+    <div class="composer-inner">
+      <textarea class="composer-input" id="msg-input" placeholder="Andika ujumbe..." rows="1"></textarea>
+      <button class="composer-send" id="send-btn">
+        <i data-lucide="send" style="width:16px;height:16px"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CONV_ID = {{ conv_id }};
+let convStatus = 'active';
+
+async function loadThread() {
+  try {
+    const res = await fetch(`/api/conversations/${CONV_ID}/messages`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Hitilafu');
+
+    document.getElementById('thread-name').textContent = data.messages.length > 0
+      ? (data.messages.find(m => !m.is_mine)?.sender || 'Mazungumzo')
+      : 'Mazungumzo';
+    document.getElementById('thread-listing').textContent = data.listing_title;
+
+    convStatus = data.status;
+    const statusEl = document.getElementById('thread-status');
+    statusEl.textContent = convStatus === 'active' ? 'Hai' : 'Imefungwa';
+    if (convStatus !== 'active') {
+      statusEl.classList.add('closed');
+      document.getElementById('thread-composer').innerHTML =
+        '<div class="thread-closed-bar">Mazungumzo haya yamefungwa.</div>';
+    }
+
+    renderMessages(data.messages);
+    lucide.createIcons();
+  } catch(e) {
+    document.getElementById('msg-list').innerHTML =
+      `<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem">Hitilafu: ${e.message}</div>`;
+  }
+}
+
+function renderMessages(msgs) {
+  const list = document.getElementById('msg-list');
+  if (msgs.length === 0) {
+    list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem">Bado hakuna ujumbe. Anza mazungumzo!</div>`;
+    return;
+  }
+  list.innerHTML = msgs.map(m => `
+    <div class="msg-bubble ${m.is_mine ? 'mine' : 'theirs'}">
+      <div class="msg-text">${escHtml(m.body)}</div>
+      <div class="msg-meta">${m.sent_at}${m.is_mine && m.is_read ? ' · Imesomwa' : ''}</div>
+    </div>
+  `).join('');
+  list.scrollTop = list.scrollHeight;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+async function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const btn = document.getElementById('send-btn');
+  const body = input.value.trim();
+  if (!body || convStatus !== 'active') return;
+
+  btn.disabled = true;
+  input.disabled = true;
+
+  try {
+    const res = await fetch(`/api/conversations/${CONV_ID}/reply`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({message: body})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Hitilafu');
+    input.value = '';
+    input.style.height = 'auto';
+    await loadThread();
+  } catch(e) {
+    alert(e.message);
+  } finally {
+    btn.disabled = false;
+    input.disabled = false;
+    input.focus();
+  }
+}
+
+// Auto-resize textarea
+document.getElementById('msg-input').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Send on Enter (Shift+Enter = newline)
+document.getElementById('msg-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+document.getElementById('send-btn').addEventListener('click', sendMessage);
+
+loadThread();
+// Auto-refresh kila sekunde 15
+setInterval(loadThread, 15000);
+</script>
+{% endblock %}
