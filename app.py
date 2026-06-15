@@ -1,5 +1,6 @@
 import os
 import requests
+from email_service import send_welcome_email
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_migrate import Migrate
@@ -766,6 +767,8 @@ def register():
 
         # Initialize trust engine — itahesabu level ya kwanza
         trust_engine(user.id)
+        if email:
+            send_welcome_email(email, full_name, role)
 
         return jsonify({"message": "Akaunti imefunguliwa.", "id": user.id}), 201
 
