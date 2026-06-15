@@ -88,6 +88,13 @@
     .nav-drawer-user{display:flex;flex-direction:column;gap:0.6rem}
     .nav-drawer-user .nav-btn{width:100%;justify-content:flex-start;padding:0.7rem 1rem;font-size:0.88rem}
     .nav-drawer-greeting{font-size:0.78rem;color:rgba(240,247,242,0.45);padding:0 0.5rem 0.5rem}
+    .nav-dropdown{position:relative}
+    .nav-dropdown-btn{color:rgba(240,247,242,0.65);text-decoration:none;font-size:0.82rem;font-weight:500;padding:0.4rem 0.75rem;border-radius:var(--radius-sm);transition:background var(--transition),color var(--transition);white-space:nowrap;background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:var(--font-body)}
+    .nav-dropdown-btn:hover{background:rgba(255,255,255,0.10);color:var(--text-on-dark)}
+    .nav-dropdown-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--nav-bg);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-md);min-width:180px;padding:0.4rem;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,0.3)}
+    .nav-dropdown-menu a{display:flex;align-items:center;gap:8px;color:rgba(240,247,242,0.72);text-decoration:none;font-size:0.82rem;padding:0.5rem 0.75rem;border-radius:var(--radius-sm);transition:background var(--transition),color var(--transition);white-space:nowrap}
+    .nav-dropdown-menu a:hover{background:rgba(255,255,255,0.10);color:var(--text-on-dark)}
+    .nav-dropdown.open .nav-dropdown-menu{display:block}
 
     /* Section headers */
     .section-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--brand-mid);margin-bottom:0.5rem}
@@ -189,22 +196,30 @@
       <li><a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint=='index' }}">Nyumbani</a></li>
       <li><a href="/listings" class="{{ 'active' if request.endpoint=='listings' }}">Soko</a></li>
       <li><a href="/bei" class="{{ 'active' if request.endpoint=='price_intelligence' }}">Bei ya AI</a></li>
-      <li><a href="/#huduma">Huduma</a></li>
-      <li><a href="/#hali-ya-hewa">Hali ya Hewa</a></li>
       <li><a href="/ai-daktari" class="{{ 'active' if request.endpoint=='ai_daktari' }}">Daktari wa Zao</a></li>
-      <li><a href="/farmers" class="{{ 'active' if request.endpoint=='farmers' }}">Wakulima</a></li>
-      <li><a href="/about" class="{{ 'active' if request.endpoint=='about' }}">Kuhusu</a></li>
+      <li class="nav-dropdown" id="nav-more-dropdown">
+        <button class="nav-dropdown-btn" onclick="toggleDropdown('nav-more-dropdown')">
+          Zaidi <i data-lucide="chevron-down" style="width:13px;height:13px"></i>
+        </button>
+        <div class="nav-dropdown-menu">
+          <a href="/#huduma"><i data-lucide="layers" style="width:14px;height:14px"></i>Huduma</a>
+          <a href="/#hali-ya-hewa"><i data-lucide="cloud-sun" style="width:14px;height:14px"></i>Hali ya Hewa</a>
+          <a href="/farmers" class="{{ 'active' if request.endpoint=='farmers' }}"><i data-lucide="users" style="width:14px;height:14px"></i>Wakulima</a>
+          <a href="/about" class="{{ 'active' if request.endpoint=='about' }}"><i data-lucide="info" style="width:14px;height:14px"></i>Kuhusu</a>
+        </div>
+      </li>
     </ul>
 
     <div class="nav-desktop-user">
       {% if current_user.is_authenticated %}
         <span style="font-size:0.79rem;color:rgba(240,253,244,0.60);white-space:nowrap">Karibu, {{ current_user.full_name.split()[0] }}!</span>
+        <a href="/messages" class="nav-btn nav-btn-ghost"><i data-lucide="message-square" style="width:14px;height:14px"></i>Ujumbe</a>
         <a href="/dashboard" class="nav-btn nav-btn-ghost"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i>Dashboard</a>
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:14px;height:14px"></i>Admin</a>
         {% endif %}
         {% if current_user.role in ('buyer', 'admin') %}
-        <a href="/b2b" class="nav-btn nav-btn-primary"><i data-lucide="building-2" style="width:14px;height:14px"></i>B2B Portal</a>
+        <a href="/b2b" class="nav-btn nav-btn-primary"><i data-lucide="building-2" style="width:14px;height:14px"></i>B2B</a>
         {% endif %}
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-danger"><i data-lucide="log-out" style="width:14px;height:14px"></i>Toka</a>
       {% else %}
@@ -236,6 +251,9 @@
         <a href="/messages" class="nav-btn nav-btn-ghost"><i data-lucide="message-square" style="width:16px;height:16px"></i>Ujumbe</a>
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:16px;height:16px"></i>Admin</a>
+        {% endif %}
+        {% if current_user.role in ('buyer', 'admin') %}
+        <a href="/b2b" class="nav-btn nav-btn-primary"><i data-lucide="building-2" style="width:16px;height:16px"></i>B2B Portal</a>
         {% endif %}
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-danger"><i data-lucide="log-out" style="width:16px;height:16px"></i>Toka</a>
       {% else %}
@@ -330,6 +348,16 @@
 
   <script>
     function toggleNav(){
+      // Dropdown
+      function toggleDropdown(id) {
+        const el = document.getElementById(id);
+        el.classList.toggle('open');
+      }
+      document.addEventListener('click', function(e) {
+        document.querySelectorAll('.nav-dropdown.open').forEach(d => {
+          if (!d.contains(e.target)) d.classList.remove('open');
+        });
+      });
       const drawer=document.getElementById('nav-drawer');
       const hamburger=document.getElementById('hamburger');
       drawer.classList.toggle('open');
