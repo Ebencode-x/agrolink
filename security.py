@@ -195,7 +195,7 @@ def apply_security_headers(app):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; "
             "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
             "img-src 'self' data: blob: https://*.supabase.co https://openweathermap.org; "
-            "connect-src 'self' https://*.supabase.co https://api.openweathermap.org;"
+            "connect-src 'self' https://*.supabase.co https://api.openweathermap.org https://cdn.jsdelivr.net;"
         )
 
         return response
