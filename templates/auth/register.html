@@ -203,7 +203,7 @@ document.getElementById('register-form').addEventListener('submit',async e=>{
   if(!valid)return;
   setLoading(true);
   try{
-    const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,region,role,password})});
+    const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,region,role,password,terms_accepted:terms})});
     const data=await res.json();
     if(res.ok){document.getElementById('submit-text').textContent='Akaunti Imefunguliwa! ✓';setTimeout(()=>{window.location.href='/login'},1200)}
     else{const err=document.getElementById('server-error');document.getElementById('server-error-msg').textContent=data.error||'Hitilafu. Jaribu tena.';err.style.display='flex';lucide.createIcons();setLoading(false)}
