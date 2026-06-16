@@ -65,7 +65,7 @@
 
   <!-- ── Main content ──────────────────────────────────────────────────────── -->
   <div class="container" style="padding-top:1.5rem;padding-bottom:3rem;">
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;" class="b2b-grid">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:1.5rem;align-items:start;" class="b2b-grid" id="b2b-main-grid">
 
       <!-- Listings -->
       <div>
@@ -83,7 +83,7 @@
       </div>
 
       <!-- Sidebar: My conversations -->
-      <div style="position:sticky;top:1rem;">
+      <div id="b2b-sidebar" style="position:sticky;top:1rem;">
         <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm);">
           <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;">
             <i data-lucide="message-square" style="width:18px;height:18px;color:var(--brand-mid);"></i>
@@ -193,6 +193,11 @@
 @media(max-width:768px){
   .b2b-grid{grid-template-columns:1fr!important;}
 }
+
+  @media(max-width:768px){
+    #b2b-main-grid{grid-template-columns:1fr!important;}
+    #b2b-sidebar{margin-top:1rem;}
+  }
 </style>
 
 <script>
