@@ -2581,7 +2581,13 @@ def b2b_dashboard_stats():
     if current_user.role not in ("buyer", "admin", "farmer"):
         return jsonify({"error": "Hauruhusiwi."}), 403
 
-    convs = Conversation.query.filter_by(buyer_id=current_user.id).all()
+    from sqlalchemy import or_
+    convs = Conversation.query.filter(
+        or_(
+            Conversation.buyer_id == current_user.id,
+            Conversation.seller_id == current_user.id,
+        )
+    ).all()
     total_inquiries = len(convs)
     active_convs    = sum(1 for c in convs if c.status.value == "active")
     unread          = sum(
