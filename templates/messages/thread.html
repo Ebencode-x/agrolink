@@ -2,50 +2,124 @@
 {% block title %}Mazungumzo — AgroLink Tanzania{% endblock %}
 {% block content %}
 <style>
-  .thread-wrap{max-width:680px;margin:0 auto;padding:0 0 0 0;display:flex;flex-direction:column;height:calc(100vh - 62px)}
-  .thread-header{display:flex;align-items:center;gap:0.75rem;padding:0.9rem clamp(0.75rem,4vw,1.5rem);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+  /* ── Layout ── */
+  .thread-wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;height:calc(100vh - 62px);position:relative}
+  .thread-header{display:flex;align-items:center;gap:0.75rem;padding:0.75rem clamp(0.75rem,4vw,1.25rem);background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:10}
   .thread-back{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--bg);border:1px solid var(--border);color:var(--text-primary);text-decoration:none;flex-shrink:0}
+  .thread-avatar{width:36px;height:36px;border-radius:50%;background:var(--brand-mid);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:0.85rem;flex-shrink:0}
   .thread-info{flex:1;min-width:0}
   .thread-name{font-weight:700;font-size:0.95rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .thread-listing{font-size:0.75rem;color:var(--brand-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .thread-status{font-size:0.7rem;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;flex-shrink:0}
+  .thread-listing{font-size:0.72rem;color:var(--brand-mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .thread-status{font-size:0.68rem;padding:2px 8px;border-radius:10px;background:#e8f5e9;color:#2e7d32;flex-shrink:0}
   .thread-status.closed{background:#fff5f5;color:#c53030}
-  .msg-list{flex:1;overflow-y:auto;padding:1rem clamp(0.75rem,4vw,1.5rem);display:flex;flex-direction:column;gap:0.75rem}
-  .msg-bubble{max-width:78%;display:flex;flex-direction:column;gap:0.2rem}
+  .thread-actions{display:flex;gap:0.4rem}
+  .thread-action-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;border-radius:6px;transition:color var(--transition)}
+  .thread-action-btn:hover{color:var(--text-primary)}
+
+  /* ── Messages ── */
+  .msg-list{flex:1;overflow-y:auto;padding:0.75rem clamp(0.75rem,4vw,1.25rem);display:flex;flex-direction:column;gap:0.5rem;transition:background 0.3s}
+  .msg-bubble{max-width:82%;display:flex;flex-direction:column;gap:0.15rem;position:relative;user-select:none}
   .msg-bubble.mine{align-self:flex-end;align-items:flex-end}
   .msg-bubble.theirs{align-self:flex-start;align-items:flex-start}
-  .msg-text{padding:0.65rem 0.9rem;border-radius:16px;font-size:0.88rem;line-height:1.5;word-break:break-word}
+
+  /* Reply preview inside bubble */
+  .msg-reply-preview{padding:0.35rem 0.6rem;border-radius:8px;font-size:0.75rem;margin-bottom:0.2rem;border-left:3px solid;max-width:100%}
+  .mine .msg-reply-preview{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.6);color:rgba(255,255,255,0.9)}
+  .theirs .msg-reply-preview{background:rgba(0,0,0,0.06);border-color:var(--brand-mid);color:var(--text-muted)}
+  .msg-reply-sender{font-weight:700;font-size:0.72rem;margin-bottom:1px}
+  .msg-reply-body{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+
+  /* Bubble text */
+  .msg-text{padding:0.6rem 0.85rem;border-radius:16px;font-size:0.88rem;line-height:1.5;word-break:break-word;position:relative;cursor:pointer}
   .msg-bubble.mine .msg-text{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
   .msg-bubble.theirs .msg-text{background:var(--surface);border:1px solid var(--border);color:var(--text-primary);border-bottom-left-radius:4px}
-  .msg-meta{font-size:0.68rem;color:var(--text-muted);padding:0 4px}
-  .thread-composer{padding:0.75rem clamp(0.75rem,4vw,1.5rem);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0}
+  .msg-text.deleted{opacity:0.55;font-style:italic}
+
+  /* Meta — time + ticks */
+  .msg-meta{display:flex;align-items:center;gap:3px;font-size:0.65rem;color:var(--text-muted);padding:0 4px}
+  .tick{font-size:0.7rem;line-height:1}
+  .tick.read{color:var(--brand-mid)}
+
+  /* Composer */
+  .thread-composer{padding:0.6rem clamp(0.75rem,4vw,1.25rem);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;z-index:10}
+  .reply-bar{display:none;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;background:var(--bg-subtle, var(--bg));border-radius:8px;margin-bottom:0.4rem;border-left:3px solid var(--brand-mid)}
+  .reply-bar.visible{display:flex}
+  .reply-bar-text{flex:1;min-width:0}
+  .reply-bar-name{font-size:0.72rem;font-weight:700;color:var(--brand-mid)}
+  .reply-bar-body{font-size:0.75rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .reply-bar-close{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:2px;flex-shrink:0}
   .composer-inner{display:flex;gap:0.5rem;align-items:flex-end}
-  .composer-input{flex:1;border:1px solid var(--border);border-radius:var(--radius-md);padding:0.65rem 0.9rem;font-size:0.88rem;font-family:var(--font-body);background:var(--bg);color:var(--text-primary);resize:none;max-height:120px;outline:none;transition:border-color var(--transition)}
+  .composer-input{flex:1;border:1px solid var(--border);border-radius:22px;padding:0.6rem 1rem;font-size:0.88rem;font-family:var(--font-body);background:var(--bg);color:var(--text-primary);resize:none;max-height:120px;outline:none;transition:border-color var(--transition)}
   .composer-input:focus{border-color:var(--brand-mid)}
   .composer-send{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background var(--transition)}
   .composer-send:hover{background:var(--accent-dark)}
   .composer-send:disabled{opacity:0.5;cursor:not-allowed}
-  .thread-loading{text-align:center;padding:3rem;color:var(--text-muted);font-size:0.9rem}
-  .thread-closed-bar{background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.82rem;color:#856404;text-align:center;margin-bottom:0.5rem}
+  .thread-closed-bar{background:#fff8e1;border:1px solid #ffe082;border-radius:var(--radius-md);padding:0.65rem 1rem;font-size:0.82rem;color:#856404;text-align:center}
+
+  /* Context menu */
+  .ctx-menu{position:fixed;z-index:9999;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);min-width:160px;overflow:hidden;display:none}
+  .ctx-menu.visible{display:block}
+  .ctx-item{display:flex;align-items:center;gap:0.6rem;padding:0.65rem 1rem;font-size:0.85rem;cursor:pointer;color:var(--text-primary);transition:background var(--transition);border:none;background:none;width:100%;text-align:left}
+  .ctx-item:hover{background:var(--bg-subtle,var(--bg))}
+  .ctx-item.danger{color:var(--danger)}
+  .ctx-item.danger:hover{background:rgba(192,57,43,0.08)}
+
+  /* Background picker */
+  .bg-picker{position:absolute;top:60px;right:8px;z-index:100;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:0.75rem;box-shadow:var(--shadow-lg);display:none;gap:8px;flex-wrap:wrap;max-width:200px}
+  .bg-picker.visible{display:flex}
+  .bg-swatch{width:36px;height:36px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:border-color 0.2s;flex-shrink:0}
+  .bg-swatch.active,.bg-swatch:hover{border-color:var(--brand-mid)}
+
+  /* Mobile tweaks */
+  @media(max-width:480px){
+    .msg-bubble{max-width:88%}
+    .thread-header{padding:0.6rem 0.75rem}
+  }
 </style>
 
 <div class="thread-wrap">
+  <!-- Header -->
   <div class="thread-header" id="thread-header">
     <a href="/messages" class="thread-back">
       <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
     </a>
+    <div class="thread-avatar" id="thread-avatar">?</div>
     <div class="thread-info">
       <div class="thread-name" id="thread-name">...</div>
       <div class="thread-listing" id="thread-listing">...</div>
     </div>
+    <div class="thread-actions">
+      <button class="thread-action-btn" onclick="toggleBgPicker()" title="Badilisha mandhari">
+        <i data-lucide="palette" style="width:17px;height:17px"></i>
+      </button>
+    </div>
     <span class="thread-status" id="thread-status"></span>
+    <!-- Background picker -->
+    <div class="bg-picker" id="bg-picker">
+      <div class="bg-swatch" style="background:#f0fdf4" data-bg="#f0fdf4" onclick="setBg(this)" title="Kijani Laini"></div>
+      <div class="bg-swatch" style="background:#fefce8" data-bg="#fefce8" onclick="setBg(this)" title="Njano Laini"></div>
+      <div class="bg-swatch" style="background:#f0f9ff" data-bg="#f0f9ff" onclick="setBg(this)" title="Bluu Laini"></div>
+      <div class="bg-swatch" style="background:#fdf4ff" data-bg="#fdf4ff" onclick="setBg(this)" title="Zambarau Laini"></div>
+      <div class="bg-swatch" style="background:var(--bg)" data-bg="" onclick="setBg(this)" title="Kawaida"></div>
+    </div>
   </div>
 
+  <!-- Messages -->
   <div class="msg-list" id="msg-list">
-    <div class="thread-loading">Inapakia ujumbe...</div>
+    <div style="text-align:center;color:var(--text-muted);padding:3rem;font-size:0.85rem">Inapakia...</div>
   </div>
 
+  <!-- Composer -->
   <div class="thread-composer" id="thread-composer">
+    <div class="reply-bar" id="reply-bar">
+      <div class="reply-bar-text">
+        <div class="reply-bar-name" id="reply-bar-name"></div>
+        <div class="reply-bar-body" id="reply-bar-body"></div>
+      </div>
+      <button class="reply-bar-close" onclick="clearReply()">
+        <i data-lucide="x" style="width:14px;height:14px"></i>
+      </button>
+    </div>
     <div class="composer-inner">
       <textarea class="composer-input" id="msg-input" placeholder="Andika ujumbe..." rows="1"></textarea>
       <button class="composer-send" id="send-btn">
@@ -55,78 +129,270 @@
   </div>
 </div>
 
+<!-- Context Menu -->
+<div class="ctx-menu" id="ctx-menu">
+  <button class="ctx-item" id="ctx-reply" onclick="ctxReply()">
+    <i data-lucide="corner-up-left" style="width:15px;height:15px"></i>Jibu
+  </button>
+  <button class="ctx-item" id="ctx-copy" onclick="ctxCopy()">
+    <i data-lucide="copy" style="width:15px;height:15px"></i>Nakili
+  </button>
+  <button class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()" style="display:none">
+    <i data-lucide="trash-2" style="width:15px;height:15px"></i>Futa
+  </button>
+</div>
+
 <script>
 const CONV_ID = {{ conv_id }};
 let convStatus = 'active';
+let _msgs = [];
+let _ctxMsg = null;
+let _replyTo = null;
+let _userScrolled = false;
+let _lastCount = 0;
 
-async function loadThread() {
+// ── Background picker ────────────────────────────────────────────────────
+function toggleBgPicker(){
+  document.getElementById('bg-picker').classList.toggle('visible');
+}
+function setBg(el){
+  const bg = el.dataset.bg;
+  const list = document.getElementById('msg-list');
+  list.style.background = bg || '';
+  localStorage.setItem('agrolink_chat_bg_' + CONV_ID, bg);
+  document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('bg-picker').classList.remove('visible');
+}
+function loadSavedBg(){
+  const bg = localStorage.getItem('agrolink_chat_bg_' + CONV_ID);
+  if(bg){
+    document.getElementById('msg-list').style.background = bg;
+    document.querySelectorAll('.bg-swatch').forEach(s => {
+      if(s.dataset.bg === bg) s.classList.add('active');
+    });
+  }
+}
+
+// ── Load thread ──────────────────────────────────────────────────────────
+async function loadThread(silent=false){
   try {
     const res = await fetch(`/api/conversations/${CONV_ID}/messages`);
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Hitilafu');
+    if(!res.ok) throw new Error(data.error || 'Hitilafu');
 
-    document.getElementById('thread-name').textContent = data.messages.length > 0
-      ? (data.messages.find(m => !m.is_mine)?.sender || 'Mazungumzo')
-      : 'Mazungumzo';
+    // Header
+    const otherMsg = data.messages.find(m => !m.is_mine);
+    const otherName = otherMsg?.sender || 'Mazungumzo';
+    document.getElementById('thread-name').textContent = otherName;
+    document.getElementById('thread-avatar').textContent = otherName[0].toUpperCase();
     document.getElementById('thread-listing').textContent = data.listing_title;
-
     convStatus = data.status;
     const statusEl = document.getElementById('thread-status');
     statusEl.textContent = convStatus === 'active' ? 'Hai' : 'Imefungwa';
-    if (convStatus !== 'active') {
-      statusEl.classList.add('closed');
+    if(convStatus !== 'active') statusEl.classList.add('closed');
+
+    if(convStatus !== 'active'){
       document.getElementById('thread-composer').innerHTML =
         '<div class="thread-closed-bar">Mazungumzo haya yamefungwa.</div>';
     }
 
-    renderMessages(data.messages);
+    _msgs = data.messages;
+    const newCount = _msgs.length;
+    const shouldScroll = !_userScrolled || newCount > _lastCount;
+    renderMessages(_msgs);
+    if(shouldScroll) scrollToBottom();
+    _lastCount = newCount;
     lucide.createIcons();
   } catch(e) {
-    document.getElementById('msg-list').innerHTML =
+    if(!silent) document.getElementById('msg-list').innerHTML =
       `<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem">Hitilafu: ${e.message}</div>`;
   }
 }
 
-function renderMessages(msgs) {
+function renderMessages(msgs){
   const list = document.getElementById('msg-list');
-  if (msgs.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem">Bado hakuna ujumbe. Anza mazungumzo!</div>`;
+  if(msgs.length === 0){
+    list.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:2rem;font-size:0.85rem">Anza mazungumzo!</div>`;
     return;
   }
-  list.innerHTML = msgs.map(m => `
-    <div class="msg-bubble ${m.is_mine ? 'mine' : 'theirs'}">
-      <div class="msg-text">${escHtml(m.body)}</div>
-      <div class="msg-meta">${m.sent_at}${m.is_mine && m.is_read ? ' · Imesomwa' : ''}</div>
-    </div>
-  `).join('');
+  list.innerHTML = msgs.map(m => {
+    const cls = m.is_mine ? 'mine' : 'theirs';
+    const deletedCls = m.is_deleted ? ' deleted' : '';
+
+    // Reply preview
+    let replyHtml = '';
+    if(m.reply_to){
+      replyHtml = `<div class="msg-reply-preview">
+        <div class="msg-reply-sender">${escHtml(m.reply_to.sender)}</div>
+        <div class="msg-reply-body">${escHtml(m.reply_to.body)}</div>
+      </div>`;
+    }
+
+    // Ticks
+    let ticks = '';
+    if(m.is_mine && !m.is_deleted){
+      ticks = m.is_read
+        ? `<span class="tick read">✓✓</span>`
+        : `<span class="tick">✓</span>`;
+    }
+
+    return `<div class="msg-bubble ${cls}" data-id="${m.id}" data-body="${escAttr(m.body)}" data-mine="${m.is_mine}" data-deleted="${m.is_deleted}">
+      ${replyHtml}
+      <div class="msg-text${deletedCls}">${escHtml(m.body)}</div>
+      <div class="msg-meta">${escHtml(m.sent_at)} ${ticks}</div>
+    </div>`;
+  }).join('');
+
+  // Attach long-press + right-click
+  list.querySelectorAll('.msg-bubble').forEach(attachContextMenu);
+}
+
+function escHtml(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escAttr(str){
+  if(!str) return '';
+  return String(str).replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function scrollToBottom(){
+  const list = document.getElementById('msg-list');
   list.scrollTop = list.scrollHeight;
 }
 
-function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// ── Smart scroll tracking ────────────────────────────────────────────────
+document.getElementById('msg-list').addEventListener('scroll', function(){
+  const el = this;
+  _userScrolled = el.scrollTop < el.scrollHeight - el.clientHeight - 60;
+});
+
+// ── Context menu ─────────────────────────────────────────────────────────
+function attachContextMenu(bubble){
+  let pressTimer;
+
+  const show = (x, y) => {
+    const msg = {
+      id: parseInt(bubble.dataset.id),
+      body: bubble.dataset.body,
+      is_mine: bubble.dataset.mine === 'true',
+      is_deleted: bubble.dataset.deleted === 'true',
+    };
+    _ctxMsg = msg;
+    const menu = document.getElementById('ctx-menu');
+    document.getElementById('ctx-delete').style.display = msg.is_mine && !msg.is_deleted ? 'flex' : 'none';
+    document.getElementById('ctx-copy').style.display = msg.is_deleted ? 'none' : 'flex';
+
+    // Position
+    const menuW = 170, menuH = 130;
+    let left = x, top = y;
+    if(left + menuW > window.innerWidth) left = window.innerWidth - menuW - 8;
+    if(top + menuH > window.innerHeight) top = y - menuH;
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    menu.classList.add('visible');
+    lucide.createIcons();
+  };
+
+  // Long press (mobile)
+  bubble.addEventListener('touchstart', e => {
+    pressTimer = setTimeout(() => {
+      const t = e.touches[0];
+      show(t.clientX, t.clientY);
+    }, 500);
+  });
+  bubble.addEventListener('touchend', () => clearTimeout(pressTimer));
+  bubble.addEventListener('touchmove', () => clearTimeout(pressTimer));
+
+  // Right click (desktop)
+  bubble.addEventListener('contextmenu', e => {
+    e.preventDefault();
+    show(e.clientX, e.clientY);
+  });
 }
 
-async function sendMessage() {
+document.addEventListener('click', e => {
+  if(!document.getElementById('ctx-menu').contains(e.target))
+    document.getElementById('ctx-menu').classList.remove('visible');
+  if(!document.getElementById('bg-picker').contains(e.target) &&
+     !e.target.closest('.thread-action-btn'))
+    document.getElementById('bg-picker').classList.remove('visible');
+});
+
+function ctxReply(){
+  if(!_ctxMsg || _ctxMsg.is_deleted) return;
+  _replyTo = _ctxMsg;
+  const bar = document.getElementById('reply-bar');
+  document.getElementById('reply-bar-name').textContent = _ctxMsg.is_mine ? 'Wewe' : document.getElementById('thread-name').textContent;
+  document.getElementById('reply-bar-body').textContent = _ctxMsg.body;
+  bar.classList.add('visible');
+  document.getElementById('ctx-menu').classList.remove('visible');
+  document.getElementById('msg-input').focus();
+  lucide.createIcons();
+}
+
+function clearReply(){
+  _replyTo = null;
+  document.getElementById('reply-bar').classList.remove('visible');
+}
+
+function ctxCopy(){
+  if(!_ctxMsg) return;
+  navigator.clipboard?.writeText(_ctxMsg.body).catch(()=>{});
+  document.getElementById('ctx-menu').classList.remove('visible');
+}
+
+async function ctxDelete(){
+  if(!_ctxMsg || !_ctxMsg.is_mine) return;
+  document.getElementById('ctx-menu').classList.remove('visible');
+  try {
+    const res = await fetch(`/api/messages/${_ctxMsg.id}`, {method:'DELETE'});
+    const data = await res.json();
+    if(!res.ok) { alert(data.error); return; }
+    await loadThread(true);
+    lucide.createIcons();
+  } catch(e){ alert('Hitilafu ya mtandao.'); }
+}
+
+// ── Send message ─────────────────────────────────────────────────────────
+async function sendMessage(){
   const input = document.getElementById('msg-input');
   const btn = document.getElementById('send-btn');
   const body = input.value.trim();
-  if (!body || convStatus !== 'active') return;
-
+  if(!body || convStatus !== 'active') return;
   btn.disabled = true;
   input.disabled = true;
 
+  // Optimistic UI
+  const tempId = 'temp_' + Date.now();
+  const list = document.getElementById('msg-list');
+  const tempEl = document.createElement('div');
+  tempEl.className = 'msg-bubble mine';
+  tempEl.id = tempId;
+  tempEl.innerHTML = `<div class="msg-text">${escHtml(body)}</div><div class="msg-meta">Inatuma... <span class="tick">✓</span></div>`;
+  list.appendChild(tempEl);
+  scrollToBottom();
+  _userScrolled = false;
+
   try {
+    const payload = {message: body};
+    if(_replyTo) payload.reply_to_id = _replyTo.id;
     const res = await fetch(`/api/conversations/${CONV_ID}/reply`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({message: body})
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Hitilafu');
+    if(!res.ok) throw new Error(data.error || 'Hitilafu');
     input.value = '';
     input.style.height = 'auto';
-    await loadThread();
-  } catch(e) {
+    clearReply();
+    await loadThread(true);
+    lucide.createIcons();
+  } catch(e){
+    const t = document.getElementById(tempId);
+    if(t) t.remove();
     alert(e.message);
   } finally {
     btn.disabled = false;
@@ -135,24 +401,19 @@ async function sendMessage() {
   }
 }
 
-// Auto-resize textarea
-document.getElementById('msg-input').addEventListener('input', function() {
+// ── Textarea auto-resize ─────────────────────────────────────────────────
+document.getElementById('msg-input').addEventListener('input', function(){
   this.style.height = 'auto';
   this.style.height = Math.min(this.scrollHeight, 120) + 'px';
 });
-
-// Send on Enter (Shift+Enter = newline)
-document.getElementById('msg-input').addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+document.getElementById('msg-input').addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); }
 });
-
 document.getElementById('send-btn').addEventListener('click', sendMessage);
 
+// ── Init ─────────────────────────────────────────────────────────────────
+loadSavedBg();
 loadThread();
-// Auto-refresh kila sekunde 15
-setInterval(loadThread, 15000);
+setInterval(()=>loadThread(true), 12000);
 </script>
 {% endblock %}
