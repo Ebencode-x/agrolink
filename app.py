@@ -2578,7 +2578,7 @@ def b2b_inquiry():
 @require_active_account
 def b2b_dashboard_stats():
     """Stats za buyer dashboard — mazungumzo, maombi, jumla."""
-    if current_user.role not in ("buyer", "admin"):
+    if current_user.role not in ("buyer", "admin", "farmer"):
         return jsonify({"error": "Hauruhusiwi."}), 403
 
     convs = Conversation.query.filter_by(buyer_id=current_user.id).all()
