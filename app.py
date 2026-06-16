@@ -2408,7 +2408,7 @@ def require_buyer(f):
     def decorated(*args, **kwargs):
         if not current_user.is_authenticated:
             return jsonify({"error": "Ingia kwanza."}), 401
-        if current_user.role not in ("buyer", "admin"):
+        if current_user.role not in ("buyer", "admin", "farmer"):
             return jsonify({"error": "Sehemu hii ni kwa wanunuzi wa biashara tu."}), 403
         return f(*args, **kwargs)
     return decorated
@@ -2419,7 +2419,7 @@ def require_buyer(f):
 @require_active_account
 def b2b_portal():
     """B2B Buyer Portal — landing page."""
-    if current_user.role not in ("buyer", "admin"):
+    if current_user.role not in ("buyer", "admin", "farmer"):
         return redirect(url_for("index"))
     # Bulk listings: zinazopatikana na quantity >= 100kg
     bulk_listings = (
