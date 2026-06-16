@@ -451,7 +451,7 @@ function getTimeGreeting(){
 
 // ── CSS ───────────────────────────────────────────────────────────────────
 const CSS=`
-#agrobot-bubble{position:fixed;bottom:24px;right:24px;z-index:9999;cursor:pointer}
+#agrobot-bubble{position:fixed;bottom:24px;right:24px;z-index:9999;cursor:pointer}@media(max-width:768px){#agrobot-bubble{bottom:80px!important;right:16px!important}}
 #agrobot-bubble-inner{width:58px;height:58px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(16,185,129,0.7),0 4px 20px rgba(16,185,129,0.4);animation:abotPulse 2.5s ease-in-out infinite}
 #agrobot-bubble-inner svg{width:27px;height:27px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #abot-label{position:absolute;bottom:64px;right:0;background:rgba(6,30,20,0.95);border:1px solid rgba(16,185,129,0.5);color:#6ee7b7;font-size:0.7rem;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap;font-family:sans-serif;letter-spacing:0.05em;box-shadow:0 0 12px rgba(16,185,129,0.3);animation:abotLabelPulse 3s ease-in-out infinite}

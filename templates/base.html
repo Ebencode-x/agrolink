@@ -174,7 +174,7 @@
       .nav-links{display:none}.nav-desktop-user{display:none}.nav-hamburger{display:flex}
       .footer-grid{grid-template-columns:1fr 1fr;gap:1.5rem}
       .section{padding:2.5rem 1rem}
-      #agrobot-bubble{position:fixed!important;bottom:20px!important;right:16px!important;z-index:9999!important}
+      #agrobot-bubble{position:fixed!important;bottom:80px!important;right:16px!important;z-index:9999!important}
       #agrobot-panel{position:fixed!important;top:0!important;bottom:0!important;right:-100vw!important;width:100vw!important;height:100%!important;border-left:none!important;z-index:10000!important}
       #agrobot-panel.open{right:0!important}
     }
@@ -219,7 +219,7 @@
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:14px;height:14px"></i>Admin</a>
         {% endif %}
-        {% if current_user.role in ('buyer', 'admin') %}
+        {% if current_user.role in ('buyer', 'admin', 'farmer') %}
         <a href="/b2b" class="nav-btn nav-btn-primary"><i data-lucide="building-2" style="width:14px;height:14px"></i>B2B</a>
         {% endif %}
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-danger"><i data-lucide="log-out" style="width:14px;height:14px"></i>Toka</a>
@@ -253,7 +253,7 @@
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:16px;height:16px"></i>Admin</a>
         {% endif %}
-        {% if current_user.role in ('buyer', 'admin') %}
+        {% if current_user.role in ('buyer', 'admin', 'farmer') %}
         <a href="/b2b" class="nav-btn nav-btn-primary"><i data-lucide="building-2" style="width:16px;height:16px"></i>B2B Portal</a>
         {% endif %}
         <a href="{{ url_for('logout') }}" class="nav-btn nav-btn-danger"><i data-lucide="log-out" style="width:16px;height:16px"></i>Toka</a>
