@@ -2335,7 +2335,17 @@ def reply_message(conv_id):
     if not body:
         return jsonify({"error": "Ujumbe hauwezi kuwa wazi."}), 400
 
-    msg = Message(conversation_id=conv.id, sender_id=current_user.id, body=body)
+    reply_to_id = data.get("reply_to_id")
+    if reply_to_id:
+        parent = Message.query.get(reply_to_id)
+        if not parent or parent.conversation_id != conv.id:
+            reply_to_id = None
+    msg = Message(
+        conversation_id=conv.id,
+        sender_id=current_user.id,
+        body=body,
+        reply_to_id=reply_to_id,
+    )
     conv.updated_at = datetime.utcnow()
     db.session.add(msg)
     db.session.commit()
