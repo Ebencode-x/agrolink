@@ -335,6 +335,8 @@ class Message(db.Model):
     sender_id       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     body            = db.Column(db.Text, nullable=False)
     is_read         = db.Column(db.Boolean, default=False)
+    is_deleted      = db.Column(db.Boolean, default=False, nullable=False, server_default="false")
+    reply_to_id     = db.Column(db.Integer, db.ForeignKey("messages.id"), nullable=True)
     sent_at         = db.Column(db.DateTime, default=datetime.utcnow)
     sender          = db.relationship("User", foreign_keys=[sender_id], lazy=True)
 
