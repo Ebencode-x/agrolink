@@ -2355,6 +2355,25 @@ def reply_message(conv_id):
     return jsonify({"success": True, "message_id": msg.id})
 
 
+
+@app.route("/api/messages/<int:msg_id>", methods=["DELETE"])
+@login_required
+@require_active_account
+def delete_message(msg_id):
+    """Futa ujumbe — sender tu, ndani ya dakika 10."""
+    msg = Message.query.get_or_404(msg_id)
+    if msg.sender_id != current_user.id:
+        return jsonify({"error": "Unaweza kufuta ujumbe wako tu."}), 403
+    if msg.is_deleted:
+        return jsonify({"error": "Umeshafutwa."}), 400
+    diff = (datetime.utcnow() - msg.sent_at).total_seconds()
+    if diff > 600:
+        return jsonify({"error": "Muda umepita — dakika 10 tu."}), 400
+    msg.is_deleted = True
+    msg.body = "Ujumbe huu umefutwa."
+    db.session.commit()
+    return jsonify({"success": True})
+
 @app.route("/api/conversations/mine", methods=["GET"])
 @login_required
 @require_active_account
