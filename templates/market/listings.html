@@ -287,9 +287,19 @@
                 <i data-lucide="flag" style="width:13px;height:13px"></i>Ripoti
               </button>
               {% endif %}
+              {% if current_user.is_authenticated and current_user.id != l.seller_id %}
+              <button class="contact-btn" onclick="openWasiliana({{ l.id }}, '{{ l.crop_name }}', '{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
+                <i data-lucide="message-circle" style="width:14px;height:14px"></i>Wasiliana
+              </button>
+              {% elif current_user.is_authenticated %}
               <a href="tel:{{ l.contact }}" class="contact-btn">
                 <i data-lucide="phone" style="width:14px;height:14px"></i>{{ l.contact }}
               </a>
+              {% else %}
+              <a href="/login" class="contact-btn">
+                <i data-lucide="message-circle" style="width:14px;height:14px"></i>Wasiliana
+              </a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -512,5 +522,103 @@ function filterCategory(cat,btn){
   btn.classList.add("active");
   filterListings();
 }
+</script>
+
+<!-- ── Wasiliana Modal ─────────────────────────────────────── -->
+<div id="wasiliana-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:1rem">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;width:100%;max-width:420px;box-shadow:var(--shadow-lg);position:relative">
+    <button onclick="closeWasiliana()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px">
+      <i data-lucide="x" style="width:18px;height:18px"></i>
+    </button>
+    <h3 id="wasiliana-title" style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem"></h3>
+    <p id="wasiliana-sub" style="font-size:0.83rem;color:var(--text-muted);margin-bottom:1.25rem"></p>
+    <textarea id="wasiliana-msg" rows="4" placeholder="Andika ujumbe wako hapa... (mfano: Ninahitaji kg 200 wiki hii, bei yako ni ngapi?)"
+      style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;resize:vertical;outline:none;transition:border-color var(--transition);box-sizing:border-box"></textarea>
+    <div id="wasiliana-error" style="display:none;color:var(--danger);font-size:0.82rem;margin-top:0.5rem"></div>
+    <div style="display:flex;gap:0.75rem;margin-top:1rem">
+      <button onclick="closeWasiliana()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--transition)">Ghairi</button>
+      <button id="wasiliana-submit" onclick="submitWasiliana()" style="flex:2;background:var(--brand-mid);border:none;color:#fff;padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:700;cursor:pointer;transition:all var(--transition)">
+        <span id="wasiliana-btn-text" style="display:inline-flex;align-items:center;gap:6px"><i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  let _listingId = null;
+
+  window.openWasiliana = function(listingId, cropName, sellerName){
+    _listingId = listingId;
+    document.getElementById('wasiliana-title').textContent = cropName + ' — ' + sellerName;
+    document.getElementById('wasiliana-sub').textContent = 'Tuma ujumbe kwa ' + sellerName + ' kuhusu bidhaa hii.';
+    document.getElementById('wasiliana-msg').value = '';
+    document.getElementById('wasiliana-error').style.display = 'none';
+    const modal = document.getElementById('wasiliana-modal');
+    modal.style.display = 'flex';
+    setTimeout(()=>{ document.getElementById('wasiliana-msg').focus(); }, 100);
+    lucide.createIcons();
+  };
+
+  window.closeWasiliana = function(){
+    document.getElementById('wasiliana-modal').style.display = 'none';
+    _listingId = null;
+  };
+
+  window.submitWasiliana = async function(){
+    const msg = document.getElementById('wasiliana-msg').value.trim();
+    const errEl = document.getElementById('wasiliana-error');
+    const btn = document.getElementById('wasiliana-submit');
+    const btnText = document.getElementById('wasiliana-btn-text');
+
+    if(!msg){
+      errEl.textContent = 'Andika ujumbe kwanza.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if(msg.length < 5){
+      errEl.textContent = 'Ujumbe mfupi sana.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btnText.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px"></i> Inatuma...';
+    lucide.createIcons();
+    errEl.style.display = 'none';
+
+    try {
+      const res = await fetch('/api/conversations/start', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ listing_id: _listingId, message: msg })
+      });
+      const data = await res.json();
+      if(res.ok && data.success){
+        window.location.href = '/messages/' + data.conversation_id;
+      } else {
+        errEl.textContent = data.error || 'Imeshindwa kutuma. Jaribu tena.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btnText.innerHTML = '<i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe';
+        lucide.createIcons();
+      }
+    } catch(e){
+      errEl.textContent = 'Tatizo la mtandao. Angalia connection yako.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btnText.innerHTML = '<i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe';
+      lucide.createIcons();
+    }
+  };
+
+  document.getElementById('wasiliana-modal').addEventListener('click', function(e){
+    if(e.target === this) closeWasiliana();
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeWasiliana();
+  });
+})();
 </script>
 {% endblock %}
