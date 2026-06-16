@@ -71,6 +71,9 @@
   .bg-swatch.active,.bg-swatch:hover{border-color:var(--brand-mid)}
 
   /* Mobile tweaks */
+  /* Dark bg support */
+  .msg-list[style*="1a1a2e"] .msg-bubble.theirs .msg-text{background:#2d2d44;border-color:#444;color:#e8e8f0}
+  .msg-list[style*="1a1a2e"] .msg-meta{color:#888}
   @media(max-width:480px){
     .msg-bubble{max-width:88%}
     .thread-header{padding:0.6rem 0.75rem}
@@ -96,11 +99,15 @@
     <span class="thread-status" id="thread-status"></span>
     <!-- Background picker -->
     <div class="bg-picker" id="bg-picker">
-      <div class="bg-swatch" style="background:#f0fdf4" data-bg="#f0fdf4" onclick="setBg(this)" title="Kijani Laini"></div>
-      <div class="bg-swatch" style="background:#fefce8" data-bg="#fefce8" onclick="setBg(this)" title="Njano Laini"></div>
-      <div class="bg-swatch" style="background:#f0f9ff" data-bg="#f0f9ff" onclick="setBg(this)" title="Bluu Laini"></div>
-      <div class="bg-swatch" style="background:#fdf4ff" data-bg="#fdf4ff" onclick="setBg(this)" title="Zambarau Laini"></div>
-      <div class="bg-swatch" style="background:var(--bg)" data-bg="" onclick="setBg(this)" title="Kawaida"></div>
+      <div style="width:100%;font-size:0.72rem;color:var(--text-muted);margin-bottom:4px;font-weight:600">Mandhari ya Chat</div>
+      <div class="bg-swatch" style="background:#f0fdf4;border:2px solid #86efac" data-bg="#f0fdf4" onclick="setBg(this)" title="Kijani"></div>
+      <div class="bg-swatch" style="background:#fefce8;border:2px solid #fde047" data-bg="#fefce8" onclick="setBg(this)" title="Njano"></div>
+      <div class="bg-swatch" style="background:#f0f9ff;border:2px solid #7dd3fc" data-bg="#f0f9ff" onclick="setBg(this)" title="Bluu"></div>
+      <div class="bg-swatch" style="background:#fdf4ff;border:2px solid #d8b4fe" data-bg="#fdf4ff" onclick="setBg(this)" title="Zambarau"></div>
+      <div class="bg-swatch" style="background:#1a1a2e;border:2px solid #444" data-bg="#1a1a2e" onclick="setBg(this)" title="Giza"></div>
+      <div class="bg-swatch" style="background:#f5f5f5;border:2px solid #ccc" data-bg="#f5f5f5" onclick="setBg(this)" title="Kijivu"></div>
+      <div class="bg-swatch" style="background:linear-gradient(135deg,#e8f5e9,#e3f2fd);border:2px solid #a5d6a7" data-bg="linear-gradient(135deg,#e8f5e9,#e3f2fd)" onclick="setBg(this)" title="Gradient"></div>
+      <div class="bg-swatch" style="background:#ffffff;border:2px solid #ddd" data-bg="" onclick="setBg(this)" title="Kawaida"></div>
     </div>
   </div>
 
