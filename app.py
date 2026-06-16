@@ -2430,10 +2430,16 @@ def b2b_portal():
         .limit(50)
         .all()
     )
-    # Mazungumzo ya buyer huyu
+    # Mazungumzo ya mtumiaji huyu (buyer au seller)
+    from sqlalchemy import or_
     my_convs = (
         Conversation.query
-        .filter_by(buyer_id=current_user.id)
+        .filter(
+            or_(
+                Conversation.buyer_id == current_user.id,
+                Conversation.seller_id == current_user.id,
+            )
+        )
         .order_by(Conversation.updated_at.desc())
         .limit(10)
         .all()
