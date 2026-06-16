@@ -247,7 +247,7 @@ function renderMessages(msgs){
     return `<div class="msg-bubble ${cls}" data-id="${m.id}" data-body="${escAttr(m.body)}" data-mine="${m.is_mine}" data-deleted="${m.is_deleted}">
       ${replyHtml}
       <div class="msg-text${deletedCls}">${escHtml(m.body)}</div>
-      <div class="msg-meta">${escHtml(m.sent_at)} ${ticks}</div>
+      <div class="msg-meta">${fmtTime(m.sent_at)} ${ticks}</div>
     </div>`;
   }).join('');
 
@@ -258,6 +258,31 @@ function renderMessages(msgs){
 function escHtml(str){
   if(!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function fmtTime(iso){
+  if(!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  // Leo
+  if(diffDays === 0){
+    return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+  // Jana
+  if(diffDays === 1){
+    return 'Jana ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+  // Wiki hii
+  if(diffDays < 7){
+    const days = ['Jumapili','Jumatatu','Jumanne','Jumatano','Alhamisi','Ijumaa','Jumamosi'];
+    return days[d.getDay()] + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+  // Zamani
+  return d.toLocaleDateString('sw-TZ', {day:'numeric', month:'short', year:'numeric'}) +
+    ', ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
 function escAttr(str){
   if(!str) return '';
