@@ -101,6 +101,9 @@
       <div class="thread-listing" id="thread-listing">...</div>
     </div>
     <div class="thread-actions">
+      <button class="thread-action-btn" onclick="toggleEscrow()" title="Lipa Salama" id="escrow-btn">
+        <i data-lucide="shield" style="width:17px;height:17px"></i>
+      </button>
       <button class="thread-action-btn" onclick="toggleBgPicker()" title="Badilisha mandhari">
         <i data-lucide="palette" style="width:17px;height:17px"></i>
       </button>
@@ -145,6 +148,60 @@
   </div>
 </div>
 
+
+<!-- Escrow Panel -->
+<div id="escrow-panel" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:200;width:min(94vw,420px)">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:1.1rem 1.25rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+      <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.9rem;color:var(--text-primary)">
+        <i data-lucide="shield" style="width:16px;height:16px;color:#2D6A4F"></i>Lipa Salama (Escrow)
+      </div>
+      <button onclick="document.getElementById('escrow-panel').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--text-muted)">
+        <i data-lucide="x" style="width:16px;height:16px"></i>
+      </button>
+    </div>
+    <div id="escrow-status-area">
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.75rem">Malipo yanahifadhiwa salama hadi bidhaa ipokelewa.</div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.75rem">
+        <label style="font-size:0.8rem;color:var(--text-secondary);white-space:nowrap">Kiasi (TZS)</label>
+        <input id="escrow-amount" type="number" min="1000" step="1000"
+          style="flex:1;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:8px;font-size:0.85rem;background:var(--bg-input,var(--bg-card));color:var(--text-primary)"
+          placeholder="e.g. 150000"/>
+      </div>
+      <div style="display:flex;gap:0.5rem">
+        <button onclick="escrowHold()" id="escrow-hold-btn"
+          style="flex:1;padding:0.5rem;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer">
+          <i data-lucide="lock" style="width:13px;height:13px"></i> Hifadhi Malipo
+        </button>
+      </div>
+    </div>
+    <div id="escrow-held-area" style="display:none">
+      <div style="background:rgba(45,106,79,0.08);border:1px solid rgba(45,106,79,0.25);border-radius:8px;padding:0.75rem;margin-bottom:0.75rem">
+        <div style="font-size:0.78rem;color:var(--text-muted)">Rejeleo</div>
+        <div id="escrow-ref" style="font-weight:700;font-size:0.88rem;color:#2D6A4F;font-family:monospace"></div>
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">Kiasi: TZS <span id="escrow-amt-display"></span></div>
+        <div style="font-size:0.78rem;margin-top:4px">Hali: <span id="escrow-state-badge" style="font-weight:700"></span></div>
+      </div>
+      {% if is_buyer %}
+      <button onclick="escrowRelease()" id="escrow-release-btn"
+        style="width:100%;padding:0.5rem;background:#1B4332;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;margin-bottom:0.4rem">
+        <i data-lucide="check-circle" style="width:13px;height:13px"></i> Nimepokea Bidhaa — Toa Malipo
+      </button>
+      {% endif %}
+      {% if is_seller %}
+      <button onclick="escrowRefund()" id="escrow-refund-btn"
+        style="width:100%;padding:0.5rem;background:var(--danger,#c0392b);color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer">
+        <i data-lucide="undo-2" style="width:13px;height:13px"></i> Rudisha Malipo kwa Mnunuzi
+      </button>
+      {% endif %}
+    </div>
+    <div id="escrow-done-area" style="display:none;text-align:center;padding:0.5rem 0">
+      <i data-lucide="check-circle-2" style="width:28px;height:28px;color:#2D6A4F"></i>
+      <div id="escrow-done-msg" style="font-size:0.85rem;color:var(--text-secondary);margin-top:0.4rem"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Context Menu -->
 <div class="ctx-menu" id="ctx-menu">
   <button class="ctx-item" id="ctx-reply" onclick="ctxReply()">
@@ -160,6 +217,92 @@
 
 <script>
 const CONV_ID = {{ conv_id }};
+
+// ── Escrow ────────────────────────────────────────────────────────────────
+const IS_BUYER  = {{ 'true' if is_buyer else 'false' }};
+const IS_SELLER = {{ 'true' if is_seller else 'false' }};
+const LISTING_PRICE = {{ listing_price }};
+const LISTING_QTY   = {{ listing_qty }};
+let _escrowRef = null;
+
+function toggleEscrow(){
+  const p = document.getElementById('escrow-panel');
+  if(p.style.display === 'none'){ p.style.display='block'; loadEscrowStatus(); }
+  else p.style.display='none';
+  lucide.createIcons();
+}
+
+async function loadEscrowStatus(){
+  try{
+    const r = await fetch(`/api/escrow/status/${CONV_ID}`);
+    const d = await r.json();
+    if(d.escrow){
+      _escrowRef = d.escrow.reference;
+      showEscrowHeld(d.escrow);
+    } else {
+      // Pendekeza kiasi
+      const suggested = LISTING_PRICE * LISTING_QTY;
+      if(suggested > 0) document.getElementById('escrow-amount').value = suggested;
+    }
+  }catch(e){}
+}
+
+function showEscrowHeld(e){
+  document.getElementById('escrow-status-area').style.display='none';
+  document.getElementById('escrow-held-area').style.display='block';
+  document.getElementById('escrow-ref').textContent = e.reference;
+  document.getElementById('escrow-amt-display').textContent = Number(e.amount_tzs).toLocaleString();
+  const badge = document.getElementById('escrow-state-badge');
+  const colors = {held:'#b45309',released:'#2D6A4F',refunded:'#c0392b'};
+  const labels = {held:'Imehifadhiwa',released:'Imetolewa',refunded:'Imerudishwa'};
+  badge.textContent = labels[e.status] || e.status;
+  badge.style.color = colors[e.status] || '#888';
+  if(e.status !== 'held'){
+    document.getElementById('escrow-held-area').querySelectorAll('button').forEach(b=>b.style.display='none');
+  }
+}
+
+async function escrowHold(){
+  const amt = parseInt(document.getElementById('escrow-amount').value);
+  if(!amt || amt < 1000){ alert('Ingiza kiasi sahihi (angalau TZS 1,000)'); return; }
+  const btn = document.getElementById('escrow-hold-btn');
+  btn.disabled = true; btn.textContent = 'Inahifadhi...';
+  try{
+    const r = await fetch('/api/escrow/hold',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({conversation_id:CONV_ID, amount_tzs:amt})});
+    const d = await r.json();
+    if(d.success){ _escrowRef=d.reference; showEscrowHeld({reference:d.reference,amount_tzs:amt,status:'held'}); }
+    else { alert(d.error||'Imeshindwa'); btn.disabled=false; btn.textContent='Hifadhi Malipo'; }
+  }catch(e){ btn.disabled=false; btn.textContent='Hifadhi Malipo'; }
+}
+
+async function escrowRelease(){
+  if(!confirm('Una uhakika umepokea bidhaa na unataka kutoa malipo kwa muuzaji?')) return;
+  const r = await fetch('/api/escrow/release',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({reference:_escrowRef})});
+  const d = await r.json();
+  if(d.success){ showDone(d.message); }
+  else alert(d.error||'Imeshindwa');
+}
+
+async function escrowRefund(){
+  if(!confirm('Una uhakika unataka kurudisha malipo kwa mnunuzi?')) return;
+  const r = await fetch('/api/escrow/refund',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({reference:_escrowRef})});
+  const d = await r.json();
+  if(d.success){ showDone(d.message); }
+  else alert(d.error||'Imeshindwa');
+}
+
+function showDone(msg){
+  document.getElementById('escrow-held-area').style.display='none';
+  document.getElementById('escrow-status-area').style.display='none';
+  const a = document.getElementById('escrow-done-area');
+  a.style.display='block';
+  document.getElementById('escrow-done-msg').textContent=msg;
+  lucide.createIcons();
+}
+
 let convStatus = 'active';
 let _msgs = [];
 let _ctxMsg = null;

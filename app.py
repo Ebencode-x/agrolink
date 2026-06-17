@@ -340,6 +340,27 @@ class Message(db.Model):
     sent_at         = db.Column(db.DateTime, default=datetime.utcnow)
     sender          = db.relationship("User", foreign_keys=[sender_id], lazy=True)
 
+# ── Escrow Model ─────────────────────────────────────────────────────────────
+class EscrowStatus(enum.Enum):
+    held     = "held"
+    released = "released"
+    refunded = "refunded"
+
+class EscrowTransaction(db.Model):
+    __tablename__ = "escrow_transactions"
+    id              = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey("conversations.id"), nullable=False)
+    buyer_id        = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    seller_id       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    amount_tzs      = db.Column(db.BigInteger, nullable=False)
+    status          = db.Column(db.Enum(EscrowStatus), default=EscrowStatus.held, nullable=False)
+    reference       = db.Column(db.String(32), unique=True, nullable=False)
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    buyer           = db.relationship("User", foreign_keys=[buyer_id], lazy=True)
+    seller          = db.relationship("User", foreign_keys=[seller_id], lazy=True)
+    conversation    = db.relationship("Conversation", foreign_keys=[conversation_id], lazy=True)
+
 # ── Login Manager ─────────────────────────────────────────────────────────────
 
 
@@ -2385,6 +2406,93 @@ def notification_unread_count():
     ).count()
     return jsonify({"unread": count})
 
+@app.route("/api/escrow/hold", methods=["POST"])
+@login_required
+@require_active_account
+def escrow_hold():
+    """Mock: buyer anaanzisha malipo ya escrow."""
+    import secrets
+    data        = request.get_json(silent=True) or {}
+    conv_id     = data.get("conversation_id")
+    amount      = data.get("amount_tzs")
+    if not conv_id or not amount:
+        return jsonify({"error": "Taarifa hazikamiliki"}), 400
+    conv = Conversation.query.get_or_404(conv_id)
+    if conv.buyer_id != current_user.id:
+        return jsonify({"error": "Huna ruhusa"}), 403
+    # Angalia kama escrow ipo tayari kwa conversation hii
+    existing = EscrowTransaction.query.filter_by(
+        conversation_id=conv_id, status=EscrowStatus.held
+    ).first()
+    if existing:
+        return jsonify({"error": "Escrow ipo tayari", "reference": existing.reference}), 409
+    ref = "ESC-" + secrets.token_hex(6).upper()
+    tx  = EscrowTransaction(
+        conversation_id=conv_id,
+        buyer_id=conv.buyer_id,
+        seller_id=conv.seller_id,
+        amount_tzs=int(amount),
+        status=EscrowStatus.held,
+        reference=ref,
+    )
+    db.session.add(tx)
+    db.session.commit()
+    return jsonify({"success": True, "reference": ref, "status": "held",
+                    "message": f"TZS {int(amount):,} imehifadhiwa salama. Ref: {ref}"})
+
+@app.route("/api/escrow/release", methods=["POST"])
+@login_required
+@require_active_account
+def escrow_release():
+    """Mock: buyer anakubali kutoa pesa kwa seller baada ya kupokea bidhaa."""
+    data = request.get_json(silent=True) or {}
+    ref  = data.get("reference")
+    tx   = EscrowTransaction.query.filter_by(reference=ref).first_or_404()
+    if tx.buyer_id != current_user.id:
+        return jsonify({"error": "Huna ruhusa"}), 403
+    if tx.status != EscrowStatus.held:
+        return jsonify({"error": f"Hali ya sasa: {tx.status.value}"}), 409
+    tx.status = EscrowStatus.released
+    db.session.commit()
+    return jsonify({"success": True, "status": "released",
+                    "message": f"TZS {tx.amount_tzs:,} imetolewa kwa muuzaji. Asante!"})
+
+@app.route("/api/escrow/refund", methods=["POST"])
+@login_required
+@require_active_account
+def escrow_refund():
+    """Mock: admin/seller anarudisha pesa kwa buyer."""
+    data = request.get_json(silent=True) or {}
+    ref  = data.get("reference")
+    tx   = EscrowTransaction.query.filter_by(reference=ref).first_or_404()
+    if current_user.role not in ("admin",) and tx.seller_id != current_user.id:
+        return jsonify({"error": "Huna ruhusa"}), 403
+    if tx.status != EscrowStatus.held:
+        return jsonify({"error": f"Hali ya sasa: {tx.status.value}"}), 409
+    tx.status = EscrowStatus.refunded
+    db.session.commit()
+    return jsonify({"success": True, "status": "refunded",
+                    "message": f"TZS {tx.amount_tzs:,} imerudishwa kwa mnunuzi."})
+
+@app.route("/api/escrow/status/<int:conv_id>", methods=["GET"])
+@login_required
+def escrow_status(conv_id):
+    """Angalia hali ya escrow kwa conversation."""
+    conv = Conversation.query.get_or_404(conv_id)
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return jsonify({"error": "Huna ruhusa"}), 403
+    tx = EscrowTransaction.query.filter_by(conversation_id=conv_id).order_by(
+        EscrowTransaction.created_at.desc()
+    ).first()
+    if not tx:
+        return jsonify({"escrow": None})
+    return jsonify({"escrow": {
+        "reference":  tx.reference,
+        "amount_tzs": tx.amount_tzs,
+        "status":     tx.status.value,
+        "created_at": tx.created_at.strftime("%d %b %Y, %H:%M"),
+    }})
+
 @app.route("/api/conversations/mine", methods=["GET"])
 @login_required
 @require_active_account
@@ -2436,7 +2544,17 @@ def messages_thread(conv_id):
     conv = Conversation.query.get_or_404(conv_id)
     if current_user.id not in (conv.buyer_id, conv.seller_id):
         return redirect(url_for("messages_inbox"))
-    return render_template("messages/thread.html", conv_id=conv_id)
+    is_buyer  = current_user.id == conv.buyer_id
+    is_seller = current_user.id == conv.seller_id
+    listing_price = conv.listing.price_tzs if conv.listing else 0
+    listing_qty   = conv.listing.quantity_kg if conv.listing else 0
+    return render_template("messages/thread.html",
+        conv_id=conv_id,
+        is_buyer=is_buyer,
+        is_seller=is_seller,
+        listing_price=listing_price,
+        listing_qty=listing_qty,
+    )
 
 # ════════════════════════════════════════════════════════════════════════════
 # B2B BUYER PORTAL
