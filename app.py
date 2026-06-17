@@ -2371,6 +2371,20 @@ def delete_message(msg_id):
     db.session.commit()
     return jsonify({"success": True})
 
+@app.route("/api/notifications/unread-count", methods=["GET"])
+@login_required
+def notification_unread_count():
+    """Idadi ya ujumbe ambao haujasomwa — kwa nav badge."""
+    count = Message.query.join(Conversation).filter(
+        Message.is_read == False,
+        Message.sender_id != current_user.id,
+        db.or_(
+            Conversation.buyer_id  == current_user.id,
+            Conversation.seller_id == current_user.id,
+        )
+    ).count()
+    return jsonify({"unread": count})
+
 @app.route("/api/conversations/mine", methods=["GET"])
 @login_required
 @require_active_account

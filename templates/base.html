@@ -214,7 +214,7 @@
     <div class="nav-desktop-user">
       {% if current_user.is_authenticated %}
         <span style="font-size:0.79rem;color:rgba(240,253,244,0.60);white-space:nowrap">Karibu, {{ current_user.full_name.split()[0] }}!</span>
-        <a href="/messages" class="nav-btn nav-btn-ghost"><i data-lucide="message-square" style="width:14px;height:14px"></i>Ujumbe</a>
+        <a href="/messages" class="nav-btn nav-btn-ghost" style="position:relative"><i data-lucide="message-square" style="width:14px;height:14px"></i>Ujumbe<span id="nav-unread-badge" style="display:none;position:absolute;top:-4px;right:-6px;background:#e84c30;color:#fff;font-size:0.6rem;font-weight:700;min-width:16px;height:16px;border-radius:50px;padding:0 4px;line-height:16px;text-align:center"></span></a>
         <a href="/dashboard" class="nav-btn nav-btn-ghost"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i>Dashboard</a>
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:14px;height:14px"></i>Admin</a>
@@ -249,7 +249,7 @@
       {% if current_user.is_authenticated %}
         <div class="nav-drawer-greeting">Karibu, {{ current_user.full_name.split()[0] }}!</div>
         <a href="/dashboard" class="nav-btn nav-btn-ghost"><i data-lucide="layout-dashboard" style="width:16px;height:16px"></i>Dashboard</a>
-        <a href="/messages" class="nav-btn nav-btn-ghost"><i data-lucide="message-square" style="width:16px;height:16px"></i>Ujumbe</a>
+        <a href="/messages" class="nav-btn nav-btn-ghost" style="position:relative"><i data-lucide="message-square" style="width:16px;height:16px"></i>Ujumbe<span id="nav-unread-badge-mob" style="display:none;position:absolute;top:-4px;right:-6px;background:#e84c30;color:#fff;font-size:0.6rem;font-weight:700;min-width:16px;height:16px;border-radius:50px;padding:0 4px;line-height:16px;text-align:center"></span></a>
         {% if current_user.role == 'admin' %}
         <a href="/admin" class="nav-btn nav-btn-danger"><i data-lucide="shield" style="width:16px;height:16px"></i>Admin</a>
         {% endif %}
@@ -378,5 +378,32 @@
   <script src="/static/js/agrobot.js"></script>
   <div id="agrobot-auth" data-auth="{{ '1' if current_user.is_authenticated else '0' }}" style="display:none"></div>
   <div id="agrobot-user" data-name="{{ current_user.full_name.split()[0] if current_user.is_authenticated and current_user.full_name else '' }}" style="display:none"></div>
+
+  <script>
+    (function(){
+      if(!document.getElementById('nav-unread-badge')) return;
+      function updateBadge(){
+        fetch('/api/notifications/unread-count')
+          .then(r=>r.ok?r.json():null)
+          .then(data=>{
+            if(!data) return;
+            var n = data.unread;
+            ['nav-unread-badge','nav-unread-badge-mob'].forEach(function(id){
+              var el = document.getElementById(id);
+              if(!el) return;
+              if(n > 0){
+                el.textContent = n > 99 ? '99+' : n;
+                el.style.display = 'inline-block';
+              } else {
+                el.style.display = 'none';
+              }
+            });
+          })
+          .catch(function(){});
+      }
+      updateBadge();
+      setInterval(updateBadge, 30000);
+    })();
+  </script>
 </body>
 </html>
