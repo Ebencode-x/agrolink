@@ -361,6 +361,33 @@ class EscrowTransaction(db.Model):
     seller          = db.relationship("User", foreign_keys=[seller_id], lazy=True)
     conversation    = db.relationship("Conversation", foreign_keys=[conversation_id], lazy=True)
 
+# ── Order State Machine ──────────────────────────────────────────────────────
+class OrderStatus(enum.Enum):
+    draft     = "draft"
+    submitted = "submitted"
+    approved  = "approved"
+    paid      = "paid"
+    completed = "completed"
+    cancelled = "cancelled"
+
+class Order(db.Model):
+    __tablename__ = "orders"
+    id              = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey("conversations.id"), nullable=False, unique=True)
+    buyer_id        = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    seller_id       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    listing_id      = db.Column(db.Integer, db.ForeignKey("market_listings.id"), nullable=False)
+    quantity_kg     = db.Column(db.Float, nullable=False)
+    price_tzs       = db.Column(db.BigInteger, nullable=False)
+    status          = db.Column(db.Enum(OrderStatus), default=OrderStatus.draft, nullable=False)
+    note            = db.Column(db.Text, nullable=True)
+    created_at      = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at      = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    buyer           = db.relationship("User", foreign_keys=[buyer_id], lazy=True)
+    seller          = db.relationship("User", foreign_keys=[seller_id], lazy=True)
+    listing         = db.relationship("MarketListing", foreign_keys=[listing_id], lazy=True)
+    conversation    = db.relationship("Conversation", foreign_keys=[conversation_id], lazy=True)
+
 # ── Login Manager ─────────────────────────────────────────────────────────────
 
 
@@ -2491,6 +2518,102 @@ def escrow_status(conv_id):
         "amount_tzs": tx.amount_tzs,
         "status":     tx.status.value,
         "created_at": tx.created_at.strftime("%d %b %Y, %H:%M"),
+    }})
+
+# ── Order State Machine Routes ────────────────────────────────────────────────
+VALID_TRANSITIONS = {
+    OrderStatus.draft:     {"next": OrderStatus.submitted, "role": "buyer"},
+    OrderStatus.submitted: {"next": OrderStatus.approved,  "role": "seller"},
+    OrderStatus.approved:  {"next": OrderStatus.paid,      "role": "buyer"},
+    OrderStatus.paid:      {"next": OrderStatus.completed, "role": "seller"},
+}
+
+@app.route("/api/orders/create", methods=["POST"])
+@login_required
+@require_active_account
+def order_create():
+    """Buyer anaunda order mpya (draft) kwa conversation."""
+    data    = request.get_json(silent=True) or {}
+    conv_id = data.get("conversation_id")
+    qty     = data.get("quantity_kg")
+    if not conv_id or not qty:
+        return jsonify({"error": "Taarifa hazikamiliki"}), 400
+    conv = Conversation.query.get_or_404(conv_id)
+    if conv.buyer_id != current_user.id:
+        return jsonify({"error": "Huna ruhusa"}), 403
+    existing = Order.query.filter_by(conversation_id=conv_id).first()
+    if existing:
+        return jsonify({"error": "Order ipo tayari", "order_id": existing.id,
+                        "status": existing.status.value}), 409
+    order = Order(
+        conversation_id=conv_id,
+        buyer_id=conv.buyer_id,
+        seller_id=conv.seller_id,
+        listing_id=conv.listing_id,
+        quantity_kg=float(qty),
+        price_tzs=int(conv.listing.price_tzs * float(qty)),
+        status=OrderStatus.draft,
+        note=data.get("note", ""),
+    )
+    db.session.add(order)
+    db.session.commit()
+    return jsonify({"success": True, "order_id": order.id, "status": order.status.value,
+                    "total_tzs": order.price_tzs})
+
+@app.route("/api/orders/<int:order_id>/advance", methods=["POST"])
+@login_required
+@require_active_account
+def order_advance(order_id):
+    """Endeleza order hadi hatua inayofuata."""
+    order = Order.query.get_or_404(order_id)
+    if current_user.id not in (order.buyer_id, order.seller_id):
+        return jsonify({"error": "Huna ruhusa"}), 403
+    transition = VALID_TRANSITIONS.get(order.status)
+    if not transition:
+        return jsonify({"error": f"Order iko {order.status.value} — haiwezi kuendelea"}), 409
+    required_role = transition["role"]
+    if required_role == "buyer" and current_user.id != order.buyer_id:
+        return jsonify({"error": f"Hatua hii inafanywa na mnunuzi tu"}), 403
+    if required_role == "seller" and current_user.id != order.seller_id:
+        return jsonify({"error": f"Hatua hii inafanywa na muuzaji tu"}), 403
+    order.status = transition["next"]
+    db.session.commit()
+    return jsonify({"success": True, "status": order.status.value,
+                    "message": f"Order imesogea hadi: {order.status.value}"})
+
+@app.route("/api/orders/<int:order_id>/cancel", methods=["POST"])
+@login_required
+@require_active_account
+def order_cancel(order_id):
+    """Futa order (buyer au seller, kabla ya paid)."""
+    order = Order.query.get_or_404(order_id)
+    if current_user.id not in (order.buyer_id, order.seller_id):
+        return jsonify({"error": "Huna ruhusa"}), 403
+    if order.status in (OrderStatus.paid, OrderStatus.completed):
+        return jsonify({"error": "Order imekamilika — haiwezi kufutwa"}), 409
+    order.status = OrderStatus.cancelled
+    db.session.commit()
+    return jsonify({"success": True, "status": "cancelled"})
+
+@app.route("/api/orders/status/<int:conv_id>", methods=["GET"])
+@login_required
+def order_status(conv_id):
+    """Angalia hali ya order kwa conversation."""
+    conv = Conversation.query.get_or_404(conv_id)
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return jsonify({"error": "Huna ruhusa"}), 403
+    order = Order.query.filter_by(conversation_id=conv_id).first()
+    if not order:
+        return jsonify({"order": None})
+    return jsonify({"order": {
+        "id":          order.id,
+        "status":      order.status.value,
+        "quantity_kg": order.quantity_kg,
+        "price_tzs":   order.price_tzs,
+        "note":        order.note or "",
+        "created_at":  order.created_at.strftime("%d %b %Y, %H:%M"),
+        "is_buyer":    current_user.id == order.buyer_id,
+        "is_seller":   current_user.id == order.seller_id,
     }})
 
 @app.route("/api/conversations/mine", methods=["GET"])

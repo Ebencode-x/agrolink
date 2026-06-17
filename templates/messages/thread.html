@@ -101,6 +101,9 @@
       <div class="thread-listing" id="thread-listing">...</div>
     </div>
     <div class="thread-actions">
+      <button class="thread-action-btn" onclick="toggleOrder()" title="Agizo" id="order-btn">
+        <i data-lucide="clipboard-list" style="width:17px;height:17px"></i>
+      </button>
       <button class="thread-action-btn" onclick="toggleEscrow()" title="Lipa Salama" id="escrow-btn">
         <i data-lucide="shield" style="width:17px;height:17px"></i>
       </button>
@@ -144,6 +147,73 @@
       <button class="composer-send" id="send-btn">
         <i data-lucide="send" style="width:16px;height:16px"></i>
       </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Order Panel -->
+<div id="order-panel" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:201;width:min(94vw,420px)">
+  <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:1.1rem 1.25rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+      <div style="display:flex;align-items:center;gap:0.5rem;font-weight:700;font-size:0.9rem;color:var(--text-primary)">
+        <i data-lucide="clipboard-list" style="width:16px;height:16px;color:#2D6A4F"></i>Agizo
+      </div>
+      <button onclick="document.getElementById('order-panel').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--text-muted)">
+        <i data-lucide="x" style="width:16px;height:16px"></i>
+      </button>
+    </div>
+
+    <!-- Stepper -->
+    <div id="order-stepper" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding:0.6rem 0.5rem;background:var(--bg-subtle,rgba(0,0,0,0.03));border-radius:8px">
+      {% for step in [('draft','Rasimu'),('submitted','Tuma'),('approved','Kubali'),('paid','Lipa'),('completed','Kamilika')] %}
+      <div id="step-{{step[0]}}" style="display:flex;flex-direction:column;align-items:center;gap:2px;opacity:0.35;transition:opacity 0.2s">
+        <div style="width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--text-muted)">
+          <i data-lucide="circle" style="width:10px;height:10px"></i>
+        </div>
+        <span style="font-size:0.6rem;color:var(--text-muted);white-space:nowrap">{{step[1]}}</span>
+      </div>
+      {% if not loop.last %}<div style="flex:1;height:1px;background:var(--border);margin:0 2px;margin-bottom:12px"></div>{% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Create form (buyer only, no order yet) -->
+    {% if is_buyer %}
+    <div id="order-create-area">
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.6rem">Unda agizo jipya kwa bidhaa hii.</div>
+      <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem">
+        <label style="font-size:0.8rem;color:var(--text-secondary);white-space:nowrap">Kiasi (kg)</label>
+        <input id="order-qty" type="number" min="1" step="0.5" value="{{ listing_qty }}"
+          style="flex:1;padding:0.4rem 0.6rem;border:1px solid var(--border);border-radius:8px;font-size:0.85rem;background:var(--bg-input,var(--bg-card));color:var(--text-primary)"/>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.75rem">
+        Jumla: TZS <span id="order-total-preview">{{ "{:,.0f}".format(listing_price * listing_qty) }}</span>
+      </div>
+      <button onclick="orderCreate()" id="order-create-btn"
+        style="width:100%;padding:0.5rem;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer">
+        <i data-lucide="plus-circle" style="width:13px;height:13px"></i> Tuma Agizo
+      </button>
+    </div>
+    {% endif %}
+
+    <!-- Order details (existing order) -->
+    <div id="order-details-area" style="display:none">
+      <div style="background:rgba(45,106,79,0.07);border:1px solid rgba(45,106,79,0.2);border-radius:8px;padding:0.75rem;margin-bottom:0.75rem;font-size:0.82rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="color:var(--text-muted)">Kiasi</span>
+          <span id="order-qty-display" style="font-weight:700;color:var(--text-primary)"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span style="color:var(--text-muted)">Jumla</span>
+          <span id="order-price-display" style="font-weight:700;color:#2D6A4F"></span>
+        </div>
+      </div>
+      <div id="order-action-area"></div>
+    </div>
+
+    <div id="order-done-area" style="display:none;text-align:center;padding:0.5rem 0">
+      <i data-lucide="check-circle-2" style="width:28px;height:28px;color:#2D6A4F"></i>
+      <div id="order-done-msg" style="font-size:0.85rem;color:var(--text-secondary);margin-top:0.4rem"></div>
     </div>
   </div>
 </div>
@@ -217,6 +287,143 @@
 
 <script>
 const CONV_ID = {{ conv_id }};
+
+// ── Order State Machine ──────────────────────────────────────────────────────
+let _orderId = null;
+const STEP_LABELS = {
+  draft:'Rasimu',submitted:'Imetumwa',approved:'Imekubaliwa',
+  paid:'Imelipwa',completed:'Imekamilika',cancelled:'Imefutwa'
+};
+const STEP_COLORS = {
+  draft:'#888',submitted:'#b45309',approved:'#0d9488',
+  paid:'#2D6A4F',completed:'#1B4332',cancelled:'#c0392b'
+};
+const STEPS = ['draft','submitted','approved','paid','completed'];
+
+function toggleOrder(){
+  const p = document.getElementById('order-panel');
+  if(p.style.display==='none'){ p.style.display='block'; loadOrderStatus(); }
+  else p.style.display='none';
+  lucide.createIcons();
+}
+
+async function loadOrderStatus(){
+  try{
+    const r = await fetch(`/api/orders/status/${CONV_ID}`);
+    const d = await r.json();
+    if(d.order){ showOrderDetails(d.order); }
+    else {
+      document.getElementById('order-create-area') && (document.getElementById('order-create-area').style.display='block');
+      document.getElementById('order-details-area').style.display='none';
+      updateStepper('draft', false);
+    }
+  }catch(e){}
+}
+
+function updateStepper(currentStatus, active){
+  STEPS.forEach(function(s){
+    const el = document.getElementById('step-'+s);
+    if(!el) return;
+    const idx = STEPS.indexOf(s);
+    const cur = STEPS.indexOf(currentStatus);
+    el.style.opacity = idx <= cur ? '1' : '0.3';
+    const dot = el.querySelector('div');
+    if(idx < cur){ dot.style.background='#2D6A4F'; dot.style.color='#fff'; }
+    else if(idx === cur){ dot.style.background=STEP_COLORS[currentStatus]||'#2D6A4F'; dot.style.color='#fff'; }
+    else { dot.style.background='var(--border)'; }
+  });
+}
+
+function showOrderDetails(order){
+  _orderId = order.id;
+  document.getElementById('order-create-area') && (document.getElementById('order-create-area').style.display='none');
+  document.getElementById('order-details-area').style.display='block';
+  document.getElementById('order-qty-display').textContent = order.quantity_kg + ' kg';
+  document.getElementById('order-price-display').textContent = 'TZS ' + Number(order.price_tzs).toLocaleString();
+  updateStepper(order.status, true);
+  renderOrderActions(order);
+}
+
+function renderOrderActions(order){
+  const area = document.getElementById('order-action-area');
+  area.innerHTML = '';
+  if(order.status === 'completed' || order.status === 'cancelled'){
+    const msg = order.status === 'completed' ? '✅ Agizo limekamilika!' : '❌ Agizo limefutwa.';
+    area.innerHTML = `<div style="text-align:center;font-size:0.85rem;font-weight:700;color:${STEP_COLORS[order.status]};padding:0.5rem 0">${msg}</div>`;
+    return;
+  }
+  const transitions = {
+    draft:     {label:'Tuma Agizo kwa Muuzaji', role:'buyer',   next:'submitted'},
+    submitted: {label:'Kubali Agizo',           role:'seller',  next:'approved'},
+    approved:  {label:'Thibitisha Malipo',      role:'buyer',   next:'paid'},
+    paid:      {label:'Thibitisha Uwasilishaji',role:'seller',  next:'completed'},
+  };
+  const t = transitions[order.status];
+  if(t){
+    const canAct = (t.role==='buyer' && order.is_buyer) || (t.role==='seller' && order.is_seller);
+    if(canAct){
+      const btn = document.createElement('button');
+      btn.textContent = t.label;
+      btn.style.cssText='width:100%;padding:0.5rem;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;margin-bottom:0.4rem';
+      btn.onclick = () => orderAdvance();
+      area.appendChild(btn);
+    } else {
+      area.innerHTML = `<div style="font-size:0.78rem;color:var(--text-muted);text-align:center;padding:0.4rem">Inasubiri hatua ya ${t.role==='buyer'?'mnunuzi':'muuzaji'}...</div>`;
+    }
+  }
+  if(order.status !== 'paid'){
+    const cancel = document.createElement('button');
+    cancel.textContent = 'Futa Agizo';
+    cancel.style.cssText='width:100%;padding:0.4rem;background:none;color:var(--danger,#c0392b);border:1px solid var(--danger,#c0392b);border-radius:8px;font-size:0.78rem;cursor:pointer;margin-top:4px';
+    cancel.onclick = () => orderCancel();
+    area.appendChild(cancel);
+  }
+  lucide.createIcons();
+}
+
+async function orderCreate(){
+  const qty = parseFloat(document.getElementById('order-qty').value);
+  if(!qty || qty < 0.5){ alert('Ingiza kiasi sahihi'); return; }
+  const btn = document.getElementById('order-create-btn');
+  btn.disabled=true; btn.textContent='Inatuma...';
+  const r = await fetch('/api/orders/create',{method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({conversation_id:CONV_ID, quantity_kg:qty})});
+  const d = await r.json();
+  if(d.success){ loadOrderStatus(); }
+  else if(d.order_id){ _orderId=d.order_id; loadOrderStatus(); }
+  else { alert(d.error||'Imeshindwa'); btn.disabled=false; btn.textContent='Tuma Agizo'; }
+}
+
+async function orderAdvance(){
+  if(!_orderId) return;
+  const r = await fetch(`/api/orders/${_orderId}/advance`,{method:'POST',
+    headers:{'Content-Type':'application/json'}});
+  const d = await r.json();
+  if(d.success){ loadOrderStatus(); }
+  else alert(d.error||'Imeshindwa');
+}
+
+async function orderCancel(){
+  if(!confirm('Una uhakika unataka kufuta agizo hili?')) return;
+  const r = await fetch(`/api/orders/${_orderId}/cancel`,{method:'POST',
+    headers:{'Content-Type':'application/json'}});
+  const d = await r.json();
+  if(d.success){ loadOrderStatus(); }
+  else alert(d.error||'Imeshindwa');
+}
+
+// Update order total preview
+document.addEventListener('DOMContentLoaded', function(){
+  const qtyInput = document.getElementById('order-qty');
+  if(qtyInput){
+    qtyInput.addEventListener('input', function(){
+      const total = parseFloat(this.value||0) * LISTING_PRICE;
+      const el = document.getElementById('order-total-preview');
+      if(el) el.textContent = total.toLocaleString('en-US', {maximumFractionDigits:0});
+    });
+  }
+});
 
 // ── Escrow ────────────────────────────────────────────────────────────────
 const IS_BUYER  = {{ 'true' if is_buyer else 'false' }};
