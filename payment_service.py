@@ -164,6 +164,15 @@ class AzamPayProvider(BasePaymentProvider):
             "Content-Type":  "application/json",
         }
 
+        # ── Mock mode kwa sandbox (PAYMENT_MOCK=true) ──────────────────────
+        if os.getenv("PAYMENT_MOCK", "true").lower() == "true":
+            logger.info(f"[MOCK] Payment simulated: {amount_tzs} TZS → {msisdn}")
+            return {
+                "success":      True,
+                "provider_ref": f"MOCK-{reference}",
+                "message":      "Ombi la malipo limetumwa. Angalia simu yako na uthibitishe.",
+            }
+        # ── Production flow ──────────────────────────────────────────────────
         try:
             resp = requests.post(url, json=payload, headers=headers, timeout=30)
             data = resp.json()
