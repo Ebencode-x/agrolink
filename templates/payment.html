@@ -409,6 +409,7 @@
           "Ref: " + (data.reference || "")
         );
         btnText.textContent = "Ombi Limetumwa";
+        spinner.style.display = "none";
         btn.disabled = true;
       } else {
         showStatus("error", "alert-circle", data.message || "Imeshindwa. Jaribu tena.");
