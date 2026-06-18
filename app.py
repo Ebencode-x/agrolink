@@ -2893,3 +2893,168 @@ def b2b_dashboard_stats():
         "region": current_user.region or "Haijabainishwa",
     })
 
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# PAYMENT ROUTES — Sprint 1 (AzamPay Sandbox)
+# ══════════════════════════════════════════════════════════════════════════════
+from payment_service import get_payment_service, PaymentError
+
+@app.route("/payments/initiate/<int:order_id>", methods=["GET"])
+@login_required
+@require_active_account
+def payment_page(order_id):
+    """Onyesha ukurasa wa kulipa kwa order iliyoidhinishwa."""
+    order = Order.query.get_or_404(order_id)
+
+    # Hakikisha ni mnunuzi wa order hii
+    if order.buyer_id != current_user.id:
+        flash("Hauruhusiwi kufikia ukurasa huu.", "error")
+        return redirect(url_for("dashboard"))
+
+    # Order lazima iwe approved
+    if order.status != OrderStatus.approved:
+        flash("Agizo hili halijaidhinishwa bado.", "error")
+        return redirect(url_for("dashboard"))
+
+    return render_template(
+        "payment.html",
+        order=order,
+        listing=order.listing,
+        seller=order.seller,
+    )
+
+
+@app.route("/payments/initiate/<int:order_id>", methods=["POST"])
+@login_required
+@require_active_account
+def payment_initiate(order_id):
+    """Anzisha malipo — tuma USSD push kwa simu ya mnunuzi."""
+    order = Order.query.get_or_404(order_id)
+
+    if order.buyer_id != current_user.id:
+        return jsonify({"success": False, "message": "Hauruhusiwi."}), 403
+
+    if order.status != OrderStatus.approved:
+        return jsonify({"success": False, "message": "Agizo hili halijaidhinishwa."}), 400
+
+    msisdn = request.form.get("msisdn", "").strip()
+    if not msisdn:
+        return jsonify({"success": False, "message": "Weka namba ya simu ya kulipa."}), 400
+
+    try:
+        svc    = get_payment_service()
+        result = svc.initiate_payment(order=order, msisdn=msisdn)
+
+        if result["success"]:
+            # Hifadhi reference kwenye EscrowTransaction
+            escrow = EscrowTransaction.query.filter_by(
+                conversation_id=order.conversation_id
+            ).first()
+            if escrow:
+                escrow.reference = result["reference"]
+                escrow.status    = EscrowStatus.held
+                db.session.commit()
+
+            return jsonify({
+                "success": True,
+                "message": result["message"],
+                "reference": result["reference"],
+            })
+        else:
+            return jsonify({"success": False, "message": result["message"]}), 400
+
+    except PaymentError as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
+
+@app.route("/payments/callback", methods=["POST"])
+def payment_callback():
+    """
+    AzamPay sandbox callback — inaitwa na AzamPay baada ya mnunuzi kulipa.
+    Inabadilisha order status kuwa 'paid'.
+    """
+    payload = request.get_json(force=True) or {}
+
+    try:
+        svc    = get_payment_service()
+        result = svc.handle_callback(payload, dict(request.headers))
+
+        if result["success"]:
+            reference = result.get("reference", "")
+            # Tafuta escrow kwa reference
+            escrow = EscrowTransaction.query.filter_by(reference=reference).first()
+            if escrow:
+                escrow.status = EscrowStatus.held
+                db.session.commit()
+
+                # Badilisha order status kuwa paid
+                order = Order.query.filter_by(
+                    conversation_id=escrow.conversation_id
+                ).first()
+                if order and order.status == OrderStatus.approved:
+                    order.status = OrderStatus.paid
+                    db.session.commit()
+
+        return jsonify({"status": "ok"}), 200
+
+    except Exception as e:
+        app.logger.error(f"Payment callback error: {e}")
+        return jsonify({"status": "error"}), 200  # 200 daima kwa callbacks
+
+
+@app.route("/payments/release/<int:order_id>", methods=["POST"])
+@login_required
+@require_active_account
+def payment_release(order_id):
+    """
+    Toa pesa kwa mkulima — inaitwa mnunuzi akithibitisha kupokea bidhaa.
+    Order status: paid → completed.
+    """
+    order = Order.query.get_or_404(order_id)
+
+    # Ni mnunuzi au admin tu anayeweza kuthibitisha
+    if order.buyer_id != current_user.id and current_user.role != "admin":
+        return jsonify({"success": False, "message": "Hauruhusiwi."}), 403
+
+    if order.status != OrderStatus.paid:
+        return jsonify({"success": False, "message": "Malipo hayajakamilika bado."}), 400
+
+    escrow = EscrowTransaction.query.filter_by(
+        conversation_id=order.conversation_id
+    ).first()
+    if not escrow:
+        return jsonify({"success": False, "message": "Escrow haikupatikana."}), 404
+
+    seller = order.seller
+    seller_msisdn = seller.phone or ""
+    if not seller_msisdn:
+        return jsonify({
+            "success": False,
+            "message": "Mkulima hajaweka namba ya simu. Wasiliana naye moja kwa moja."
+        }), 400
+
+    try:
+        svc    = get_payment_service()
+        result = svc.release_escrow(escrow=escrow, seller_msisdn=seller_msisdn)
+
+        if result["success"]:
+            # Badilisha status zote
+            escrow.status = EscrowStatus.released
+            order.status  = OrderStatus.completed
+            db.session.commit()
+
+            # Sasisha trust score ya muuzaji
+            trust_engine(seller.id)
+
+            return jsonify({
+                "success": True,
+                "message": f"Malipo ya {result['seller_amount']:,} TZS yametumwa kwa {seller.full_name}.",
+                "seller_amount": result["seller_amount"],
+                "platform_fee":  result["platform_fee"],
+            })
+        else:
+            return jsonify({"success": False, "message": result["message"]}), 400
+
+    except PaymentError as e:
+        return jsonify({"success": False, "message": str(e)}), 500
