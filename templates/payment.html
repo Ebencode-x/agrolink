@@ -1,0 +1,443 @@
+{% extends "base.html" %}
+{% block title %}Lipa — {{ listing.title }} | AgroLink{% endblock %}
+
+{% block content %}
+<style>
+  /* ── Payment Page Styles ── */
+  .pay-wrap {
+    min-height: 100vh;
+    background: var(--bg-light, #F4F7F4);
+    padding: 1.5rem 1rem 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pay-card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #D6E4DB;
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(28,61,42,0.07);
+  }
+
+  /* ── Header ── */
+  .pay-header {
+    background: var(--brand-dark, #1C3D2A);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .pay-header-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .pay-header-icon svg { color: #E8B84B; }
+  .pay-header-title {
+    font-family: 'Sora', sans-serif;
+    font-size: 16px; font-weight: 600;
+    color: #fff;
+  }
+  .pay-header-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,0.65);
+    margin-top: 2px;
+  }
+
+  /* ── Order Summary ── */
+  .pay-summary {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #EBF1ED;
+  }
+  .pay-summary-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-mid, #2E6B47);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+  .pay-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 14px;
+    color: #444;
+  }
+  .pay-row .label { color: #777; }
+  .pay-row .value { font-weight: 500; color: #1C3D2A; }
+  .pay-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px dashed #D6E4DB;
+  }
+  .pay-total .label {
+    font-size: 13px; font-weight: 600; color: #1C3D2A;
+  }
+  .pay-total .amount {
+    font-family: 'Sora', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--brand-mid, #2E6B47);
+  }
+  .pay-total .currency {
+    font-size: 13px; font-weight: 400;
+    color: #888; margin-left: 4px;
+  }
+
+  /* ── Escrow Notice ── */
+  .escrow-notice {
+    margin: 0 1.5rem 1rem;
+    background: #F0F7F2;
+    border: 1px solid #C2DBC9;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .escrow-notice svg { color: var(--brand-mid); flex-shrink: 0; margin-top: 1px; }
+  .escrow-notice p {
+    font-size: 12px; color: #2E6B47; line-height: 1.5; margin: 0;
+  }
+  .escrow-notice strong { font-weight: 600; }
+
+  /* ── Form ── */
+  .pay-form { padding: 0 1.5rem 1.5rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-label {
+    display: block;
+    font-size: 13px; font-weight: 500;
+    color: #333; margin-bottom: 6px;
+  }
+  .form-label span { color: #E53E3E; margin-left: 2px; }
+
+  .phone-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #C8D9CC;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color 0.2s;
+  }
+  .phone-input-wrap:focus-within {
+    border-color: var(--brand-mid, #2E6B47);
+    box-shadow: 0 0 0 3px rgba(46,107,71,0.1);
+  }
+  .phone-prefix {
+    padding: 0 12px;
+    font-size: 14px; font-weight: 500;
+    color: #555;
+    background: #F4F7F4;
+    border-right: 1.5px solid #C8D9CC;
+    height: 48px;
+    display: flex; align-items: center;
+    white-space: nowrap;
+  }
+  .phone-input {
+    flex: 1;
+    border: none; outline: none;
+    padding: 0 14px;
+    font-size: 15px;
+    height: 48px;
+    color: #1C3D2A;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .phone-input::placeholder { color: #aaa; }
+
+  .mno-hint {
+    font-size: 11px; color: #888;
+    margin-top: 5px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  /* ── MNO Logos Row ── */
+  .mno-row {
+    display: flex; gap: 8px; margin-top: 8px;
+  }
+  .mno-badge {
+    font-size: 11px; font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 99px;
+    border: 1px solid #D6E4DB;
+    color: #555;
+  }
+
+  /* ── Submit Button ── */
+  .btn-pay {
+    width: 100%;
+    background: var(--brand-mid, #2E6B47);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 1.25rem;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-pay:hover { background: #245839; }
+  .btn-pay:active { transform: scale(0.98); }
+  .btn-pay:disabled {
+    background: #9ab5a5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── Status Messages ── */
+  .pay-status {
+    display: none;
+    margin: 0 1.5rem 1rem;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .pay-status.success {
+    background: #E8F5ED;
+    border: 1px solid #A8D5B5;
+    color: #1C6035;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .pay-status.error {
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    color: #991B1B;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Back link ── */
+  .pay-back {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: #2E6B47;
+    text-decoration: none;
+    margin-bottom: 1rem;
+    width: 100%; max-width: 480px;
+  }
+  .pay-back:hover { color: #1C3D2A; }
+
+  /* ── Security footer ── */
+  .pay-security {
+    margin-top: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    font-size: 11px; color: #aaa;
+  }
+  .pay-security svg { color: #aaa; }
+</style>
+
+<div class="pay-wrap">
+
+  <!-- Back -->
+  <a href="{{ url_for('dashboard') }}" class="pay-back">
+    <i data-lucide="arrow-left" style="width:16px;height:16px"></i>
+    Rudi kwenye dashibodi
+  </a>
+
+  <div class="pay-card">
+
+    <!-- Header -->
+    <div class="pay-header">
+      <div class="pay-header-icon">
+        <i data-lucide="shield-check" style="width:22px;height:22px"></i>
+      </div>
+      <div>
+        <div class="pay-header-title">Malipo Salama</div>
+        <div class="pay-header-sub">Pesa itashikiliwa salama hadi bidhaa upokeapo</div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="pay-summary">
+      <div class="pay-summary-label">Muhtasari wa Agizo</div>
+
+      <div class="pay-row">
+        <span class="label">Bidhaa</span>
+        <span class="value">{{ listing.title }}</span>
+      </div>
+      <div class="pay-row">
+        <span class="label">Muuzaji</span>
+        <span class="value">{{ seller.full_name }}</span>
+      </div>
+      <div class="pay-row">
+        <span class="label">Kiasi</span>
+        <span class="value">{{ "%.0f"|format(order.quantity_kg) }} kg</span>
+      </div>
+      <div class="pay-row">
+        <span class="label">Bei kwa kg</span>
+        <span class="value">TZS {{ "{:,}".format((order.price_tzs // order.quantity_kg)|int) }}</span>
+      </div>
+
+      <div class="pay-total">
+        <span class="label">Jumla ya Kulipa</span>
+        <div>
+          <span class="amount">{{ "{:,}".format(order.price_tzs) }}</span>
+          <span class="currency">TZS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Escrow Notice -->
+    <div class="escrow-notice" style="margin-top:1rem">
+      <i data-lucide="lock" style="width:16px;height:16px"></i>
+      <p>
+        <strong>Malipo yako yako salama.</strong>
+        Pesa itashikiliwa na AgroLink hadi uthibitishe kupokea bidhaa yako.
+        Mkulima atapata malipo baada ya kuthibitisha.
+      </p>
+    </div>
+
+    <!-- Status messages -->
+    <div class="pay-status" id="payStatus"></div>
+
+    <!-- Form -->
+    <div class="pay-form">
+      <div class="form-group">
+        <label class="form-label" for="msisdn">
+          Namba ya Simu ya Kulipa <span>*</span>
+        </label>
+        <div class="phone-input-wrap">
+          <span class="phone-prefix">
+            <i data-lucide="smartphone" style="width:14px;height:14px;margin-right:5px"></i>
+            +255
+          </span>
+          <input
+            type="tel"
+            id="msisdn"
+            class="phone-input"
+            placeholder="712 345 678"
+            maxlength="9"
+            inputmode="numeric"
+            autocomplete="tel"
+          />
+        </div>
+        <div class="mno-hint">
+          <i data-lucide="info" style="width:12px;height:12px"></i>
+          Inakubaliana na:
+        </div>
+        <div class="mno-row">
+          <span class="mno-badge">M-Pesa</span>
+          <span class="mno-badge">Tigo Pesa</span>
+          <span class="mno-badge">Airtel Money</span>
+          <span class="mno-badge">Halopesa</span>
+        </div>
+      </div>
+
+      <button class="btn-pay" id="btnPay" onclick="initiatePay()">
+        <i data-lucide="credit-card" style="width:18px;height:18px" id="btnIcon"></i>
+        <span id="btnText">Lipa TZS {{ "{:,}".format(order.price_tzs) }}</span>
+        <div class="spinner" id="btnSpinner"></div>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Security footer -->
+  <div class="pay-security">
+    <i data-lucide="shield" style="width:13px;height:13px"></i>
+    Malipo yanalindwa na AzamPay Tanzania
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+
+  async function initiatePay() {
+    const msisdnInput = document.getElementById("msisdn").value.trim();
+    const btn         = document.getElementById("btnPay");
+    const btnText     = document.getElementById("btnText");
+    const btnIcon     = document.getElementById("btnIcon");
+    const spinner     = document.getElementById("btnSpinner");
+    const statusEl    = document.getElementById("payStatus");
+
+    // Validate
+    if (!msisdnInput || msisdnInput.length < 9) {
+      showStatus("error", "lock", "Weka namba sahihi ya simu (tarakimu 9).");
+      return;
+    }
+
+    // Format msisdn: 255 + namba (bila sifuri ya mwanzo)
+    let msisdn = msisdnInput.replace(/\s/g, "");
+    if (msisdn.startsWith("0")) msisdn = msisdn.slice(1);
+    msisdn = "255" + msisdn;
+
+    // Loading state
+    btn.disabled     = true;
+    btnIcon.style.display  = "none";
+    spinner.style.display  = "block";
+    btnText.textContent    = "Inatuma ombi...";
+    statusEl.className     = "pay-status";
+    statusEl.style.display = "none";
+
+    try {
+      const formData = new FormData();
+      formData.append("msisdn", msisdn);
+
+      const resp = await fetch("{{ url_for('payment_initiate', order_id=order.id) }}", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await resp.json();
+
+      if (data.success) {
+        showStatus("success", "check-circle",
+          "Ombi limetumwa! Angalia simu yako — utapata ujumbe wa kuthibitisha malipo. " +
+          "Ref: " + (data.reference || "")
+        );
+        btnText.textContent = "Ombi Limetumwa";
+        btn.disabled = true;
+      } else {
+        showStatus("error", "alert-circle", data.message || "Imeshindwa. Jaribu tena.");
+        resetBtn();
+      }
+    } catch (e) {
+      showStatus("error", "wifi-off", "Hitilafu ya mtandao. Angalia muunganiko wako na ujaribu tena.");
+      resetBtn();
+    }
+  }
+
+  function showStatus(type, icon, message) {
+    const el = document.getElementById("payStatus");
+    el.className = "pay-status " + type;
+    el.innerHTML = `<i data-lucide="${icon}" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i><span>${message}</span>`;
+    el.style.display = "flex";
+    lucide.createIcons();
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function resetBtn() {
+    const btn     = document.getElementById("btnPay");
+    const btnText = document.getElementById("btnText");
+    const btnIcon = document.getElementById("btnIcon");
+    const spinner = document.getElementById("btnSpinner");
+    btn.disabled         = false;
+    btnIcon.style.display  = "block";
+    spinner.style.display  = "none";
+    btnText.textContent    = "Lipa TZS {{ '{:,}'.format(order.price_tzs) }}";
+  }
+</script>
+{% endblock %}
