@@ -365,7 +365,11 @@ function renderOrderActions(order){
       const btn = document.createElement('button');
       btn.textContent = t.label;
       btn.style.cssText='width:100%;padding:0.5rem;background:#2D6A4F;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;margin-bottom:0.4rem';
-      btn.onclick = () => orderAdvance();
+      if(order.status === 'approved' && order.is_buyer){
+        btn.onclick = () => { window.location.href = `/payments/initiate/${_orderId}`; };
+      } else {
+        btn.onclick = () => orderAdvance();
+      }
       area.appendChild(btn);
     } else {
       area.innerHTML = `<div style="font-size:0.78rem;color:var(--text-muted);text-align:center;padding:0.4rem">Inasubiri hatua ya ${t.role==='buyer'?'mnunuzi':'muuzaji'}...</div>`;
