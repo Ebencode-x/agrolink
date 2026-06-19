@@ -2898,6 +2898,7 @@ def b2b_dashboard_stats():
 # ══════════════════════════════════════════════════════════════════════════════
 # PAYMENT ROUTES — Sprint 1 (AzamPay Sandbox)
 # ══════════════════════════════════════════════════════════════════════════════
+import secrets
 from payment_service import get_payment_service, PaymentError
 
 @app.route("/payments/initiate/<int:order_id>", methods=["GET"])
@@ -2971,9 +2972,34 @@ def payment_initiate(order_id):
 @app.route("/payments/callback", methods=["POST"])
 def payment_callback():
     """
-    AzamPay sandbox callback — inaitwa na AzamPay baada ya mnunuzi kulipa.
+    Payment provider callback — inaitwa na AzamPay/Selcom baada ya mnunuzi kulipa.
     Inabadilisha order status kuwa 'paid'.
+
+    USALAMA:
+      - Shared-secret token (?secret=XXXX) lazima ulingane na PAYMENT_CALLBACK_SECRET
+      - Idempotent — callback ile ile haiwezi kuprocesiwa mara mbili
+      - Kila jaribio (likifaulu au la) linarekodiwa kwa audit (IP + matokeo)
     """
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+
+    # ── 1. Shared-secret verification ──────────────────────────────────────
+    expected_secret = os.getenv("PAYMENT_CALLBACK_SECRET", "")
+    provided_secret  = request.args.get("secret", "")
+
+    if not expected_secret:
+        app.logger.error(
+            "SECURITY: PAYMENT_CALLBACK_SECRET haijawekwa kwenye env — "
+            "callback endpoint haina ulinzi!"
+        )
+        return jsonify({"status": "error", "message": "Server misconfigured"}), 200
+
+    if not secrets.compare_digest(provided_secret, expected_secret):
+        app.logger.warning(
+            f"SECURITY: Callback ya kughushi kutoka IP={client_ip} — "
+            f"secret token si sahihi. Imekataliwa."
+        )
+        return jsonify({"status": "error", "message": "Unauthorized"}), 200
+
     payload = request.get_json(force=True) or {}
 
     try:
@@ -2982,24 +3008,46 @@ def payment_callback():
 
         if result["success"]:
             reference = result.get("reference", "")
-            # Tafuta escrow kwa reference
             escrow = EscrowTransaction.query.filter_by(reference=reference).first()
-            if escrow:
-                escrow.status = EscrowStatus.held
-                db.session.commit()
 
-                # Badilisha order status kuwa paid
-                order = Order.query.filter_by(
-                    conversation_id=escrow.conversation_id
-                ).first()
-                if order and order.status == OrderStatus.approved:
-                    order.status = OrderStatus.paid
-                    db.session.commit()
+            if not escrow:
+                app.logger.warning(
+                    f"AUDIT: Callback yenye reference isiyojulikana: {reference} "
+                    f"kutoka IP={client_ip}"
+                )
+                return jsonify({"status": "ok"}), 200
+
+            # ── 2. Idempotency check — kuzuia kuprocesiwa mara mbili ──────
+            if escrow.status == EscrowStatus.held:
+                app.logger.info(
+                    f"AUDIT: Callback duplicate kwa reference={reference} "
+                    f"imepuuzwa (tayari imeprocesiwa)."
+                )
+                return jsonify({"status": "ok", "message": "Already processed"}), 200
+
+            escrow.status = EscrowStatus.held
+            db.session.commit()
+
+            order = Order.query.filter_by(
+                conversation_id=escrow.conversation_id
+            ).first()
+            if order and order.status == OrderStatus.approved:
+                order.status = OrderStatus.paid
+                db.session.commit()
+                app.logger.info(
+                    f"AUDIT: Payment confirmed — order={order.id}, "
+                    f"reference={reference}, IP={client_ip}"
+                )
+        else:
+            app.logger.warning(
+                f"AUDIT: Callback verification ilishindwa — "
+                f"payload={payload}, IP={client_ip}"
+            )
 
         return jsonify({"status": "ok"}), 200
 
     except Exception as e:
-        app.logger.error(f"Payment callback error: {e}")
+        app.logger.error(f"Payment callback error: {e} — IP={client_ip}")
         return jsonify({"status": "error"}), 200  # 200 daima kwa callbacks
 
 
