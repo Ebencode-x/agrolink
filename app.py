@@ -2521,12 +2521,18 @@ def escrow_status(conv_id):
     }})
 
 # ── Order State Machine Routes ────────────────────────────────────────────────
+# SECURITY FIX (Sprint 2): 'approved->paid' na 'paid->completed' ZIMEONDOLEWA
+# kimakusudi. Hatua hizo mbili zinafanyika TU kupitia /payments/callback na
+# /payments/release (zenye shared-secret token + idempotency + audit log).
+# Kuziacha hapa kungeruhusu buyer kughushi malipo kwa kupiga /advance moja kwa moja.
 VALID_TRANSITIONS = {
     OrderStatus.draft:     {"next": OrderStatus.submitted, "role": "buyer"},
     OrderStatus.submitted: {"next": OrderStatus.approved,  "role": "seller"},
-    OrderStatus.approved:  {"next": OrderStatus.paid,      "role": "buyer"},
-    OrderStatus.paid:      {"next": OrderStatus.completed, "role": "seller"},
 }
+
+# Hatua zinazoruhusiwa TU kupitia mfumo wa malipo (payment_service / escrow),
+# kamwe si kupitia /api/orders/<id>/advance.
+PAYMENT_ONLY_TRANSITIONS = {OrderStatus.paid, OrderStatus.completed}
 
 @app.route("/api/orders/create", methods=["POST"])
 @login_required
@@ -2571,6 +2577,16 @@ def order_advance(order_id):
     transition = VALID_TRANSITIONS.get(order.status)
     if not transition:
         return jsonify({"error": f"Order iko {order.status.value} — haiwezi kuendelea"}), 409
+    # SECURITY FIX: ulinzi wa ziada (defense-in-depth) — hata kama
+    # VALID_TRANSITIONS itabadilishwa kimakosa baadaye, mpito kwenda
+    # 'paid' au 'completed' kupitia route hii UNAKATALIWA daima.
+    if transition["next"] in PAYMENT_ONLY_TRANSITIONS:
+        app.logger.warning(
+            f"SECURITY: jaribio la kupita malipo — user {current_user.id} "
+            f"alijaribu /advance order {order.id} kutoka {order.status.value} "
+            f"kwenda {transition['next'].value}"
+        )
+        return jsonify({"error": "Hatua hii inafanyika tu baada ya malipo kuthibitishwa"}), 403
     required_role = transition["role"]
     if required_role == "buyer" and current_user.id != order.buyer_id:
         return jsonify({"error": f"Hatua hii inafanywa na mnunuzi tu"}), 403
