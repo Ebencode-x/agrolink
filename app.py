@@ -370,6 +370,28 @@ class OrderStatus(enum.Enum):
     completed = "completed"
     cancelled = "cancelled"
 
+class PageView(db.Model):
+    __tablename__ = "page_views"
+    id         = db.Column(db.Integer, primary_key=True)
+    path       = db.Column(db.String(255), nullable=False)
+    method     = db.Column(db.String(10), default="GET")
+    user_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(512))
+    browser    = db.Column(db.String(64))
+    device     = db.Column(db.String(32))  # mobile / desktop / tablet
+    referrer   = db.Column(db.String(512))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class PWAInstall(db.Model):
+    __tablename__ = "pwa_installs"
+    id         = db.Column(db.Integer, primary_key=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(512))
+    platform   = db.Column(db.String(32))  # android / ios / desktop
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 class Order(db.Model):
     __tablename__ = "orders"
     id              = db.Column(db.Integer, primary_key=True)
@@ -3122,6 +3144,136 @@ def payment_release(order_id):
 
     except PaymentError as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+
+# ─── ANALYTICS ──────────────────────────────────────────
+def detect_device(ua):
+    ua = ua.lower()
+    if any(x in ua for x in ["mobile", "android", "iphone", "ipod"]):
+        return "mobile"
+    if "ipad" in ua or "tablet" in ua:
+        return "tablet"
+    return "desktop"
+
+def detect_browser(ua):
+    ua = ua.lower()
+    if "edg" in ua:    return "Edge"
+    if "chrome" in ua: return "Chrome"
+    if "firefox" in ua:return "Firefox"
+    if "safari" in ua: return "Safari"
+    if "opera" in ua:  return "Opera"
+    return "Other"
+
+SKIP_PATHS = ["/static", "/sw.js", "/favicon", "/api/notifications",
+              "/api/b2b/dashboard", "uptimerobot"]
+
+@app.after_request
+def track_pageview(response):
+    try:
+        path = request.path
+        ua   = request.headers.get("User-Agent", "")
+        # Skip static files, bots, API polling
+        if any(s in path for s in SKIP_PATHS): return response
+        if any(s in ua for s in ["UptimeRobot", "bot", "crawler", "spider"]): return response
+        if response.status_code not in [200, 201]: return response
+
+        pv = PageView(
+            path       = path[:255],
+            method     = request.method,
+            user_id    = current_user.id if current_user.is_authenticated else None,
+            ip_address = request.remote_addr,
+            user_agent = ua[:512],
+            browser    = detect_browser(ua),
+            device     = detect_device(ua),
+            referrer   = request.referrer[:512] if request.referrer else None,
+        )
+        db.session.add(pv)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+    return response
+
+@app.route("/api/analytics/pwa-install", methods=["POST"])
+def track_pwa_install():
+    ua = request.headers.get("User-Agent", "")
+    ua_lower = ua.lower()
+    if "iphone" in ua_lower or "ipad" in ua_lower:
+        platform = "ios"
+    elif "android" in ua_lower:
+        platform = "android"
+    else:
+        platform = "desktop"
+
+    install = PWAInstall(
+        user_id    = current_user.id if current_user.is_authenticated else None,
+        ip_address = request.remote_addr,
+        user_agent = ua[:512],
+        platform   = platform,
+    )
+    db.session.add(install)
+    db.session.commit()
+    return jsonify({"success": True})
+
+@app.route("/admin/analytics")
+@login_required
+@require_admin
+def admin_analytics():
+    from datetime import timedelta
+    today = datetime.utcnow().date()
+    week_ago  = datetime.utcnow() - timedelta(days=7)
+    month_ago = datetime.utcnow() - timedelta(days=30)
+
+    total_views   = PageView.query.count()
+    views_today   = PageView.query.filter(db.func.date(PageView.created_at) == today).count()
+    views_week    = PageView.query.filter(PageView.created_at >= week_ago).count()
+    views_month   = PageView.query.filter(PageView.created_at >= month_ago).count()
+
+    # Device breakdown
+    mobile_views  = PageView.query.filter_by(device="mobile").count()
+    desktop_views = PageView.query.filter_by(device="desktop").count()
+    tablet_views  = PageView.query.filter_by(device="tablet").count()
+
+    # Browser breakdown
+    browsers = db.session.query(
+        PageView.browser, db.func.count(PageView.id)
+    ).group_by(PageView.browser).all()
+
+    # Top pages
+    top_pages = db.session.query(
+        PageView.path, db.func.count(PageView.id).label("visits")
+    ).group_by(PageView.path).order_by(db.text("visits DESC")).limit(10).all()
+
+    # PWA installs
+    total_installs   = PWAInstall.query.count()
+    installs_week    = PWAInstall.query.filter(PWAInstall.created_at >= week_ago).count()
+    android_installs = PWAInstall.query.filter_by(platform="android").count()
+    ios_installs     = PWAInstall.query.filter_by(platform="ios").count()
+
+    # Daily views last 7 days
+    daily_views = []
+    for i in range(6, -1, -1):
+        day = datetime.utcnow() - timedelta(days=i)
+        count = PageView.query.filter(
+            db.func.date(PageView.created_at) == day.date()
+        ).count()
+        daily_views.append({"date": day.strftime("%d %b"), "count": count})
+
+    return render_template("admin/analytics.html",
+        total_views=total_views,
+        views_today=views_today,
+        views_week=views_week,
+        views_month=views_month,
+        mobile_views=mobile_views,
+        desktop_views=desktop_views,
+        tablet_views=tablet_views,
+        browsers=browsers,
+        top_pages=top_pages,
+        total_installs=total_installs,
+        installs_week=installs_week,
+        android_installs=android_installs,
+        ios_installs=ios_installs,
+        daily_views=daily_views,
+    )
 
 # ─── PWA ────────────────────────────────────────────────
 @app.route("/offline")

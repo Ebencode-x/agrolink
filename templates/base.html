@@ -270,7 +270,10 @@
       installBtn.addEventListener('click', function() {
         if (deferredPrompt) {
           deferredPrompt.prompt();
-          deferredPrompt.userChoice.then(function() {
+          deferredPrompt.userChoice.then(function(result) {
+            if (result.outcome === 'accepted') {
+              fetch('/api/analytics/pwa-install', { method: 'POST' }).catch(function(){});
+            }
             deferredPrompt = null;
             banner.style.display = 'none';
             localStorage.setItem('pwa-banner-dismissed', '1');
@@ -278,6 +281,11 @@
         }
       });
     }
+
+    // iOS — track appinstalled event
+    window.addEventListener('appinstalled', function() {
+      fetch('/api/analytics/pwa-install', { method: 'POST' }).catch(function(){});
+    });
 
     // Dismiss button
     if (dismissBtn) {
