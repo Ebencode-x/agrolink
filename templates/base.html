@@ -182,8 +182,96 @@
   </style>
 
   {% block extra_head %}{% endblock %}
+  <!-- PWA -->
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#1C3D2A"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="AgroLink"/>
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png"/>
 </head>
 <body>
+<!-- PWA Install Banner -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1C3D2A;border-top:2px solid #E8B84B;padding:0.85rem 1.25rem;box-shadow:0 -4px 16px rgba(0,0,0,0.18);">
+  <div style="max-width:480px;margin:0 auto;display:flex;align-items:center;gap:0.85rem;">
+    <img src="/static/icons/icon-192.png" style="width:40px;height:40px;border-radius:8px;flex-shrink:0;" alt="AgroLink"/>
+    <div style="flex:1;min-width:0;">
+      <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:0.88rem;color:#f0f7f2;line-height:1.2;">Pakua AgroLink</div>
+      <div style="font-size:0.78rem;color:rgba(240,247,242,0.7);margin-top:2px;">Weka app yako kwenye simu bila kwenda dukani</div>
+    </div>
+    <button id="pwa-install-btn" style="background:#E8B84B;color:#7a4f0a;font-family:'Sora',sans-serif;font-weight:700;font-size:0.8rem;border:none;border-radius:7px;padding:0.5rem 1rem;cursor:pointer;white-space:nowrap;flex-shrink:0;">Pakua</button>
+    <button id="pwa-dismiss-btn" style="background:none;border:none;color:rgba(240,247,242,0.5);cursor:pointer;padding:0.25rem;flex-shrink:0;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <!-- iOS hint — inaonekana kwa Safari tu -->
+  <div id="ios-hint" style="display:none;margin-top:0.6rem;font-size:0.76rem;color:rgba(240,247,242,0.6);text-align:center;">
+    Kwenye Safari: bonyeza <strong style="color:#E8B84B;">Share</strong> kisha chagua <strong style="color:#E8B84B;">Add to Home Screen</strong>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(function(err) {
+        console.warn('SW registration failed:', err);
+      });
+    });
+  }
+
+  // iOS detection
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  var isInStandalone = window.navigator.standalone === true;
+
+  // Dismiss state
+  var dismissed = localStorage.getItem('pwa-banner-dismissed');
+  if (dismissed) return;
+
+  var banner = document.getElementById('pwa-banner');
+  var installBtn = document.getElementById('pwa-install-btn');
+  var dismissBtn = document.getElementById('pwa-dismiss-btn');
+  var iosHint = document.getElementById('ios-hint');
+
+  var deferredPrompt = null;
+
+  // Android/Chrome — beforeinstallprompt
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!isInStandalone) {
+      banner.style.display = 'block';
+    }
+  });
+
+  // iOS Safari
+  if (isIOS && !isInStandalone) {
+    banner.style.display = 'block';
+    installBtn.style.display = 'none';
+    iosHint.style.display = 'block';
+  }
+
+  // Install button
+  installBtn.addEventListener('click', function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        deferredPrompt = null;
+        banner.style.display = 'none';
+        localStorage.setItem('pwa-banner-dismissed', '1');
+      });
+    }
+  });
+
+  // Dismiss button
+  dismissBtn.addEventListener('click', function() {
+    banner.style.display = 'none';
+    localStorage.setItem('pwa-banner-dismissed', '1');
+  });
+})();
+</script>
+
 
   <nav>
     <a href="{{ url_for('index') }}" class="nav-brand">

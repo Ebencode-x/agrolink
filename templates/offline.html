@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hakuna Mtandao — AgroLink Tanzania</title>
+  <style>
+    :root {
+      --brand-dark: #1C3D2A;
+      --brand-mid: #2E6B47;
+      --accent: #E8B84B;
+      --text-on-dark: #f0f7f2;
+      --font-display: 'Sora', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background: var(--brand-dark);
+      color: var(--text-on-dark);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    .card {
+      max-width: 360px;
+      width: 100%;
+    }
+    .icon-wrap {
+      width: 72px;
+      height: 72px;
+      background: rgba(232,184,75,0.15);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--accent);
+    }
+    p {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(240,247,242,0.75);
+      margin-bottom: 2rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #7a4f0a;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.75rem 1.75rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .btn:hover { background: #C49A2E; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=DM+Sans:wght@400&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.396.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-wrap">
+      <i data-lucide="wifi-off" style="width:32px;height:32px;color:#E8B84B;"></i>
+    </div>
+    <h1>Hakuna Mtandao</h1>
+    <p>Inaonekana huna muunganiko wa intaneti sasa hivi. Tafadhali angalia mtandao wako kisha jaribu tena.</p>
+    <a href="/" class="btn">
+      <i data-lucide="refresh-cw" style="width:16px;height:16px;"></i>
+      Jaribu Tena
+    </a>
+  </div>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

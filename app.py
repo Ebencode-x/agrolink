@@ -3122,3 +3122,14 @@ def payment_release(order_id):
 
     except PaymentError as e:
         return jsonify({"success": False, "message": str(e)}), 500
+
+# ─── PWA ────────────────────────────────────────────────
+@app.route("/offline")
+def offline():
+    return render_template("offline.html")
+
+@app.route("/sw.js")
+def service_worker():
+    from flask import send_from_directory
+    return send_from_directory(app.static_folder, "sw.js",
+                               mimetype="application/javascript")
