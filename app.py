@@ -3164,8 +3164,7 @@ def detect_browser(ua):
     if "opera" in ua:  return "Opera"
     return "Other"
 
-SKIP_PATHS = ["/static", "/sw.js", "/favicon", "/api/notifications",
-              "/api/b2b/dashboard", "uptimerobot"]
+SKIP_PATHS = ["/static", "/sw.js", "/favicon", "/api/", "uptimerobot"]
 
 @app.after_request
 def track_pageview(response):
