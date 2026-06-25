@@ -185,6 +185,7 @@
   <!-- PWA -->
   <link rel="manifest" href="/static/manifest.json"/>
   <meta name="theme-color" content="#1C3D2A"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="AgroLink"/>
@@ -211,7 +212,6 @@
 </div>
 
 <script>
-(function(){
   // Register Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
@@ -221,55 +221,72 @@
     });
   }
 
-  // iOS detection
-  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-  var isInStandalone = window.navigator.standalone === true;
-
-  // Dismiss state
-  var dismissed = localStorage.getItem('pwa-banner-dismissed');
-  if (dismissed) return;
-
-  var banner = document.getElementById('pwa-banner');
-  var installBtn = document.getElementById('pwa-install-btn');
-  var dismissBtn = document.getElementById('pwa-dismiss-btn');
-  var iosHint = document.getElementById('ios-hint');
-
   var deferredPrompt = null;
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  var isInStandalone = window.navigator.standalone === true ||
+                       window.matchMedia('(display-mode: standalone)').matches;
 
-  // Android/Chrome — beforeinstallprompt
+  // Catch beforeinstallprompt ASAP — kabla ya DOMContentLoaded
   window.addEventListener('beforeinstallprompt', function(e) {
     e.preventDefault();
     deferredPrompt = e;
-    if (!isInStandalone) {
-      banner.style.display = 'block';
-    }
   });
 
-  // iOS Safari
-  if (isIOS && !isInStandalone) {
-    banner.style.display = 'block';
-    installBtn.style.display = 'none';
-    iosHint.style.display = 'block';
-  }
+  // Weka banner baada ya DOM kuwa tayari
+  window.addEventListener('DOMContentLoaded', function() {
+    var banner     = document.getElementById('pwa-banner');
+    var installBtn = document.getElementById('pwa-install-btn');
+    var dismissBtn = document.getElementById('pwa-dismiss-btn');
+    var iosHint    = document.getElementById('ios-hint');
 
-  // Install button
-  installBtn.addEventListener('click', function() {
+    if (!banner) return;
+
+    var dismissed = localStorage.getItem('pwa-banner-dismissed');
+    if (dismissed || isInStandalone) return;
+
+    function showBanner() { banner.style.display = 'block'; }
+
+    // Android/Chrome
     if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(function(result) {
-        deferredPrompt = null;
+      showBanner();
+    } else {
+      // Kama prompt ilikuja kabla ya listener — subiri kidogo
+      window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        showBanner();
+      });
+    }
+
+    // iOS Safari
+    if (isIOS && !isInStandalone) {
+      showBanner();
+      if (installBtn) installBtn.style.display = 'none';
+      if (iosHint)    iosHint.style.display = 'block';
+    }
+
+    // Install button
+    if (installBtn) {
+      installBtn.addEventListener('click', function() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function() {
+            deferredPrompt = null;
+            banner.style.display = 'none';
+            localStorage.setItem('pwa-banner-dismissed', '1');
+          });
+        }
+      });
+    }
+
+    // Dismiss button
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', function() {
         banner.style.display = 'none';
         localStorage.setItem('pwa-banner-dismissed', '1');
       });
     }
   });
-
-  // Dismiss button
-  dismissBtn.addEventListener('click', function() {
-    banner.style.display = 'none';
-    localStorage.setItem('pwa-banner-dismissed', '1');
-  });
-})();
 </script>
 
 
