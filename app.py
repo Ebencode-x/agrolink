@@ -2247,6 +2247,82 @@ def clear_price_cache():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
+
+@app.route("/robots.txt")
+def robots_txt():
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /dashboard",
+        "Disallow: /dashboard/",
+        "Disallow: /admin",
+        "Disallow: /admin/",
+        "Disallow: /api/",
+        "Disallow: /payments/",
+        "Disallow: /messages",
+        "Disallow: /messages/",
+        "Disallow: /b2b",
+        "Disallow: /login",
+        "Disallow: /register",
+        "Disallow: /forgot-password",
+        "Disallow: /change-password",
+        "Disallow: /logout",
+        "Disallow: /offline",
+        "Disallow: /sw.js",
+        "",
+        "Sitemap: https://agrolink-tanzania.onrender.com/sitemap.xml",
+    ]
+    return "\n".join(lines), 200, {"Content-Type": "text/plain; charset=utf-8"}
+
+
+@app.route("/sitemap.xml")
+def sitemap_xml():
+    from flask import make_response
+    base = "https://agrolink-tanzania.onrender.com"
+
+    static_urls = [
+        {"loc": f"{base}/",           "priority": "1.0", "changefreq": "daily"},
+        {"loc": f"{base}/listings",   "priority": "0.9", "changefreq": "hourly"},
+        {"loc": f"{base}/farmers",    "priority": "0.7", "changefreq": "weekly"},
+        {"loc": f"{base}/ai-daktari", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": f"{base}/mshauri",    "priority": "0.7", "changefreq": "monthly"},
+        {"loc": f"{base}/about",      "priority": "0.6", "changefreq": "monthly"},
+        {"loc": f"{base}/bei",        "priority": "0.5", "changefreq": "weekly"},
+        {"loc": f"{base}/terms",      "priority": "0.3", "changefreq": "yearly"},
+    ]
+
+    listings = MarketListing.query.filter_by(is_available=True).order_by(
+        MarketListing.posted_at.desc()
+    ).limit(1000).all()
+
+    listing_urls = [
+        {
+            "loc": f"{base}/listings?id={l.id}",
+            "lastmod": l.posted_at.strftime("%Y-%m-%d"),
+            "priority": "0.8",
+            "changefreq": "weekly",
+        }
+        for l in listings
+    ]
+
+    all_urls = static_urls + listing_urls
+
+    xml_parts = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml_parts.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    for u in all_urls:
+        xml_parts.append("  <url>")
+        xml_parts.append(f"    <loc>{u['loc']}</loc>")
+        if "lastmod" in u:
+            xml_parts.append(f"    <lastmod>{u['lastmod']}</lastmod>")
+        xml_parts.append(f"    <changefreq>{u['changefreq']}</changefreq>")
+        xml_parts.append(f"    <priority>{u['priority']}</priority>")
+        xml_parts.append("  </url>")
+    xml_parts.append("</urlset>")
+
+    resp = make_response("\n".join(xml_parts))
+    resp.headers["Content-Type"] = "application/xml; charset=utf-8"
+    return resp
+
 @app.route("/health")
 def health():
     try:

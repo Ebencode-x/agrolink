@@ -1,5 +1,23 @@
 {% extends "base.html" %}
 {% block title %}AgroLink Tanzania — Jukwaa la Kilimo la Kisasa{% endblock %}
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AgroLink Tanzania",
+  "url": "https://agrolink-tanzania.onrender.com",
+  "logo": "https://agrolink-tanzania.onrender.com/static/icons/icon-512.png",
+  "description": "Soko la Kilimo la Kidijitali Tanzania. Nunua na uuze mazao, mifugo na pembejeo kwa bei nzuri.",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "TZ"
+  },
+  "sameAs": []
+}
+</script>
+{% endblock %}
+
 
 {% block extra_head %}
 <style>

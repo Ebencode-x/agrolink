@@ -181,6 +181,27 @@
     @media(max-width:480px){.footer-grid{grid-template-columns:1fr;gap:1.25rem}}
   </style>
 
+  <!-- SEO Meta Tags -->
+  {% block seo_meta %}
+  <meta name="description" content="{% block meta_description %}AgroLink Tanzania — Soko la Kilimo la Kidijitali. Nunua na uuze mazao, mifugo na pembejeo kwa bei nzuri Tanzania.{% endblock %}"/>
+  <meta name="keywords" content="kilimo Tanzania, soko la mazao, AgroLink, wakulima Tanzania, bei za mazao, agricultural marketplace Tanzania"/>
+  <meta name="author" content="AgroLink Tanzania"/>
+  <link rel="canonical" href="{% block canonical %}https://agrolink-tanzania.onrender.com{{ request.path }}{% endblock %}"/>
+  <!-- Open Graph -->
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}"/>
+  <meta property="og:site_name" content="AgroLink Tanzania"/>
+  <meta property="og:title" content="{% block og_title %}AgroLink Tanzania — Soko la Kilimo la Kidijitali{% endblock %}"/>
+  <meta property="og:description" content="{% block og_description %}Nunua na uuze mazao, mifugo na pembejeo kwa bei nzuri Tanzania. Wakulima zaidi ya 1,000 wanakusubiri.{% endblock %}"/>
+  <meta property="og:image" content="{% block og_image %}https://agrolink-tanzania.onrender.com/static/icons/icon-512.png{% endblock %}"/>
+  <meta property="og:url" content="https://agrolink-tanzania.onrender.com{{ request.path }}"/>
+  <meta property="og:locale" content="sw_TZ"/>
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="{% block twitter_title %}AgroLink Tanzania — Soko la Kilimo la Kidijitali{% endblock %}"/>
+  <meta name="twitter:description" content="{% block twitter_description %}Nunua na uuze mazao, mifugo na pembejeo kwa bei nzuri Tanzania.{% endblock %}"/>
+  <meta name="twitter:image" content="{% block twitter_image %}https://agrolink-tanzania.onrender.com/static/icons/icon-512.png{% endblock %}"/>
+  {% endblock %}
+  {% block jsonld %}{% endblock %}
   {% block extra_head %}{% endblock %}
   <!-- PWA -->
   <link rel="manifest" href="/static/manifest.json"/>

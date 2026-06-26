@@ -1,5 +1,43 @@
 {% extends "base.html" %}
-{% block title %}Soko — AgroLink Tanzania
+{% block title %}Soko la Mazao — AgroLink Tanzania{% endblock %}
+{% block meta_description %}Tafuta na nunua mazao, mifugo na pembejeo Tanzania. Orodha za wakulima wa Tanzania kwenye AgroLink.{% endblock %}
+{% block og_title %}Soko la Mazao — AgroLink Tanzania{% endblock %}
+{% block og_description %}Tafuta mazao, mifugo na pembejeo kwa bei nzuri kutoka kwa wakulima wa Tanzania.{% endblock %}
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Orodha ya Mazao — AgroLink Tanzania",
+  "description": "Mazao, mifugo na pembejeo kutoka kwa wakulima wa Tanzania",
+  "url": "https://agrolink-tanzania.onrender.com/listings",
+  "itemListElement": [
+    {% for listing in listings[:10] %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "item": {
+        "@type": "Product",
+        "name": "{{ listing.title | e }}",
+        "description": "{{ listing.crop_name | e }} — {{ listing.region | e }}",
+        "offers": {
+          "@type": "Offer",
+          "price": "{{ listing.price_tzs }}",
+          "priceCurrency": "TZS",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Person",
+            "name": "{{ listing.seller.username | e }}"
+          }
+        }
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 <!-- PAGINATION -->
 {% if total_pages and total_pages > 1 %}
 <div class="pagination-wrap">
