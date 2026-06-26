@@ -106,6 +106,30 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
+# ── OTP SMS Helper ────────────────────────────────────────────────────────────
+OTP_MOCK = os.environ.get("OTP_MOCK", "true").lower() == "true"
+
+def send_otp_sms(phone: str, otp_code: str) -> bool:
+    """Tuma OTP kwa SMS. OTP_MOCK=true → log tu (development/staging)."""
+    if OTP_MOCK:
+        app.logger.info(f"[OTP MOCK] Phone={phone} OTP={otp_code}")
+        return True
+    try:
+        import africastalking
+        africastalking.initialize(
+            os.environ.get("AT_USERNAME", ""),
+            os.environ.get("AT_API_KEY", ""),
+        )
+        sms = africastalking.SMS
+        msg = f"AgroLink Tanzania: Nambari yako ya uthibitisho ni {otp_code}. Inaisha baada ya dakika 10. Usishirikishe mtu yeyote."
+        response = sms.send(msg, [f"+255{phone.lstrip('0')}"])
+        return True
+    except Exception as e:
+        app.logger.error(f"[OTP SMS ERROR] {e}")
+        return False
+
+
+
 # ── Security Headers (kila response) ─────────────────────────────────────────
 apply_security_headers(app)
 
@@ -163,6 +187,28 @@ class User(db.Model):
     def get_id(self):
         return str(self.id)
 
+
+class PhoneOTP(db.Model):
+    __tablename__ = "phone_otps"
+    id         = db.Column(db.Integer, primary_key=True)
+    phone      = db.Column(db.String(20), nullable=False, index=True)
+    otp_code   = db.Column(db.String(6), nullable=False)
+    form_data  = db.Column(db.Text, nullable=False)   # JSON ya form yote
+    attempts   = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    verified   = db.Column(db.Boolean, default=False)
+
+    def is_expired(self):
+        return datetime.utcnow() > self.expires_at
+
+    def is_valid(self, code):
+        return (
+            not self.verified
+            and not self.is_expired()
+            and self.attempts < 5
+            and self.otp_code == code.strip()
+        )
 
 class Crop(db.Model):
     __tablename__ = "crops"
@@ -759,91 +805,156 @@ def login():
     return render_template("auth/login.html")
 
 
+@app.route("/register/initiate", methods=["POST"])
+@limiter.limit("5 per hour")
+def register_initiate():
+    """Hatua ya 1: Validate form data, tuma OTP, subiri uthibitisho."""
+    import json, secrets as _secrets
+    data = request.get_json() or request.form
+
+    # ── Sanitize ─────────────────────────────────────────────────────────────
+    full_name = sanitize(data.get("full_name", ""), max_length=120)
+    phone     = sanitize(data.get("phone", ""), max_length=20)
+    email     = sanitize(data.get("email", ""), max_length=120) or None
+    region    = sanitize(data.get("region", ""), max_length=80)
+    role      = sanitize(data.get("role", "farmer"), max_length=20)
+    password  = data.get("password", "")
+    terms     = data.get("terms_accepted", False)
+
+    # ── Validate ──────────────────────────────────────────────────────────────
+    if not terms or str(terms).lower() in ("false", "0", ""):
+        return jsonify({"error": "Lazima ukubali Masharti na Vigezo vya AgroLink."}), 400
+    if not full_name:
+        return jsonify({"error": "Jina kamili linahitajika."}), 400
+    if not validate_phone(phone):
+        return jsonify({"error": "Namba ya simu si sahihi. Tumia muundo: 0712345678."}), 400
+    if email and not validate_email(email):
+        return jsonify({"error": "Muundo wa email si sahihi."}), 400
+    pw_ok, pw_err = validate_password(password)
+    if not pw_ok:
+        return jsonify({"error": pw_err}), 400
+
+    # ── Check banned ──────────────────────────────────────────────────────────
+    if BannedEmail.query.filter_by(phone=phone).first():
+        return jsonify({"error": "Namba hii imefungwa. Wasiliana na msimamizi."}), 403
+    if email and BannedEmail.query.filter_by(email=email).first():
+        return jsonify({"error": "Email hii imefungwa. Wasiliana na msimamizi."}), 403
+
+    # ── Check duplicates ──────────────────────────────────────────────────────
+    if User.query.filter_by(phone=phone).first():
+        return jsonify({"error": "Namba ya simu tayari imetumika."}), 409
+    if email and User.query.filter_by(email=email).first():
+        return jsonify({"error": "Email tayari imetumika."}), 409
+
+    # ── Validate role ─────────────────────────────────────────────────────────
+    if role not in ("farmer", "agent", "buyer", "member"):
+        role = "farmer"
+
+    # ── Futa OTP za zamani za namba hii ──────────────────────────────────────
+    PhoneOTP.query.filter_by(phone=phone, verified=False).delete()
+    db.session.flush()
+
+    # ── Tengeneza OTP ─────────────────────────────────────────────────────────
+    otp_code = f"{_secrets.randbelow(900000) + 100000}"
+    form_payload = json.dumps({
+        "full_name": full_name, "phone": phone, "email": email,
+        "region": region, "role": role, "password": password,
+    })
+    otp_record = PhoneOTP(
+        phone=phone,
+        otp_code=otp_code,
+        form_data=form_payload,
+        expires_at=datetime.utcnow() + timedelta(minutes=10),
+    )
+    db.session.add(otp_record)
+    db.session.commit()
+
+    # ── Tuma SMS ──────────────────────────────────────────────────────────────
+    sent = send_otp_sms(phone, otp_code)
+    if not sent:
+        return jsonify({"error": "Imeshindwa kutuma SMS. Jaribu tena."}), 500
+
+    resp = {"message": "OTP imetumwa.", "phone": phone}
+    if OTP_MOCK:
+        resp["otp_dev"] = otp_code   # Development only — ondoa production
+    return jsonify(resp), 200
+
+
+@app.route("/register/verify", methods=["POST"])
+@limiter.limit("10 per hour")
+def register_verify():
+    """Hatua ya 2: Thibitisha OTP na unda akaunti."""
+    import json
+    data = request.get_json() or request.form
+    phone    = sanitize(data.get("phone", ""), max_length=20)
+    otp_code = sanitize(data.get("otp_code", ""), max_length=6)
+
+    if not phone or not otp_code:
+        return jsonify({"error": "Taarifa hazitoshi."}), 400
+
+    # ── Tafuta OTP record ─────────────────────────────────────────────────────
+    record = PhoneOTP.query.filter_by(phone=phone, verified=False)                           .order_by(PhoneOTP.created_at.desc()).first()
+    if not record:
+        return jsonify({"error": "Ombi la OTP halipatikani. Anza upya."}), 404
+
+    # ── Angalia majaribio ─────────────────────────────────────────────────────
+    record.attempts += 1
+    db.session.flush()
+
+    if record.is_expired():
+        db.session.commit()
+        return jsonify({"error": "OTP imeisha muda. Omba nyingine."}), 410
+    if record.attempts > 5:
+        db.session.commit()
+        return jsonify({"error": "Majaribio mengi. Omba OTP mpya."}), 429
+    if not record.is_valid(otp_code):
+        db.session.commit()
+        remaining = 5 - record.attempts
+        return jsonify({"error": f"OTP si sahihi. Majaribio {remaining} yamebaki."}), 400
+
+    # ── OTP sahihi — unda mtumiaji ───────────────────────────────────────────
+    form = json.loads(record.form_data)
+    if User.query.filter_by(phone=form["phone"]).first():
+        return jsonify({"error": "Namba ya simu tayari imetumika."}), 409
+
+    user = User(
+        full_name=form["full_name"],
+        phone=form["phone"],
+        email=form.get("email"),
+        region=form.get("region"),
+        role=form.get("role", "farmer"),
+        accepted_terms=True,
+        terms_accepted_at=datetime.utcnow(),
+        is_verified=True,
+        trust_level="gray",
+        trust_points=0,
+        flag_count=0,
+        transaction_count=0,
+        avg_rating=0.0,
+        can_post_listing=False,
+        can_advise=False,
+        can_b2b=False,
+    )
+    user.set_password(form["password"])
+    db.session.add(user)
+
+    record.verified = True
+    db.session.commit()
+
+    trust_engine(user.id)
+    if form.get("email"):
+        send_welcome_email(form["email"], form["full_name"], form.get("role", "farmer"))
+
+    login_user(user)
+    return jsonify({"message": "Akaunti imefunguliwa na kuthibitishwa.", "redirect": "/dashboard"}), 201
+
+
 @app.route("/register", methods=["GET", "POST"])
 @limiter.limit("3 per hour")
 def register():
+    """GET: onyesha form. POST: redirect kwa /register/initiate (backward compat)."""
     if request.method == "POST":
-        data = request.get_json() or request.form
-
-        # ── Sanitize all inputs ───────────────────────────────────────────────
-        full_name = sanitize(data.get("full_name", ""), max_length=120)
-        phone = sanitize(data.get("phone", ""), max_length=20)
-        email = sanitize(data.get("email", ""), max_length=120) or None
-        region = sanitize(data.get("region", ""), max_length=80)
-        role = sanitize(data.get("role", "farmer"), max_length=20)
-        password = data.get("password", "")
-        terms = data.get("terms_accepted", False)
-
-        # ── Validate T&C ─────────────────────────────────────────────────────
-        if not terms or str(terms).lower() in ("false", "0", ""):
-            return jsonify(
-                {"error": "Lazima ukubali Masharti na Vigezo vya AgroLink."}
-            ), 400
-
-        # ── Validate required fields ──────────────────────────────────────────
-        if not full_name:
-            return jsonify({"error": "Jina kamili linahitajika."}), 400
-        if not validate_phone(phone):
-            return jsonify(
-                {"error": "Namba ya simu si sahihi. Tumia muundo: 0712345678."}
-            ), 400
-        if email and not validate_email(email):
-            return jsonify({"error": "Muundo wa email si sahihi."}), 400
-
-        # ── Validate password strength ────────────────────────────────────────
-        pw_ok, pw_err = validate_password(password)
-        if not pw_ok:
-            return jsonify({"error": pw_err}), 400
-
-        # ── Check banned list ─────────────────────────────────────────────────
-        banned_phone = BannedEmail.query.filter_by(phone=phone).first()
-        banned_email = (
-            BannedEmail.query.filter_by(email=email).first() if email else None
-        )
-        if banned_phone or banned_email:
-            return jsonify(
-                {"error": "Namba hii au email imefungwa. Wasiliana na msimamizi."}
-            ), 403
-
-        # ── Check duplicates ──────────────────────────────────────────────────
-        if User.query.filter_by(phone=phone).first():
-            return jsonify({"error": "Namba ya simu tayari imetumika."}), 409
-        if email and User.query.filter_by(email=email).first():
-            return jsonify({"error": "Email tayari imetumika."}), 409
-
-        # ── Validate role ─────────────────────────────────────────────────────
-        if role not in ("farmer", "agent", "buyer", "member"):
-            role = "farmer"
-
-        # ── Create user ───────────────────────────────────────────────────────
-        user = User(
-            full_name=full_name,
-            phone=phone,
-            email=email,
-            region=region,
-            role=role,
-            accepted_terms=True,
-            terms_accepted_at=datetime.utcnow(),
-            trust_level="gray",
-            trust_points=0,
-            flag_count=0,
-            transaction_count=0,
-            avg_rating=0.0,
-            can_post_listing=False,
-            can_advise=False,
-            can_b2b=False,
-        )
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-
-        # Initialize trust engine — itahesabu level ya kwanza
-        trust_engine(user.id)
-        if email:
-            send_welcome_email(email, full_name, role)
-
-        return jsonify({"message": "Akaunti imefunguliwa.", "id": user.id}), 201
-
+        return register_initiate()
     return render_template("auth/register.html")
 
 

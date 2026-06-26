@@ -170,6 +170,39 @@
             Data yako inalindwa — Cisco Security Standards
           </p>
         </form>
+
+        <!-- ── OTP Verification Screen ─────────────────────────────────── -->
+        <div id="otp-screen" style="display:none">
+          <div style="text-align:center;margin-bottom:1.5rem">
+            <div style="width:56px;height:56px;background:var(--brand-mid);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem">
+              <i data-lucide="smartphone" style="width:26px;height:26px;color:#fff"></i>
+            </div>
+            <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem">Thibitisha Namba Yako</h2>
+            <p id="otp-phone-hint" style="font-size:0.85rem;color:var(--text-muted)"></p>
+          </div>
+
+          <div style="margin-bottom:1.25rem">
+            <label class="form-label">Nambari ya OTP (Digits 6)</label>
+            <div style="position:relative;margin-top:0.5rem">
+              <i data-lucide="shield-check" style="position:absolute;left:0.9rem;top:50%;transform:translateY(-50%);width:17px;height:17px;color:var(--brand-mid)"></i>
+              <input type="number" id="otp-input" maxlength="6" placeholder="123456"
+                style="width:100%;padding:0.85rem 1rem 0.85rem 2.75rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-display);font-size:1.5rem;letter-spacing:0.35em;text-align:center;outline:none;transition:border-color var(--transition);background:var(--bg-card);color:var(--text-primary)"
+                inputmode="numeric" pattern="[0-9]*"/>
+            </div>
+            <span id="otp-error" style="color:var(--danger);font-size:0.82rem;margin-top:0.4rem;display:block"></span>
+          </div>
+
+          <button id="otp-verify-btn" class="btn-submit" style="margin-top:0">
+            <i data-lucide="check-circle" style="width:17px;height:17px"></i>
+            Thibitisha
+          </button>
+
+          <div style="text-align:center;margin-top:1.25rem">
+            <p style="font-size:0.82rem;color:var(--text-muted)">Haukupokea OTP?
+              <button id="otp-resend-btn" style="background:none;border:none;color:var(--brand-mid);font-weight:600;cursor:pointer;font-size:0.82rem;padding:0;text-decoration:underline">Jaza tena</button>
+            </p>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -191,7 +224,23 @@ function checkStrength(val){
 }
 function showErr(id,msg){const f=document.getElementById(id);const e=document.getElementById(id+'-error');if(f)f.classList.add('error');if(e)e.textContent=msg}
 function clearErrs(){document.querySelectorAll('.form-input,.form-select').forEach(f=>f.classList.remove('error'));document.querySelectorAll('.form-error').forEach(e=>e.textContent='');document.getElementById('server-error').style.display='none'}
-function setLoading(on){document.getElementById('submit-btn').disabled=on;document.getElementById('spinner').style.display=on?'block':'none';document.getElementById('submit-icon').style.display=on?'none':'block';document.getElementById('submit-text').textContent=on?'Inasajili...':'Fungua Akaunti Yangu'}
+function setLoading(on){document.getElementById('submit-btn').disabled=on;document.getElementById('spinner').style.display=on?'block':'none';document.getElementById('submit-icon').style.display=on?'none':'block';document.getElementById('submit-text').textContent=on?'Inatuma OTP...':'Fungua Akaunti Yangu'}
+
+// ── OTP State ─────────────────────────────────────────────────────────────────
+let _pendingPhone = '';
+
+function showOtpScreen(phone){
+  _pendingPhone = phone;
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('otp-screen').style.display='block';
+  const masked=phone.slice(0,4)+'****'+phone.slice(-3);
+  document.getElementById('otp-phone-hint').textContent='Nambari imetumwa kwa '+masked;
+  document.getElementById('otp-input').focus();
+}
+
+function hideServerErr(){document.getElementById('server-error').style.display='none'}
+
+// ── Step 1: Submit form → /register/initiate ───────────────────────────────
 document.getElementById('register-form').addEventListener('submit',async e=>{
   e.preventDefault();clearErrs();
   const full_name=document.getElementById('full_name').value.trim();
@@ -211,11 +260,57 @@ document.getElementById('register-form').addEventListener('submit',async e=>{
   if(!valid)return;
   setLoading(true);
   try{
-    const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),20000);const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,region,role,password,terms_accepted:terms}),signal:controller.signal});clearTimeout(timeout);
+    const controller=new AbortController();
+    const timeout=setTimeout(()=>controller.abort(),20000);
+    const res=await fetch('/register/initiate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,region,role,password,terms_accepted:terms}),signal:controller.signal});
+    clearTimeout(timeout);
     const data=await res.json();
-    if(res.ok){document.getElementById('submit-text').textContent='Akaunti Imefunguliwa! ✓';setTimeout(()=>{window.location.href='/login'},1200)}
-    else{const err=document.getElementById('server-error');document.getElementById('server-error-msg').textContent=data.error||'Hitilafu. Jaribu tena.';err.style.display='flex';lucide.createIcons();setLoading(false)}
-  }catch(err){const msg=err.name==='AbortError'?'Ombi lilichukua muda mrefu. Jaribu tena.':'Hitilafu ya mtandao. Angalia muunganiko wako wa intaneti.';document.getElementById('server-error-msg').textContent=msg;document.getElementById('server-error').style.display='flex';lucide.createIcons();setLoading(false)}
+    if(res.ok){
+      setLoading(false);
+      showOtpScreen(phone);
+    } else {
+      const err=document.getElementById('server-error');
+      document.getElementById('server-error-msg').textContent=data.error||'Hitilafu. Jaribu tena.';
+      err.style.display='flex';lucide.createIcons();setLoading(false);
+    }
+  }catch(err){
+    const msg=err.name==='AbortError'?'Ombi lilichukua muda mrefu. Jaribu tena.':'Hitilafu ya mtandao. Angalia muunganiko wako wa intaneti.';
+    document.getElementById('server-error-msg').textContent=msg;
+    document.getElementById('server-error').style.display='flex';
+    lucide.createIcons();setLoading(false);
+  }
+});
+
+// ── Step 2: Verify OTP → /register/verify ─────────────────────────────────
+document.getElementById('otp-verify-btn').addEventListener('click',async()=>{
+  const otp_code=document.getElementById('otp-input').value.trim();
+  const otpErr=document.getElementById('otp-error');
+  otpErr.textContent='';
+  if(!otp_code||otp_code.length!==6){otpErr.textContent='Ingiza nambari 6 za OTP.';return}
+  const btn=document.getElementById('otp-verify-btn');
+  btn.disabled=true;btn.textContent='Inathibitisha...';
+  try{
+    const res=await fetch('/register/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:_pendingPhone,otp_code})});
+    const data=await res.json();
+    if(res.ok){
+      btn.textContent='Imethibitishwa!';
+      setTimeout(()=>{window.location.href=data.redirect||'/dashboard'},1000);
+    } else {
+      otpErr.textContent=data.error||'OTP si sahihi. Jaribu tena.';
+      btn.disabled=false;btn.textContent='Thibitisha';
+    }
+  }catch{
+    otpErr.textContent='Hitilafu ya mtandao. Jaribu tena.';
+    btn.disabled=false;btn.textContent='Thibitisha';
+  }
+});
+
+// ── Resend OTP ─────────────────────────────────────────────────────────────
+document.getElementById('otp-resend-btn').addEventListener('click',()=>{
+  document.getElementById('otp-screen').style.display='none';
+  document.getElementById('register-form').style.display='block';
+  document.getElementById('otp-input').value='';
+  document.getElementById('otp-error').textContent='';
 });
 </script>
 {% endblock %}
