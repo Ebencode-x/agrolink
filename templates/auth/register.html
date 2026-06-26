@@ -211,11 +211,11 @@ document.getElementById('register-form').addEventListener('submit',async e=>{
   if(!valid)return;
   setLoading(true);
   try{
-    const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,region,role,password,terms_accepted:terms})});
+    const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),20000);const res=await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({full_name,phone,email,region,role,password,terms_accepted:terms}),signal:controller.signal});clearTimeout(timeout);
     const data=await res.json();
     if(res.ok){document.getElementById('submit-text').textContent='Akaunti Imefunguliwa! ✓';setTimeout(()=>{window.location.href='/login'},1200)}
     else{const err=document.getElementById('server-error');document.getElementById('server-error-msg').textContent=data.error||'Hitilafu. Jaribu tena.';err.style.display='flex';lucide.createIcons();setLoading(false)}
-  }catch{document.getElementById('server-error-msg').textContent='Hitilafu ya mtandao.';document.getElementById('server-error').style.display='flex';setLoading(false)}
+  }catch(err){const msg=err.name==='AbortError'?'Ombi lilichukua muda mrefu. Jaribu tena.':'Hitilafu ya mtandao. Angalia muunganiko wako wa intaneti.';document.getElementById('server-error-msg').textContent=msg;document.getElementById('server-error').style.display='flex';lucide.createIcons();setLoading(false)}
 });
 </script>
 {% endblock %}
