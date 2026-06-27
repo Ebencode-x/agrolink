@@ -150,6 +150,7 @@ class User(db.Model):
     is_verified = db.Column(db.Boolean, default=False)
     accepted_terms = db.Column(db.Boolean, default=False)  # ← T&C checkbox
     terms_accepted_at = db.Column(db.DateTime, nullable=True)  # ← wakati wa kukubali
+    phone_verified = db.Column(db.Boolean, default=False, nullable=False)  # ← OTP imethibitishwa
 
     # ── Trust system ──────────────────────────────────────────────────────────
     trust_level     = db.Column(db.String(10), default="gray", nullable=False)
@@ -926,6 +927,7 @@ def register_verify():
         accepted_terms=True,
         terms_accepted_at=datetime.utcnow(),
         is_verified=True,
+        phone_verified=True,
         trust_level="gray",
         trust_points=0,
         flag_count=0,
@@ -1487,6 +1489,15 @@ def create_listing():
     qty_ok, quantity = validate_quantity(data.get("quantity", 0))
     if not qty_ok:
         return jsonify({"error": "Kiwango si sahihi."}), 400
+    # ── Listing quality gates ─────────────────────────────────────────────────
+    if price <= 0:
+        return jsonify({"error": "Bei lazima iwe zaidi ya sifuri."}), 400
+    if quantity <= 0:
+        return jsonify({"error": "Kiwango lazima kiwe zaidi ya sifuri."}), 400
+    if len(description) < 20:
+        return jsonify({"error": "Maelezo lazima yawe na herufi 20 au zaidi."}), 400
+    if not image_url:
+        return jsonify({"error": "Picha ya zao inahitajika."}), 400
 
     listing = MarketListing(
         seller_id=current_user.id,
