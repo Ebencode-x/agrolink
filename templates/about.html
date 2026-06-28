@@ -2,147 +2,223 @@
 {% block title %}Kuhusu AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
-  .about-hero{background:var(--brand-dark);padding:5rem clamp(1rem,5vw,3rem) 4rem;border-bottom:3px solid var(--brand-mid)}
+  .ab-wrap{max-width:1100px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
 
+  /* ── HERO ── */
+  .ab-hero{background:var(--brand-dark);padding:6rem clamp(1rem,5vw,3rem) 5rem}
+  .ab-hero-inner{max-width:640px}
+  .ab-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem}
+  .ab-hero h1{font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
+  .ab-hero p{color:rgba(254,250,224,0.60);font-size:1rem;line-height:1.85;max-width:520px;margin-bottom:2.5rem}
+  .ab-hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
+  .ab-btn-solid{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.4rem;background:var(--accent);color:#3d2000;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.85rem;text-decoration:none;transition:opacity .2s}
+  .ab-btn-solid:hover{opacity:.88}
+  .ab-btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.4rem;background:transparent;border:1.5px solid rgba(255,255,255,0.18);color:rgba(254,250,224,0.80);border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.85rem;text-decoration:none;transition:border-color .2s}
+  .ab-btn-ghost:hover{border-color:rgba(255,255,255,0.40)}
 
-  .hero-inner{text-align:center;max-width:700px;margin:0 auto}
-  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,0.30);border:1px solid rgba(212,163,115,0.40);color:var(--brand-light);padding:0.35rem 1rem;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem}
-  .hero-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.2rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1rem}
-  .hero-title .accent{color:var(--brand-green)}
-  .hero-sub{color:rgba(254,250,224,0.65);font-size:1rem;line-height:1.8;margin-bottom:2.5rem}
-  .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-  .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:0.78rem 1.6rem;background:var(--brand-mid);color:var(--text-on-dark);border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.9rem;text-decoration:none;transition:all var(--transition);box-shadow:0 4px 14px rgba(45,106,79,0.28);border:none}
-  .btn-primary:hover{background:#163d2a;transform:translateY(-1px)}
-  .btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:0.78rem 1.6rem;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.20);color:var(--text-on-dark);border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.9rem;text-decoration:none;transition:all var(--transition)}
-  .btn-ghost:hover{background:rgba(255,255,255,0.15)}
-  .stats-section{padding:4rem clamp(1rem,5vw,3rem);background:var(--bg-alt);border-bottom:1px solid var(--border)}
-  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem}
-  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;text-align:center;transition:border-color var(--transition),box-shadow var(--transition)}
-  .stat-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md)}
-  .stat-num{font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:var(--brand-mid);margin-bottom:0.4rem}
-  .stat-label{font-size:0.82rem;color:var(--text-muted)}
-  .mission-section{padding:4rem clamp(1rem,5vw,3rem);max-width:1200px;margin:0 auto}
-  .section-eyebrow{font-size:0.74rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--brand-mid);margin-bottom:0.75rem;display:flex;align-items:center;gap:6px}
-  .section-title{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:var(--text-primary);margin-bottom:1rem}
-  .section-sub{color:var(--text-secondary);font-size:0.95rem;line-height:1.8;max-width:600px;margin-bottom:2.5rem}
-  .mission-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.25rem}
-  .mission-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:2rem;position:relative;overflow:hidden;transition:border-color var(--transition),box-shadow var(--transition)}
-  .mission-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--brand-mid)}
-  .mission-card:hover{border-color:var(--brand-mid);box-shadow:var(--shadow-md)}
-  .mission-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem}
-  .mission-icon.green{background:rgba(45,106,79,0.10);color:var(--brand-mid);border:1px solid rgba(45,106,79,0.20)}
-  .mission-icon.amber{background:rgba(212,163,115,0.12);color:var(--brand-earth);border:1px solid rgba(212,163,115,0.25)}
-  .mission-icon.sky{background:rgba(147,197,253,0.10);color:#3b82f6;border:1px solid rgba(147,197,253,0.20)}
-  .mission-icon.red{background:rgba(244,63,94,0.08);color:#f43f5e;border:1px solid rgba(244,63,94,0.18)}
-  .mission-title{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:0.5rem}
-  .mission-desc{font-size:0.875rem;color:var(--text-secondary);line-height:1.7}
-  .tech-section{padding:4rem clamp(1rem,5vw,3rem);background:var(--bg-alt);border-top:1px solid var(--border)}
-  .tech-grid{display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:1.5rem}
-  .tech-badge{display:inline-flex;align-items:center;gap:6px;padding:0.5rem 1rem;border-radius:50px;font-size:0.82rem;font-weight:600;border:1px solid}
-  .tech-python{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:#93c5fd}
-  .tech-flask{background:rgba(45,106,79,0.10);border-color:rgba(45,106,79,0.25);color:var(--brand-mid)}
-  .tech-pg{background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.3);color:#7dd3fc}
-  .tech-html{background:rgba(212,163,115,0.10);border-color:rgba(212,163,115,0.25);color:#92400e}
-  .tech-render{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);color:#c4b5fd}
-  .cta-section{padding:5rem clamp(1rem,5vw,3rem);text-align:center;background:var(--brand-dark);border-top:3px solid var(--brand-mid)}
+  /* ── DIVIDER ── */
+  .ab-divider{border:none;border-top:1px solid var(--border-subtle);margin:0}
 
-  .cta-card{max-width:580px;margin:0 auto}
-  .developer-card{display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-md);padding:1rem 1.25rem;margin-top:2rem;text-decoration:none;transition:border-color var(--transition);max-width:320px;margin-left:auto;margin-right:auto}
-  .developer-card:hover{border-color:rgba(212,163,115,0.50)}
-  .dev-avatar{width:44px;height:44px;border-radius:12px;background:var(--brand-mid);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:0.88rem;color:var(--text-on-dark);flex-shrink:0}
-  .dev-name{font-weight:700;font-size:0.9rem;color:var(--text-on-dark)}
-  .dev-role{font-size:0.75rem;color:rgba(254,250,224,0.50)}
+  /* ── SECTION BASE ── */
+  .ab-section{padding:4.5rem 0}
+
+  /* ── WHAT WE DO — horizontal rows ── */
+  .ab-row{display:flex;align-items:flex-start;gap:2.5rem;padding:2rem 0;border-bottom:1px solid var(--border-subtle)}
+  .ab-row:last-child{border-bottom:none}
+  .ab-row-num{font-family:var(--font-display);font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.08em;min-width:32px;padding-top:3px}
+  .ab-row-body{}
+  .ab-row-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.4rem}
+  .ab-row-desc{font-size:0.88rem;color:var(--text-secondary);line-height:1.75;max-width:560px}
+
+  /* ── METRICS — minimal ── */
+  .ab-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden}
+  .ab-metric{padding:1.75rem 1.5rem;border-right:1px solid var(--border-subtle)}
+  .ab-metric:last-child{border-right:none}
+  .ab-metric-val{font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--text-primary);margin-bottom:0.3rem}
+  .ab-metric-label{font-size:0.78rem;color:var(--text-muted);line-height:1.5}
+  @media(max-width:600px){
+    .ab-metrics{grid-template-columns:1fr 1fr}
+    .ab-metric{border-right:none;border-bottom:1px solid var(--border-subtle)}
+    .ab-metric:nth-child(odd){border-right:1px solid var(--border-subtle)}
+    .ab-metric:last-child{border-bottom:none}
+  }
+
+  /* ── TECH STACK ── */
+  .ab-stack{display:flex;flex-direction:column;gap:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden}
+  .ab-stack-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border-subtle);font-size:0.88rem}
+  .ab-stack-row:last-child{border-bottom:none}
+  .ab-stack-name{font-family:var(--font-display);font-weight:700;color:var(--text-primary)}
+  .ab-stack-role{color:var(--text-muted);font-size:0.82rem}
+
+  /* ── CTA ── */
+  .ab-cta{background:var(--brand-dark);padding:5rem clamp(1rem,5vw,3rem)}
+  .ab-cta-inner{max-width:520px}
+  .ab-cta h2{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:var(--text-on-dark);margin-bottom:0.75rem}
+  .ab-cta p{color:rgba(254,250,224,0.55);font-size:0.9rem;line-height:1.8;margin-bottom:2rem}
+
+  /* ── DEVELOPER ── */
+  .ab-dev{display:inline-flex;align-items:center;gap:0.85rem;margin-top:2rem;padding:0.9rem 1.1rem;border:1px solid rgba(255,255,255,0.10);border-radius:var(--radius-sm);text-decoration:none;transition:border-color .2s;background:rgba(255,255,255,0.03)}
+  .ab-dev:hover{border-color:rgba(232,184,75,0.35)}
+  .ab-dev-avatar{width:38px;height:38px;border-radius:8px;background:var(--brand-mid);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:0.78rem;color:var(--text-on-dark);flex-shrink:0;letter-spacing:.03em}
+  .ab-dev-name{font-family:var(--font-display);font-weight:700;font-size:0.85rem;color:var(--text-on-dark)}
+  .ab-dev-role{font-size:0.75rem;color:rgba(254,250,224,0.40);margin-top:1px}
+
+  .ab-section-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2rem;display:flex;align-items:center;gap:8px}
+  .ab-section-label::after{content:'';flex:1;height:1px;background:var(--border-subtle)}
 </style>
 {% endblock %}
+
 {% block content %}
-<section class="about-hero">
-  <div class="hero-inner">
-    <div class="hero-badge"><i data-lucide="sprout" style="width:13px;height:13px"></i>Jukwaa la Kilimo</div>
-    <h1 class="hero-title">Tunaunganisha <span class="accent">Wakulima</span><br/>na Masoko ya Tanzania</h1>
-    <p class="hero-sub">AgroLink Tanzania ni jukwaa la kidijitali linalounganisha wakulima, mawakala, na masoko ya Tanzania — bei za kweli, watu wa kweli, wakati halisi.</p>
-    <div class="hero-btns">
-      <a href="/register" class="btn-primary"><i data-lucide="user-plus" style="width:16px;height:16px"></i>Jiunge Bure</a>
-      <a href="/listings" class="btn-ghost"><i data-lucide="shopping-basket" style="width:16px;height:16px"></i>Angalia Soko</a>
+
+<!-- HERO -->
+<section class="ab-hero">
+  <div class="ab-wrap">
+    <div class="ab-hero-inner">
+      <div class="ab-eyebrow">AgroLink Tanzania</div>
+      <h1>Jukwaa la Kilimo<br/>cha Tanzania</h1>
+      <p>Tunaunganisha wakulima, mawakala, na masoko ya Tanzania — bei za kweli, watu wa kweli, wakati halisi. Bila wasitani, bila udanganyifu.</p>
+      <div class="ab-hero-btns">
+        <a href="/register" class="ab-btn-solid">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          Jiunge Bure
+        </a>
+        <a href="/listings" class="ab-btn-ghost">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+          Angalia Soko
+        </a>
+      </div>
     </div>
   </div>
 </section>
 
-<div class="stats-section">
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-num">25+</div>
-      <div class="stat-label">Masoko Tanzania</div>
+<hr class="ab-divider"/>
+
+<!-- METRICS -->
+<div class="ab-wrap">
+  <div class="ab-section">
+    <div class="ab-section-label">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Takwimu
     </div>
-    <div class="stat-card">
-      <div class="stat-num">10K+</div>
-      <div class="stat-label">Wakulima Wanaolengwa</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">100%</div>
-      <div class="stat-label">Bure Kabisa</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">24/7</div>
-      <div class="stat-label">Inapatikana Wakati Wote</div>
+    <div class="ab-metrics">
+      <div class="ab-metric">
+        <div class="ab-metric-val">25+</div>
+        <div class="ab-metric-label">Masoko Tanzania yanayofuatiliwa</div>
+      </div>
+      <div class="ab-metric">
+        <div class="ab-metric-val">100%</div>
+        <div class="ab-metric-label">Bure kabisa kwa wakulima</div>
+      </div>
+      <div class="ab-metric">
+        <div class="ab-metric-val">24/7</div>
+        <div class="ab-metric-label">Inapatikana wakati wote</div>
+      </div>
+      <div class="ab-metric">
+        <div class="ab-metric-val">2026</div>
+        <div class="ab-metric-label">Ilianzishwa Mbeya, Tanzania</div>
+      </div>
     </div>
   </div>
 </div>
 
-<section class="mission-section">
-  <div class="section-eyebrow"><i data-lucide="target" style="width:13px;height:13px"></i>Malengo Yetu</div>
-  <h2 class="section-title">Tunafanya Nini?</h2>
-  <p class="section-sub">Tunasuluhisha matatizo ya kweli yanayowakabili wakulima wa Tanzania kila siku.</p>
-  <div class="mission-grid">
-    <div class="mission-card">
-      <div class="mission-icon green"><i data-lucide="trending-up" style="width:22px;height:22px"></i></div>
-      <div class="mission-title">Bei za Soko za Kweli</div>
-      <div class="mission-desc">Wakulima wapata bei za soko moja kwa moja — bila wasichakuwa, bila udanganyifu. Bei halisi kutoka masoko 25+ Tanzania.</div>
-    </div>
-    <div class="mission-card">
-      <div class="mission-icon amber"><i data-lucide="cloud-sun" style="width:22px;height:22px"></i></div>
-      <div class="mission-title">Hali ya Hewa ya Wakati Halisi</div>
-      <div class="mission-desc">Taarifa za hali ya hewa na utabiri wa siku 5 kwa mji wako — kusaidia mipango ya kilimo na uvunaji.</div>
-    </div>
-    <div class="mission-card">
-      <div class="mission-icon sky"><i data-lucide="users" style="width:22px;height:22px"></i></div>
-      <div class="mission-title">Jamii ya Wakulima</div>
-      <div class="mission-desc">Unganika na wakulima wengine kutoka mikoa yote Tanzania — shiriki ujuzi, uzoefu, na fursa za biashara.</div>
-    </div>
-    <div class="mission-card">
-      <div class="mission-icon red"><i data-lucide="smartphone" style="width:22px;height:22px"></i></div>
-      <div class="mission-title">Rahisi Kutumia</div>
-      <div class="mission-desc">Imeundwa kwa ajili ya simu za mkononi — mkulima yeyote anaweza kutumia bila mafunzo maalum.</div>
-    </div>
-  </div>
-</section>
+<hr class="ab-divider"/>
 
-<section class="tech-section">
-  <div class="section-eyebrow"><i data-lucide="code-2" style="width:13px;height:13px"></i>Teknolojia</div>
-  <h2 class="section-title">Imejengwa na Nini?</h2>
-  <p class="section-sub">AgroLink Tanzania imejengwa kwa teknolojia za kisasa za uzalishaji.</p>
-  <div class="tech-grid">
-    <span class="tech-badge tech-python"><i data-lucide="code-2" style="width:13px;height:13px"></i>Python</span>
-    <span class="tech-badge tech-flask"><i data-lucide="zap" style="width:13px;height:13px"></i>Flask</span>
-    <span class="tech-badge tech-pg"><i data-lucide="database" style="width:13px;height:13px"></i>PostgreSQL</span>
-    <span class="tech-badge tech-html"><i data-lucide="layout" style="width:13px;height:13px"></i>HTML / CSS / JS</span>
-    <span class="tech-badge tech-render"><i data-lucide="cloud" style="width:13px;height:13px"></i>Render</span>
-    <span class="tech-badge tech-pg"><i data-lucide="shield" style="width:13px;height:13px"></i>Supabase</span>
-  </div>
-</section>
-
-<section class="cta-section">
-  <div class="cta-card">
-    <div class="section-eyebrow" style="justify-content:center;color:var(--brand-light)"><i data-lucide="heart" style="width:13px;height:13px"></i>Jiunge Nasi</div>
-    <h2 class="section-title" style="color:var(--text-on-dark)">Anza Leo — Bure Kabisa</h2>
-    <p style="color:rgba(254,250,224,0.62);font-size:0.9rem;line-height:1.8;margin-bottom:1.5rem">Jiunge na maelfu ya wakulima wa Tanzania wanaotumia AgroLink kupata bei bora na masoko mapya.</p>
-    <a href="/register" class="btn-primary" style="display:inline-flex;margin:0 auto"><i data-lucide="user-plus" style="width:16px;height:16px"></i>Jiunge Bure Sasa</a>
-    <a href="/developer" class="developer-card">
-      <div class="dev-avatar">ERM</div>
-      <div>
-        <div class="dev-name">Ebenezer Richard Masanja</div>
-        <div class="dev-role">Msanidi wa AgroLink Tanzania →</div>
+<!-- WHAT WE DO -->
+<div class="ab-wrap">
+  <div class="ab-section">
+    <div class="ab-section-label">
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Tunafanya Nini
+    </div>
+    <div class="ab-row">
+      <div class="ab-row-num">01</div>
+      <div class="ab-row-body">
+        <div class="ab-row-title">Bei za Soko za Kweli</div>
+        <div class="ab-row-desc">Wakulima wanapata bei za soko moja kwa moja — bila wasitani, bila udanganyifu. Bei halisi kutoka masoko 25+ Tanzania kila siku.</div>
       </div>
-    </a>
+    </div>
+    <div class="ab-row">
+      <div class="ab-row-num">02</div>
+      <div class="ab-row-body">
+        <div class="ab-row-title">Hali ya Hewa ya Wakati Halisi</div>
+        <div class="ab-row-desc">Taarifa za hewa na utabiri wa siku 5 kwa eneo lako — husaidia mipango ya kupanda na kuvuna kwa wakati sahihi.</div>
+      </div>
+    </div>
+    <div class="ab-row">
+      <div class="ab-row-num">03</div>
+      <div class="ab-row-body">
+        <div class="ab-row-title">Soko la Biashara la B2B</div>
+        <div class="ab-row-desc">Unganika moja kwa moja na wanunuzi, mawakala, na wasambazaji — mazungumzo ya moja kwa moja, makubaliano ya haraka, bila mtu wa kati.</div>
+      </div>
+    </div>
+    <div class="ab-row">
+      <div class="ab-row-num">04</div>
+      <div class="ab-row-body">
+        <div class="ab-row-title">Imejengwa kwa Simu ya Mkononi</div>
+        <div class="ab-row-desc">Inafanya kazi vizuri kwenye simu yoyote — hata bila intaneti nzuri. Mkulima yeyote anaweza kutumia bila mafunzo maalum.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="ab-divider"/>
+
+<!-- TECH STACK -->
+<div style="background:var(--bg-subtle);">
+  <div class="ab-wrap">
+    <div class="ab-section">
+      <div class="ab-section-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Teknolojia
+      </div>
+      <div class="ab-stack">
+        <div class="ab-stack-row">
+          <span class="ab-stack-name">Python / Flask</span>
+          <span class="ab-stack-role">Backend na API</span>
+        </div>
+        <div class="ab-stack-row">
+          <span class="ab-stack-name">PostgreSQL / Supabase</span>
+          <span class="ab-stack-role">Hifadhidata na uhifadhi wa picha</span>
+        </div>
+        <div class="ab-stack-row">
+          <span class="ab-stack-name">HTML / CSS / JavaScript</span>
+          <span class="ab-stack-role">Muonekano wa mtumiaji</span>
+        </div>
+        <div class="ab-stack-row">
+          <span class="ab-stack-name">Render</span>
+          <span class="ab-stack-role">Huduma ya seva na deployment</span>
+        </div>
+        <div class="ab-stack-row">
+          <span class="ab-stack-name">GitHub</span>
+          <span class="ab-stack-role">Udhibiti wa msimbo na CI/CD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="ab-divider"/>
+
+<!-- CTA -->
+<section class="ab-cta">
+  <div class="ab-wrap">
+    <div class="ab-cta-inner">
+      <div class="ab-eyebrow">Jiunge Nasi</div>
+      <h2>Anza Leo — Bure Kabisa</h2>
+      <p>Jiunge na wakulima wa Tanzania wanaotumia AgroLink kupata bei bora, masoko mapya, na fursa za biashara.</p>
+      <a href="/register" class="ab-btn-solid">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Jiunge Bure Sasa
+      </a>
+      <a href="/developer" class="ab-dev">
+        <div class="ab-dev-avatar">ERM</div>
+        <div>
+          <div class="ab-dev-name">Ebenezer Richard Masanja</div>
+          <div class="ab-dev-role">Msanidi wa AgroLink Tanzania</div>
+        </div>
+      </a>
+    </div>
   </div>
 </section>
+
 {% endblock %}
