@@ -24,11 +24,7 @@
           "@type": "Offer",
           "price": "{{ listing.price_tzs }}",
           "priceCurrency": "TZS",
-          "availability": "https://schema.org/InStock",
-          "seller": {
-            "@type": "Person",
-            "name": "{{ listing.seller.username | e }}"
-          }
+          "availability": "https://schema.org/InStock"
         }
       }
     }{% if not loop.last %},{% endif %}
@@ -38,306 +34,341 @@
 </script>
 {% endblock %}
 
-<!-- PAGINATION -->
-{% if total_pages and total_pages > 1 %}
-<div class="pagination-wrap">
-
-  {% if pagination.has_prev %}
-  <a href="{{ url_for('listings', page=current_page-1) }}" class="page-link">
-    <i data-lucide="chevron-left" style="width:14px;height:14px"></i>Iliyopita
-  </a>
-  {% endif %}
-
-  {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-    {% if p %}
-      {% if p == current_page %}
-      <span class="page-link active">{{ p }}</span>
-      {% else %}
-      <a href="{{ url_for('listings', page=p) }}" class="page-link">{{ p }}</a>
-      {% endif %}
-    {% else %}
-      <span class="page-ellipsis">…</span>
-    {% endif %}
-  {% endfor %}
-
-  {% if pagination.has_next %}
-  <a href="{{ url_for('listings', page=current_page+1) }}" class="page-link">
-    Inayofuata<i data-lucide="chevron-right" style="width:14px;height:14px"></i>
-  </a>
-  {% endif %}
-
-</div>
-{% endif %}
-
-{% endblock %}
-
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — Listings ── */
-  .listings-hero{padding:1.5rem clamp(1rem,5vw,4rem);max-width:1400px;margin:0 auto}
-  .listings-hero-label{font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--brand-light);margin-bottom:0.75rem}
-  .listings-hero h1{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:var(--text-primary);margin-bottom:0.25rem}
-  .listings-hero p{color:var(--text-secondary);font-size:0.85rem;line-height:1.5;max-width:500px}
+  /* ── Forest & Harvest — Listings eBay style ── */
+  *{box-sizing:border-box}
 
-  .post-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--text-on-accent);padding:0.65rem 1.4rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.875rem;text-decoration:none;transition:all var(--transition);box-shadow:var(--shadow-sm);border:none;cursor:pointer}
-  .post-btn:hover{background:var(--accent-dark);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  .sl-wrap{max-width:1200px;margin:0 auto;padding:0 1rem 4rem}
 
-  .search-bar{display:flex;gap:0.5rem;max-width:500px}
-  .search-input{flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.65rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;outline:none;transition:border-color var(--transition);box-shadow:var(--shadow-sm)}
-  .search-input:focus{border-color:var(--brand-light)}
-  .search-input::placeholder{color:var(--text-muted)}
+  /* Hero */
+  .sl-hero{padding:1.5rem 0 1rem}
+  .sl-hero-top{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem}
+  .sl-hero-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--brand-light);margin-bottom:0.35rem}
+  .sl-hero h1{font-family:var(--font-display);font-size:clamp(1.25rem,3vw,1.75rem);font-weight:800;color:var(--text-primary);margin:0}
+  .sl-hero-sub{font-size:0.82rem;color:var(--text-secondary);margin-top:0.25rem}
 
-  .listings-filters{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:1.25rem}
-  .filter-btn{display:inline-flex;align-items:center;gap:6px;padding:0.45rem 1rem;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);transition:all var(--transition);box-shadow:var(--shadow-sm)}
-  .filter-btn:hover{border-color:var(--brand-light);color:var(--brand-mid)}
-  .filter-btn.active{background:var(--brand-mid);border-color:var(--brand-mid);color:#fff;box-shadow:var(--shadow-md)}
+  .post-btn{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--text-on-accent);padding:0.6rem 1.25rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.85rem;text-decoration:none;transition:all var(--transition);border:none;cursor:pointer;white-space:nowrap}
+  .post-btn:hover{background:var(--accent-dark);transform:translateY(-1px)}
 
-  .listings-main{padding:2rem clamp(1rem,5vw,4rem) 4rem;max-width:1400px;margin:0 auto}
-  .listings-count{font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem}
+  /* Search */
+  .sl-search-row{display:flex;gap:0.5rem;margin-bottom:0.85rem}
+  .sl-search-input{flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.6rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.88rem;outline:none;transition:border-color var(--transition)}
+  .sl-search-input:focus{border-color:var(--brand-light)}
+  .sl-search-input::placeholder{color:var(--text-muted)}
+  .sl-search-btn{background:var(--brand-mid);border:none;border-radius:var(--radius-sm);padding:0.6rem 1.1rem;color:#fff;font-weight:700;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background var(--transition)}
+  .sl-search-btn:hover{background:var(--brand-dark)}
 
-  .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+  /* Filters */
+  .sl-filters{display:flex;gap:0.4rem;overflow-x:auto;padding-bottom:4px}
+  .sl-filters::-webkit-scrollbar{display:none}
+  .sl-filter-btn{display:inline-flex;align-items:center;gap:5px;padding:0.4rem 0.9rem;border-radius:50px;font-size:0.8rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);transition:all var(--transition);white-space:nowrap;flex-shrink:0}
+  .sl-filter-btn:hover{border-color:var(--brand-light);color:var(--brand-mid)}
+  .sl-filter-btn.active{background:var(--brand-mid);border-color:var(--brand-mid);color:#fff}
 
-  .listing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);transition:transform var(--transition),box-shadow var(--transition);position:relative;overflow:hidden;display:flex;flex-direction:column}
-  .listing-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand-light),var(--accent));transform:scaleX(0);transition:transform var(--transition);transform-origin:left;z-index:1}
-  .listing-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-  .listing-card:hover::before{transform:scaleX(1)}
+  /* Toolbar */
+  .sl-toolbar{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--border);margin-bottom:0;gap:0.5rem;flex-wrap:wrap}
+  .sl-count{font-size:0.82rem;color:var(--text-muted)}
+  .sl-count strong{color:var(--text-primary)}
 
-  .listing-img-wrap{width:100%;height:180px;overflow:hidden;position:relative;background:var(--bg-surface)}
-  .listing-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s ease}
-  .listing-card:hover .listing-img{transform:scale(1.04)}
-  .listing-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-muted);background:var(--bg-surface)}
+  /* Region filter */
+  .sl-region-select{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.4rem 0.75rem;color:var(--text-secondary);font-size:0.8rem;outline:none;cursor:pointer}
 
-  .listing-body{padding:1.25rem;display:flex;flex-direction:column;flex:1}
-  .listing-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.85rem;gap:0.5rem}
-  .listing-badge{background:var(--bg-surface);border:1px solid var(--border);color:var(--brand-mid);padding:0.28rem 0.75rem;border-radius:var(--radius-sm);font-size:0.77rem;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap}
-  .listing-region{display:flex;align-items:center;gap:4px;font-size:0.77rem;color:var(--text-muted);white-space:nowrap}
-  .listing-title{font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text-primary);margin-bottom:0.4rem;line-height:1.3}
-  .listing-desc{font-size:0.83rem;color:var(--text-secondary);line-height:1.6;margin-bottom:1rem;flex:1}
+  /* ── List rows ── */
+  .sl-list{display:flex;flex-direction:column}
 
-  .listing-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;padding:0.9rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:1rem}
-  .listing-stat{display:flex;flex-direction:column;gap:2px}
-  .listing-stat-label{font-size:0.67rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;font-weight:600}
-  .listing-stat-value{font-family:var(--font-display);font-weight:700;font-size:0.93rem;color:var(--accent-dark)}
+  .sl-row{display:grid;grid-template-columns:120px 1fr auto;gap:0;background:var(--bg-card);border-bottom:1px solid var(--border);transition:background var(--transition);position:relative;text-decoration:none;color:inherit}
+  .sl-row:first-child{border-top:1px solid var(--border)}
+  .sl-row:hover{background:var(--bg-surface)}
+  .sl-row.is-sponsored{border-left:3px solid var(--accent)}
 
-  .listing-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
-  .listing-seller{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--text-muted)}
-  .listing-actions{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap}
+  /* Sponsored label */
+  .sl-sponsored-tag{position:absolute;top:10px;left:124px;display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:var(--text-on-accent);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:50px;letter-spacing:0.04em;z-index:2}
+  .sl-row:not(.is-sponsored) .sl-sponsored-tag{display:none}
 
-  .contact-btn{display:inline-flex;align-items:center;gap:6px;background:var(--brand-mid);color:#fff;padding:0.5rem 1.1rem;border-radius:var(--radius-sm);font-size:0.82rem;font-weight:600;text-decoration:none;transition:all var(--transition);border:none;cursor:pointer;white-space:nowrap;box-shadow:var(--shadow-sm)}
-  .contact-btn:hover{background:var(--brand-dark);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  /* Thumbnail */
+  .sl-thumb{width:120px;height:110px;overflow:hidden;flex-shrink:0;background:var(--bg-surface)}
+  .sl-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .sl-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(6,78,59,0.18))}
 
-  .btn-del-listing{display:inline-flex;align-items:center;gap:4px;background:var(--danger-bg);border:1px solid rgba(192,57,43,0.25);color:var(--danger);padding:0.45rem 0.85rem;border-radius:var(--radius-sm);font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap}
-  .btn-del-listing:hover{background:rgba(192,57,43,0.15);border-color:rgba(192,57,43,0.4)}
+  /* Body */
+  .sl-body{padding:0.75rem 1rem;display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding-top:0.85rem}
+  .sl-row.is-sponsored .sl-body{padding-top:1.6rem}
 
-  .empty-state{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:var(--text-muted)}
+  .sl-title{font-family:var(--font-display);font-weight:700;font-size:0.95rem;color:var(--text-primary);margin-bottom:0.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sl-meta{display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem}
+  .sl-crop-tag{background:var(--bg-surface);border:1px solid var(--border);color:var(--brand-mid);padding:0.18rem 0.6rem;border-radius:50px;font-size:0.72rem;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+  .sl-region-tag{display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;color:var(--text-muted)}
+  .sl-desc{font-size:0.8rem;color:var(--text-secondary);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:0.4rem}
+  .sl-footer{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap}
+  .sl-seller{display:flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--text-muted)}
+  .sl-date{font-size:0.72rem;color:var(--text-muted)}
 
-  /* Rating */
-  .rating-widget{display:flex;align-items:center;gap:6px;margin-top:0.5rem;flex-wrap:wrap}
-  .stars-display{display:flex;gap:2px}
-  .star-filled{color:var(--accent);font-size:0.85rem}
-  .star-empty{color:var(--border-strong);font-size:0.85rem}
-  .rating-count{font-size:0.72rem;color:var(--text-muted)}
-  .btn-rate{display:inline-flex;align-items:center;gap:4px;background:var(--warning-bg);border:1px solid rgba(232,184,75,0.35);color:var(--accent-dark);padding:0.32rem 0.7rem;border-radius:var(--radius-sm);font-size:0.75rem;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap}
-  .btn-rate:hover{background:rgba(232,184,75,0.2);border-color:var(--accent)}
+  /* Trust badges */
+  .tb{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:50px;font-size:0.68rem;font-weight:700;margin-left:3px}
+  .tb-verified{background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);color:var(--emerald-glow)}
+  .tb-green{background:rgba(45,106,79,0.1);border:1px solid rgba(45,106,79,0.3);color:#2D6A4F}
+  .tb-teal{background:rgba(20,184,166,0.1);border:1px solid rgba(20,184,166,0.3);color:#0d9488}
+  .tb-gold{background:rgba(212,163,115,0.13);border:1px solid rgba(212,163,115,0.4);color:#b45309}
 
-  /* Rate modal */
-  .rate-modal-overlay{position:fixed;inset:0;background:rgba(26,46,31,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px)}
-  .rate-modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;width:100%;max-width:360px;box-shadow:var(--shadow-lg)}
-  .rate-modal h3{font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem}
-  .rate-modal p{font-size:0.82rem;color:var(--text-secondary);margin-bottom:1.25rem}
-  .star-picker{display:flex;gap:8px;margin-bottom:1rem;justify-content:center}
-  .star-picker span{font-size:2rem;cursor:pointer;transition:transform 0.15s;line-height:1;color:var(--border-strong)}
-  .star-picker span:hover,.star-picker span.active{transform:scale(1.2);color:var(--accent)}
-  .rate-comment{width:100%;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.85rem;resize:none;outline:none;transition:border-color var(--transition);box-sizing:border-box}
-  .rate-comment:focus{border-color:var(--brand-light)}
-  .rate-actions{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem}
-  .btn-cancel-rate{background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--transition)}
-  .btn-cancel-rate:hover{border-color:var(--border-strong)}
-  .btn-submit-rate{background:var(--brand-mid);border:none;color:#fff;padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--transition)}
-  .btn-submit-rate:hover{background:var(--brand-dark)}
-  .btn-submit-rate:disabled{opacity:0.5;cursor:not-allowed}
+  /* Price panel */
+  .sl-price-panel{padding:0.75rem 1rem;display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;min-width:150px;border-left:1px solid var(--border)}
+  .sl-price{font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--accent-dark);white-space:nowrap}
+  .sl-price-unit{font-size:0.72rem;color:var(--text-muted);margin-top:1px}
+  .sl-qty{font-size:0.78rem;color:var(--text-secondary);margin-top:0.25rem;white-space:nowrap}
+  .sl-total{font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem}
+
+  .sl-actions{display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem;align-items:flex-end}
+  .sl-contact-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;background:var(--brand-mid);color:#fff;padding:0.45rem 0.9rem;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:all var(--transition);white-space:nowrap;width:100%}
+  .sl-contact-btn:hover{background:var(--brand-dark)}
+  .sl-action-row{display:flex;gap:0.35rem;justify-content:flex-end;flex-wrap:wrap}
+  .sl-btn-sm{display:inline-flex;align-items:center;gap:3px;padding:0.32rem 0.65rem;border-radius:var(--radius-sm);font-size:0.73rem;font-weight:600;cursor:pointer;transition:all var(--transition);border:none;white-space:nowrap}
+  .sl-btn-rate{background:rgba(232,184,75,0.1);border:1px solid rgba(232,184,75,0.3);color:var(--accent-dark)}
+  .sl-btn-rate:hover{background:rgba(232,184,75,0.2)}
+  .sl-btn-report{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);color:#fbbf24}
+  .sl-btn-report:hover{background:rgba(245,158,11,0.15)}
+  .sl-btn-del{background:var(--danger-bg);border:1px solid rgba(192,57,43,0.2);color:var(--danger)}
+  .sl-btn-del:hover{background:rgba(192,57,43,0.15)}
+  .sl-btn-sponsor{display:inline-flex;align-items:center;gap:4px;background:rgba(232,184,75,0.12);border:1px solid rgba(232,184,75,0.35);color:var(--accent-dark);padding:0.32rem 0.65rem;border-radius:var(--radius-sm);font-size:0.73rem;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap}
+  .sl-btn-sponsor:hover{background:rgba(232,184,75,0.22)}
+
+  /* Rating inline */
+  .sl-rating{display:flex;align-items:center;gap:4px;font-size:0.73rem;color:var(--text-muted)}
+  .sl-stars{display:flex;gap:1px}
+  .sl-star-f{color:var(--accent);font-size:0.78rem}
+  .sl-star-e{color:var(--border-strong);font-size:0.78rem}
+
+  /* Empty */
+  .sl-empty{text-align:center;padding:5rem 2rem;color:var(--text-muted);border-top:1px solid var(--border)}
 
   /* Pagination */
-  .pagination-wrap{display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:2.5rem 1rem;flex-wrap:wrap}
-  .page-link{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 0.6rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-secondary);text-decoration:none;font-size:0.83rem;font-weight:600;transition:all var(--transition);box-shadow:var(--shadow-sm)}
-  .page-link:hover{border-color:var(--brand-light);color:var(--brand-mid)}
-  .page-link.active{background:var(--brand-mid);border-color:var(--brand-mid);color:#fff;box-shadow:var(--shadow-md)}
-  .page-ellipsis{color:var(--text-muted);padding:0 4px;font-size:0.85rem}
+  .sl-pagination{display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:2rem 0;flex-wrap:wrap}
+  .sl-page-link{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:36px;padding:0 0.6rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-secondary);text-decoration:none;font-size:0.83rem;font-weight:600;transition:all var(--transition)}
+  .sl-page-link:hover{border-color:var(--brand-light);color:var(--brand-mid)}
+  .sl-page-link.active{background:var(--brand-mid);border-color:var(--brand-mid);color:#fff}
+  .sl-page-ellipsis{color:var(--text-muted);padding:0 4px;font-size:0.85rem}
 
-  @media(max-width:768px){
-    .listings-hero{padding:1.25rem 1rem 1rem}
-    .listings-hero>div:first-child{flex-direction:column;align-items:flex-start;gap:0.75rem}
+  /* Modals */
+  .sl-modal-overlay{position:fixed;inset:0;background:rgba(26,46,31,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(3px)}
+  .sl-modal{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;width:100%;max-width:380px;box-shadow:var(--shadow-lg)}
+  .sl-modal h3{font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem}
+  .sl-modal p{font-size:0.82rem;color:var(--text-secondary);margin-bottom:1.25rem}
+
+  @media(max-width:640px){
+    .sl-row{grid-template-columns:90px 1fr}
+    .sl-thumb{width:90px;height:95px}
+    .sl-price-panel{display:none}
+    .sl-body{padding:0.6rem 0.75rem}
+    .sl-row.is-sponsored .sl-body{padding-top:1.5rem}
+    .sl-sponsored-tag{left:94px}
+    .sl-title{font-size:0.88rem}
+    .sl-desc{-webkit-line-clamp:1}
+    .sl-actions{flex-direction:row;flex-wrap:wrap;align-items:center;margin-top:0.35rem}
+    .sl-contact-btn{width:auto;padding:0.38rem 0.75rem;font-size:0.76rem}
+    .sl-price-mobile{display:block;font-family:var(--font-display);font-weight:800;font-size:0.95rem;color:var(--accent-dark);margin-bottom:0.2rem}
+    .sl-hero-top{flex-direction:column;align-items:flex-start}
     .post-btn{width:100%;justify-content:center}
-    .search-bar{flex-direction:column;gap:0.5rem;max-width:100%}
-    .listings-filters{flex-wrap:nowrap!important;overflow-x:auto;padding-bottom:4px;gap:0.4rem}
-    .listings-filters::-webkit-scrollbar{display:none}
-    .filter-btn{flex-shrink:0;padding:0.4rem 0.85rem;font-size:0.78rem}
-    .listings-main{padding:1.25rem 1rem 3rem}
-    .listings-grid{grid-template-columns:1fr!important;gap:1rem}
-    .listing-card:hover{transform:none!important}
-    .listing-card:hover::before{display:none}
-    .listing-img-wrap{height:160px}
-    .listing-body{padding:1.1rem}
-    .listing-title{font-size:0.95rem}
-    .listing-desc{font-size:0.8rem;margin-bottom:0.75rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-    .listing-stats{gap:0.35rem;padding:0.75rem 0;margin-bottom:0.75rem}
-    .listing-stat-label{font-size:0.62rem}
-    .listing-stat-value{font-size:0.85rem}
-    .listing-footer{flex-direction:column;align-items:flex-start;gap:0.65rem}
-    .listing-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:0.4rem}
-    .contact-btn{grid-column:1/-1;justify-content:center;padding:0.6rem 1rem}
-    .btn-report{justify-content:center}
-    .btn-del-listing{justify-content:center}
-    .rating-widget{flex-wrap:wrap;gap:4px}
-    .listings-count{font-size:0.8rem;margin-bottom:1rem}
+    .sl-search-row{flex-direction:column}
   }
-  @media(max-width:400px){
-    .listing-stats{grid-template-columns:1fr 1fr!important}
-    .listing-stats .listing-stat:last-child{grid-column:1/-1}
+  @media(min-width:641px){
+    .sl-price-mobile{display:none}
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- HERO -->
-<div class="listings-hero">
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1.5rem">
-    <div class="reveal">
-      <div class="listings-hero-label">Soko la AgroLink</div>
-      <h1>Orodha za Mazao Tanzania</h1>
-      <p style="color:var(--text-secondary);font-size:0.85rem;line-height:1.5;max-width:500px">Nunua na uza mazao moja kwa moja na wakulima wa Tanzania. Bei za kweli, watu wa kweli.</p>
-    </div>
-    {% if current_user.is_authenticated %}
-    <a href="/dashboard/add" class="post-btn reveal">
-      <i data-lucide="plus-circle" style="width:18px;height:18px"></i>Weka Orodha Yako
-    </a>
-    {% else %}
-    <a href="/register" class="post-btn reveal">
-      <i data-lucide="user-plus" style="width:18px;height:18px"></i>Jiunge Uuze Mazao
-    </a>
-    {% endif %}
-  </div>
+<div class="sl-wrap">
 
-  <!-- Search & Filters -->
-  <div style="margin-top:1rem;display:flex;flex-direction:column;gap:1rem" class="reveal">
-    <div class="search-bar">
-      <input type="text" id="search-input" class="search-input" placeholder="Tafuta zao, mkoa..." oninput="filterListings()"/>
-      <button onclick="filterListings()" style="background:linear-gradient(135deg,var(--emerald-bright),#059669);border:none;border-radius:50px;padding:0.7rem 1.4rem;color:white;font-family:var(--font-display);font-weight:600;font-size:0.875rem;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap">
-        <i data-lucide="search" style="width:16px;height:16px"></i>Tafuta
+  <!-- Hero -->
+  <div class="sl-hero reveal">
+    <div class="sl-hero-top">
+      <div>
+        <div class="sl-hero-label">Soko la AgroLink</div>
+        <h1>Orodha za Mazao Tanzania</h1>
+        <div class="sl-hero-sub">Nunua na uza mazao moja kwa moja na wakulima wa Tanzania.</div>
+      </div>
+      {% if current_user.is_authenticated %}
+      <a href="/dashboard/add" class="post-btn">
+        <i data-lucide="plus-circle" style="width:17px;height:17px"></i>Weka Orodha
+      </a>
+      {% else %}
+      <a href="/register" class="post-btn">
+        <i data-lucide="user-plus" style="width:17px;height:17px"></i>Jiunge Uuze
+      </a>
+      {% endif %}
+    </div>
+
+    <!-- Search -->
+    <div class="sl-search-row">
+      <input type="text" id="search-input" class="sl-search-input" placeholder="Tafuta zao, mkoa..." oninput="filterListings()"/>
+      <button class="sl-search-btn" onclick="filterListings()">
+        <i data-lucide="search" style="width:15px;height:15px"></i>Tafuta
       </button>
     </div>
-    <div class="listings-filters">
-      <button class="filter-btn active" onclick="filterCategory('all',this)">
-        <i data-lucide="layout-grid" style="width:14px;height:14px"></i>Zote
+
+    <!-- Category filters -->
+    <div class="sl-filters">
+      <button class="sl-filter-btn active" onclick="filterCategory('all',this)">
+        <i data-lucide="layout-grid" style="width:13px;height:13px"></i>Zote
       </button>
       {% for cat,icon,label in [('nafaka','wheat','Nafaka'),('mboga','salad','Mboga'),('matunda','apple','Matunda'),('biashara','trending-up','Biashara'),('jamii','sprout','Mikunde')] %}
-      <button class="filter-btn" onclick="filterCategory('{{ cat }}',this)">
-        <i data-lucide="{{ icon }}" style="width:14px;height:14px"></i>{{ label }}
+      <button class="sl-filter-btn" onclick="filterCategory('{{ cat }}',this)">
+        <i data-lucide="{{ icon }}" style="width:13px;height:13px"></i>{{ label }}
       </button>
       {% endfor %}
     </div>
   </div>
-</div>
 
-<!-- LISTINGS -->
-<div class="listings-main">
-  <div class="listings-count reveal" id="listings-count">
-    Orodha <strong style="color:var(--text-primary)">{{ listings|length }}</strong> zinapatikana
+  <!-- Toolbar -->
+  <div class="sl-toolbar">
+    <div class="sl-count" id="sl-count">
+      Orodha <strong>{{ listings|length }}</strong> zinapatikana
+    </div>
+    <select class="sl-region-select" id="region-filter" onchange="filterListings()">
+      <option value="all">Mikoa yote</option>
+      {% set regions = listings | map(attribute='region') | unique | sort %}
+      {% for r in regions %}
+      <option value="{{ r|lower }}">{{ r }}</option>
+      {% endfor %}
+    </select>
   </div>
 
-  <div class="listings-grid" id="listings-grid">
+  <!-- List -->
+  <div class="sl-list" id="sl-list">
     {% if listings %}
       {% for l in listings %}
-      <div class="listing-card glass" id="listing-card-{{ l.id }}" data-crop="{{ l.crop_name|lower }}" data-region="{{ l.region|lower }}" data-category="{{ l.crop_name|lower }}">
+      {% set active_sponsored = l.is_sponsored and l.sponsored_until and l.sponsored_until > now %}
+      <div class="sl-row{% if active_sponsored %} is-sponsored{% endif %}"
+           id="sl-row-{{ l.id }}"
+           data-crop="{{ l.crop_name|lower }}"
+           data-region="{{ l.region|lower }}">
 
-        <!-- Picha -->
-        <div class="listing-img-wrap">
+        {% if active_sponsored %}
+        <div class="sl-sponsored-tag">
+          <i data-lucide="zap" style="width:10px;height:10px"></i>Iliyoshinikizwa
+        </div>
+        {% endif %}
+
+        <!-- Thumbnail -->
+        <div class="sl-thumb">
           {% if l.image_url %}
-          <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" class="listing-img" loading="lazy"/>
+          <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
           {% else %}
-          <div class="listing-img-placeholder" style="flex-direction:column;gap:0.75rem;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(6,78,59,0.35))">
-            <i data-lucide="sprout" style="width:40px;height:40px;opacity:0.35;color:var(--emerald-bright)"></i>
-            <span style="font-size:0.72rem;color:var(--text-muted);font-weight:600;letter-spacing:0.05em;text-transform:uppercase">{{ l.crop_name }}</span>
+          <div class="sl-thumb-placeholder">
+            <i data-lucide="sprout" style="width:28px;height:28px;opacity:0.3;color:var(--brand-light)"></i>
           </div>
           {% endif %}
         </div>
 
-        <div class="listing-body">
-          <div class="listing-top">
-            <span class="listing-badge">
-              <i data-lucide="sprout" style="width:12px;height:12px"></i>{{ l.crop_name }}
-            </span>
-            <span class="listing-region">
-              <i data-lucide="map-pin" style="width:12px;height:12px"></i>{{ l.region }}
-            </span>
+        <!-- Body -->
+        <div class="sl-body">
+          <div>
+            <div class="sl-title">{{ l.title }}</div>
+            <div class="sl-meta">
+              <span class="sl-crop-tag">
+                <i data-lucide="sprout" style="width:11px;height:11px"></i>{{ l.crop_name }}
+              </span>
+              <span class="sl-region-tag">
+                <i data-lucide="map-pin" style="width:11px;height:11px"></i>{{ l.region }}
+              </span>
+            </div>
+            {% if l.description %}
+            <div class="sl-desc">{{ l.description }}</div>
+            {% endif %}
+            <!-- Mobile price -->
+            <div class="sl-price-mobile">TZS {{ "{:,.0f}".format(l.price_tzs) }}<span style="font-size:0.72rem;font-weight:400;color:var(--text-muted)">/{{ l.unit or 'kg' }}</span></div>
           </div>
-
-          <div class="listing-title">{{ l.title }}</div>
-
-          {% if l.description %}
-          <div class="listing-desc">{{ l.description }}</div>
-          {% else %}
-          <div class="listing-desc" style="opacity:0"></div>
-          {% endif %}
-
-          <div class="listing-stats">
-            <div class="listing-stat">
-              <span class="listing-stat-label">Kiasi</span>
-              <span class="listing-stat-value">{{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }}</span>
+          <div class="sl-footer">
+            <div class="sl-seller">
+              <i data-lucide="user-circle" style="width:13px;height:13px"></i>
+              {{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}
+              {% if l.seller and l.seller.is_verified %}
+              <span class="tb tb-verified"><i data-lucide="badge-check" style="width:10px;height:10px"></i>Verified</span>
+              {% endif %}
+              {% if l.seller %}{% set tl = l.seller.trust_level or 'gray' %}
+              {% if tl == 'green' %}<span class="tb tb-green"><i data-lucide="shield-check" style="width:10px;height:10px"></i>Mwanachama</span>
+              {% elif tl == 'teal' %}<span class="tb tb-teal"><i data-lucide="shield-check" style="width:10px;height:10px"></i>Mwaminifu</span>
+              {% elif tl == 'gold' %}<span class="tb tb-gold"><i data-lucide="star" style="width:10px;height:10px"></i>Imara</span>
+              {% endif %}{% endif %}
             </div>
-            <div class="listing-stat">
-              <span class="listing-stat-label">Bei / {{ l.unit or 'kg' }}</span>
-              <span class="listing-stat-value">TZS {{ "{:,.0f}".format(l.price_tzs) }}</span>
+            <div class="sl-rating" id="rating-{{ l.id }}">
+              <div class="sl-stars" id="stars-{{ l.id }}">
+                <span class="sl-star-e">☆</span><span class="sl-star-e">☆</span><span class="sl-star-e">☆</span><span class="sl-star-e">☆</span><span class="sl-star-e">☆</span>
+              </div>
+              <span id="rcount-{{ l.id }}" style="font-size:0.7rem;color:var(--text-muted)"></span>
             </div>
-            <div class="listing-stat">
-              <span class="listing-stat-label">Jumla</span>
-              <span class="listing-stat-value">TZS {{ "{:,.0f}".format(l.quantity_kg * l.price_tzs) }}</span>
-            </div>
+            <span class="sl-date">{{ l.posted_at.strftime('%d %b %Y') }}</span>
           </div>
-
-          <div class="listing-footer">
-            <div style="display:flex;flex-direction:column;gap:4px">
-              <div class="listing-seller">
-                <i data-lucide="user-circle" style="width:14px;height:14px"></i>
-                {{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}{% if l.seller and l.seller.is_verified %} <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:var(--emerald-glow);padding:1px 7px;border-radius:50px;font-size:0.7rem;font-weight:700;margin-left:4px"><i data-lucide="badge-check" style="width:11px;height:11px"></i>Verified</span>{% endif %}
-                {% if l.seller %}{% set tl = l.seller.trust_level or 'gray' %}{% if tl == 'green' %}<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(45,106,79,0.12);border:1px solid rgba(45,106,79,0.35);color:#2D6A4F;padding:1px 7px;border-radius:50px;font-size:0.68rem;font-weight:700;margin-left:4px"><i data-lucide="shield-check" style="width:10px;height:10px"></i>Mwanachama</span>{% elif tl == 'teal' %}<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(20,184,166,0.12);border:1px solid rgba(20,184,166,0.35);color:#0d9488;padding:1px 7px;border-radius:50px;font-size:0.68rem;font-weight:700;margin-left:4px"><i data-lucide="shield-check" style="width:10px;height:10px"></i>Mwaminifu</span>{% elif tl == 'gold' %}<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(212,163,115,0.15);border:1px solid rgba(212,163,115,0.45);color:#b45309;padding:1px 7px;border-radius:50px;font-size:0.68rem;font-weight:700;margin-left:4px"><i data-lucide="star" style="width:10px;height:10px"></i>Imara</span>{% endif %}{% endif %}
-                · {{ l.posted_at.strftime('%d %b') }}
-              </div>
-              <div class="rating-widget" id="rating-{{ l.id }}">
-                <div class="stars-display" id="stars-{{ l.id }}">
-                  <span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span><span class="star-empty">☆</span>
-                </div>
-                <span class="rating-count" id="rcount-{{ l.id }}">Bado hakuna rating</span>
-                {% if current_user.is_authenticated and current_user.id != l.seller_id %}
-                <button class="btn-rate" onclick="openRateModal({{ l.id }}, '{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
-                  <i data-lucide="star" style="width:11px;height:11px"></i>Rate
-                </button>
-                {% endif %}
-              </div>
-            </div>
-            <div class="listing-actions">
+          <!-- Actions (mobile) -->
+          <div class="sl-actions" style="display:none" id="mob-actions-{{ l.id }}">
+            {% if current_user.is_authenticated and current_user.id != l.seller_id %}
+            <button class="sl-contact-btn" onclick="openWasiliana({{ l.id }},'{{ l.crop_name }}','{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
+              <i data-lucide="message-circle" style="width:13px;height:13px"></i>Wasiliana
+            </button>
+            {% elif not current_user.is_authenticated %}
+            <a href="/login" class="sl-contact-btn"><i data-lucide="message-circle" style="width:13px;height:13px"></i>Wasiliana</a>
+            {% else %}
+            <a href="tel:{{ l.contact }}" class="sl-contact-btn"><i data-lucide="phone" style="width:13px;height:13px"></i>{{ l.contact }}</a>
+            {% endif %}
+            <div class="sl-action-row">
+              {% if current_user.is_authenticated and current_user.id != l.seller_id %}
+              <button class="sl-btn-sm sl-btn-rate" onclick="openRateModal({{ l.id }},'{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
+                <i data-lucide="star" style="width:11px;height:11px"></i>Rate
+              </button>
+              <button class="sl-btn-sm sl-btn-report" onclick="reportListing({{ l.id }},this)">
+                <i data-lucide="flag" style="width:11px;height:11px"></i>Ripoti
+              </button>
+              {% endif %}
               {% if current_user.is_authenticated and (current_user.id == l.seller_id or current_user.role == 'admin') %}
-              <button class="btn-del-listing" onclick="deleteListing({{ l.id }}, this)">
-                <i data-lucide="trash-2" style="width:13px;height:13px"></i>Futa
+              <button class="sl-btn-sm sl-btn-del" onclick="deleteListing({{ l.id }},this)">
+                <i data-lucide="trash-2" style="width:11px;height:11px"></i>Futa
+              </button>
+              {% if current_user.id == l.seller_id %}
+              <button class="sl-btn-sponsor" onclick="sponsorListing({{ l.id }},this)">
+                <i data-lucide="zap" style="width:11px;height:11px"></i>Shinikiza
               </button>
               {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Price panel (desktop) -->
+        <div class="sl-price-panel">
+          <div>
+            <div class="sl-price">TZS {{ "{:,.0f}".format(l.price_tzs) }}</div>
+            <div class="sl-price-unit">kwa {{ l.unit or 'kg' }}</div>
+            <div class="sl-qty"><i data-lucide="package" style="width:11px;height:11px"></i> {{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }}</div>
+            <div class="sl-total" style="margin-top:0.35rem">Jumla: TZS {{ "{:,.0f}".format(l.quantity_kg * l.price_tzs) }}</div>
+          </div>
+          <div class="sl-actions">
+            {% if current_user.is_authenticated and current_user.id != l.seller_id %}
+            <button class="sl-contact-btn" onclick="openWasiliana({{ l.id }},'{{ l.crop_name }}','{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
+              <i data-lucide="message-circle" style="width:13px;height:13px"></i>Wasiliana
+            </button>
+            {% elif not current_user.is_authenticated %}
+            <a href="/login" class="sl-contact-btn"><i data-lucide="message-circle" style="width:13px;height:13px"></i>Wasiliana</a>
+            {% else %}
+            <a href="tel:{{ l.contact }}" class="sl-contact-btn"><i data-lucide="phone" style="width:13px;height:13px"></i>{{ l.contact }}</a>
+            {% endif %}
+            <div class="sl-action-row">
               {% if current_user.is_authenticated and current_user.id != l.seller_id %}
-              <button class="btn-report" onclick="reportListing({{ l.id }}, this)" style="display:inline-flex;align-items:center;gap:4px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#fbbf24;padding:0.45rem 0.85rem;border-radius:50px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap">
-                <i data-lucide="flag" style="width:13px;height:13px"></i>Ripoti
+              <button class="sl-btn-sm sl-btn-rate" onclick="openRateModal({{ l.id }},'{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
+                <i data-lucide="star" style="width:11px;height:11px"></i>Rate
+              </button>
+              <button class="sl-btn-sm sl-btn-report" onclick="reportListing({{ l.id }},this)">
+                <i data-lucide="flag" style="width:11px;height:11px"></i>Ripoti
               </button>
               {% endif %}
-              {% if current_user.is_authenticated and current_user.id != l.seller_id %}
-              <button class="contact-btn" onclick="openWasiliana({{ l.id }}, '{{ l.crop_name }}', '{{ l.seller.full_name.split()[0] if l.seller else 'Mkulima' }}')">
-                <i data-lucide="message-circle" style="width:14px;height:14px"></i>Wasiliana
+              {% if current_user.is_authenticated and (current_user.id == l.seller_id or current_user.role == 'admin') %}
+              <button class="sl-btn-sm sl-btn-del" onclick="deleteListing({{ l.id }},this)">
+                <i data-lucide="trash-2" style="width:11px;height:11px"></i>Futa
               </button>
-              {% elif current_user.is_authenticated %}
-              <a href="tel:{{ l.contact }}" class="contact-btn">
-                <i data-lucide="phone" style="width:14px;height:14px"></i>{{ l.contact }}
-              </a>
-              {% else %}
-              <a href="/login" class="contact-btn">
-                <i data-lucide="message-circle" style="width:14px;height:14px"></i>Wasiliana
-              </a>
+              {% if current_user.id == l.seller_id %}
+              <button class="sl-btn-sponsor" onclick="sponsorListing({{ l.id }},this)">
+                <i data-lucide="zap" style="width:11px;height:11px"></i>Shinikiza
+              </button>
+              {% endif %}
               {% endif %}
             </div>
           </div>
@@ -346,318 +377,285 @@
       </div>
       {% endfor %}
     {% else %}
-      <div class="empty-state reveal">
-        <i data-lucide="package-open" style="width:64px;height:64px;opacity:0.3;margin-bottom:1.5rem"></i>
-        <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:0.75rem">Hakuna orodha bado</h3>
-        <p style="color:var(--text-muted);margin-bottom:2rem">Kuwa wa kwanza kuuza mazao yako kwenye AgroLink Tanzania!</p>
-        <a href="/register" class="post-btn" style="display:inline-flex">
-          <i data-lucide="plus" style="width:18px;height:18px"></i>Ongeza Orodha ya Kwanza
-        </a>
-      </div>
+    <div class="sl-empty">
+      <i data-lucide="package-open" style="width:56px;height:56px;opacity:0.25;margin-bottom:1.25rem"></i>
+      <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:0.5rem">Hakuna orodha bado</h3>
+      <p style="margin-bottom:1.5rem">Kuwa wa kwanza kuuza mazao yako kwenye AgroLink Tanzania!</p>
+      <a href="/register" class="post-btn" style="display:inline-flex">
+        <i data-lucide="plus" style="width:16px;height:16px"></i>Ongeza Orodha ya Kwanza
+      </a>
+    </div>
     {% endif %}
   </div>
+
+  <!-- Pagination -->
+  {% if total_pages and total_pages > 1 %}
+  <div class="sl-pagination">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for('listings', page=current_page-1) }}" class="sl-page-link">
+      <i data-lucide="chevron-left" style="width:14px;height:14px"></i>
+    </a>
+    {% endif %}
+    {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+      {% if p %}
+        {% if p == current_page %}
+        <span class="sl-page-link active">{{ p }}</span>
+        {% else %}
+        <a href="{{ url_for('listings', page=p) }}" class="sl-page-link">{{ p }}</a>
+        {% endif %}
+      {% else %}
+      <span class="sl-page-ellipsis">…</span>
+      {% endif %}
+    {% endfor %}
+    {% if pagination.has_next %}
+    <a href="{{ url_for('listings', page=current_page+1) }}" class="sl-page-link">
+      <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
 </div>
 
-{% endblock %}
-
-{% block extra_scripts %}
-<div id="rate-modal-overlay" class="rate-modal-overlay" style="display:none" onclick="closeRateModal(event)">
-  <div class="rate-modal">
+<!-- Rate Modal -->
+<div id="rate-modal-overlay" class="sl-modal-overlay" style="display:none" onclick="if(event.target===this)closeRateModal()">
+  <div class="sl-modal">
     <h3>Tathmini Muuzaji</h3>
-    <p id="rate-modal-name">Mpe muuzaji nyota</p>
-    <div class="star-picker" id="star-picker">
-      <span onclick="selectStar(1)" title="1">☆</span>
-      <span onclick="selectStar(2)" title="2">☆</span>
-      <span onclick="selectStar(3)" title="3">☆</span>
-      <span onclick="selectStar(4)" title="4">☆</span>
-      <span onclick="selectStar(5)" title="5">☆</span>
+    <p id="rate-modal-name"></p>
+    <div class="star-picker" id="star-picker" style="display:flex;gap:8px;margin-bottom:1rem;justify-content:center">
+      <span onclick="selectStar(1)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
+      <span onclick="selectStar(2)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
+      <span onclick="selectStar(3)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
+      <span onclick="selectStar(4)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
+      <span onclick="selectStar(5)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
     </div>
-    <textarea class="rate-comment" id="rate-comment" rows="3" placeholder="Maoni yako (si lazima)..."></textarea>
-    <div class="rate-actions">
-      <button class="btn-cancel-rate" onclick="closeRateModal()">Ghairi</button>
-      <button class="btn-submit-rate" id="btn-submit-rate" onclick="submitRating()">Tuma</button>
+    <textarea id="rate-comment" rows="3" placeholder="Maoni yako (si lazima)..." style="width:100%;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.85rem;resize:none;outline:none;box-sizing:border-box"></textarea>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem">
+      <button onclick="closeRateModal()" style="background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer">Ghairi</button>
+      <button id="btn-submit-rate" onclick="submitRating()" style="background:var(--brand-mid);border:none;color:#fff;padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer">Tuma</button>
     </div>
   </div>
 </div>
 
-<script>
-// Load ratings for all listings
-document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('.listing-card').forEach(card => {
-    const id = card.id.replace('listing-card-','');
-    loadRating(id);
-  });
-});
-
-async function loadRating(listingId){
-  try{
-    const res = await fetch('/api/listing/'+listingId+'/rating');
-    if(!res.ok) return;
-    const data = await res.json();
-    updateStars(listingId, data.avg, data.count);
-  }catch(e){}
-}
-
-function updateStars(listingId, avg, count){
-  const starsEl = document.getElementById('stars-'+listingId);
-  const countEl = document.getElementById('rcount-'+listingId);
-  if(!starsEl) return;
-  let html = '';
-  for(let i=1;i<=5;i++){
-    html += i<=Math.round(avg)
-      ? '<span class="star-filled">★</span>'
-      : '<span class="star-empty">☆</span>';
-  }
-  starsEl.innerHTML = html;
-  if(count > 0){
-    countEl.textContent = avg.toFixed(1) + ' (' + count + ')';
-  } else {
-    countEl.textContent = 'Bado hakuna rating';
-  }
-}
-
-let currentListingId = null;
-let selectedStars = 0;
-
-function openRateModal(listingId, sellerName){
-  currentListingId = listingId;
-  selectedStars = 0;
-  document.getElementById('rate-modal-name').textContent = 'Mpe ' + sellerName + ' nyota';
-  document.getElementById('rate-comment').value = '';
-  document.getElementById('star-picker').querySelectorAll('span').forEach(s => s.textContent='☆');
-  document.getElementById('rate-modal-overlay').style.display='flex';
-}
-
-function closeRateModal(e){
-  if(!e || e.target===document.getElementById('rate-modal-overlay')){
-    document.getElementById('rate-modal-overlay').style.display='none';
-  }
-}
-
-function selectStar(n){
-  selectedStars = n;
-  document.getElementById('star-picker').querySelectorAll('span').forEach((s,i) => {
-    s.textContent = i<n ? '★' : '☆';
-    s.classList.toggle('active', i<n);
-  });
-}
-
-async function submitRating(){
-  if(!selectedStars){ alert('Chagua nyota kwanza!'); return; }
-  const btn = document.getElementById('btn-submit-rate');
-  btn.disabled = true;
-  btn.textContent = 'Inatuma...';
-  const comment = document.getElementById('rate-comment').value.trim();
-  const res = await fetch('/listings/'+currentListingId+'/rate', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({stars:selectedStars, comment:comment})
-  });
-  const data = await res.json();
-  if(res.ok){
-    updateStars(currentListingId, data.avg, data.count);
-    document.getElementById('rate-modal-overlay').style.display='none';
-  } else {
-    alert(data.error||'Hitilafu. Jaribu tena.');
-  }
-  btn.disabled=false;
-  btn.textContent='Tuma';
-}
-
-async function reportListing(id, btn){
-  const reason = prompt("Taja sababu ya ripoti (mfano: Bei ya uongo, Spam, n.k):");
-  if(!reason || !reason.trim()) return;
-  btn.disabled=true;
-  btn.innerHTML="<i data-lucide='loader' style='width:13px;height:13px'></i> Inatuma...";
-  lucide.createIcons();
-  const res=await fetch("/listings/report/"+id,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({reason:reason.trim()})
-  });
-  const data=await res.json();
-  if(res.ok){
-    btn.innerHTML="<i data-lucide='check' style='width:13px;height:13px'></i> Imeripotiwa";
-    btn.style.background="rgba(16,185,129,0.1)";
-    btn.style.borderColor="rgba(16,185,129,0.25)";
-    btn.style.color="var(--emerald-bright)";
-    lucide.createIcons();
-  }else{
-    alert(data.error||"Hitilafu. Jaribu tena.");
-    btn.disabled=false;
-    btn.innerHTML="<i data-lucide='flag' style='width:13px;height:13px'></i> Ripoti";
-    lucide.createIcons();
-  }
-}
-async function deleteListing(id, btn){
-  if(!confirm("Futa orodha hii? Hatua hii haiwezi kurudishwa."))return;
-  btn.disabled=true;
-  const res=await fetch("/dashboard/delete-listing/"+id,{method:"POST"});
-  const data=await res.json();
-  if(res.ok){
-    const card=document.getElementById("listing-card-"+id);
-    card.style.opacity="0";
-    card.style.transform="scale(0.95)";
-    card.style.transition="all 0.3s ease";
-    setTimeout(()=>{
-      card.remove();
-      const remaining=document.querySelectorAll(".listing-card").length;
-      document.getElementById("listings-count").innerHTML=
-        "Orodha <strong style='color:var(--text-primary)'>"+remaining+"</strong> zinapatikana";
-    },300);
-  }else{
-    alert(data.error||"Hitilafu. Jaribu tena.");
-    btn.disabled=false;
-  }
-}
-// active category tracked globally
-let _activeCategory = "all";
-
-function filterListings(){
-  const search=(document.getElementById("search-input")?.value||"").toLowerCase().trim();
-  const cat=_activeCategory;
-  const region=(document.getElementById("region-filter")?.value||"all").toLowerCase().trim();
-  const cards=document.querySelectorAll(".listing-card");
-  let visible=0;
-
-  // Category groups — zao linaloangukia group gani
-  const CATS={
-    "mboga":["nyanya","kabichi","spinach","mchicha","sukuma","bamia","pilipili","hoho","karoti","boga","bilinganya","vitunguu"],
-    "nafaka":["mahindi","mpunga","mchele","ngano","mtama","uwele","sorgham","shayiri"],
-    "jamii":["maharage","kunde","choroko","mbaazi","njugu","karanga","soya","dengu"],
-    "matunda":["ndizi","embe","parachichi","avocado","papai","fenesi","nanasi","chungwa","limau","tikiti","zabibu","tofaa","pera"],
-    "mizizi":["viazi","muhogo","vitunguu","kitunguu","ginger","tangawizi","cassava"],
-    "biashara":["korosho","kahawa","chai","tumbaku","pamba","ufuta","alizeti","miwa","vanilla","cardamom"]
-  };
-
-  function getCategory(cropName){
-    const c=cropName.toLowerCase();
-    for(const[cat,crops] of Object.entries(CATS)){
-      if(crops.some(crop=>c.includes(crop)||crop.includes(c))) return cat;
-    }
-    return "nyingine";
-  }
-
-  cards.forEach(card=>{
-    const crop=card.dataset.crop||"";
-    const cardRegion=card.dataset.region||"";
-    const cardCat=getCategory(crop);
-
-    const matchSearch=!search||crop.includes(search)||cardRegion.includes(search);
-    const matchCat=cat==="all"||cardCat===cat||crop.includes(cat);
-    const matchRegion=region==="all"||cardRegion.includes(region);
-
-    const show=matchSearch&&matchCat&&matchRegion;
-    card.style.display=show?"":"none";
-    if(show) visible++;
-  });
-
-  const countEl=document.getElementById("listings-count");
-  if(countEl) countEl.innerHTML=`Orodha <strong style="color:var(--text-primary)">${visible}</strong> zinapatikana`;
-}
-function filterCategory(cat,btn){
-  _activeCategory=cat.toLowerCase().trim();
-  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  filterListings();
-}
-</script>
-
-<!-- ── Wasiliana Modal ─────────────────────────────────────── -->
+<!-- Wasiliana Modal -->
 <div id="wasiliana-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:1rem">
   <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;width:100%;max-width:420px;box-shadow:var(--shadow-lg);position:relative">
-    <button onclick="closeWasiliana()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px">
+    <button onclick="closeWasiliana()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;cursor:pointer;color:var(--text-muted)">
       <i data-lucide="x" style="width:18px;height:18px"></i>
     </button>
-    <h3 id="wasiliana-title" style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem"></h3>
-    <p id="wasiliana-sub" style="font-size:0.83rem;color:var(--text-muted);margin-bottom:1.25rem"></p>
-    <textarea id="wasiliana-msg" rows="4" placeholder="Andika ujumbe wako hapa... (mfano: Ninahitaji kg 200 wiki hii, bei yako ni ngapi?)"
-      style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;resize:vertical;outline:none;transition:border-color var(--transition);box-sizing:border-box"></textarea>
+    <h3 id="wasiliana-title" style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--text-primary);margin-bottom:0.35rem"></h3>
+    <p id="wasiliana-sub" style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1.25rem"></p>
+    <textarea id="wasiliana-msg" rows="4" placeholder="Andika ujumbe wako hapa..." style="width:100%;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.9rem;resize:vertical;outline:none;box-sizing:border-box"></textarea>
     <div id="wasiliana-error" style="display:none;color:var(--danger);font-size:0.82rem;margin-top:0.5rem"></div>
     <div style="display:flex;gap:0.75rem;margin-top:1rem">
-      <button onclick="closeWasiliana()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--transition)">Ghairi</button>
-      <button id="wasiliana-submit" onclick="submitWasiliana()" style="flex:2;background:var(--brand-mid);border:none;color:#fff;padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:700;cursor:pointer;transition:all var(--transition)">
+      <button onclick="closeWasiliana()" style="flex:1;background:var(--bg-surface);border:1px solid var(--border);color:var(--text-secondary);padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;cursor:pointer">Ghairi</button>
+      <button id="wasiliana-submit" onclick="submitWasiliana()" style="flex:2;background:var(--brand-mid);border:none;color:#fff;padding:0.6rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:700;cursor:pointer">
         <span id="wasiliana-btn-text" style="display:inline-flex;align-items:center;gap:6px"><i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe</span>
       </button>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
 <script>
+// ── Mobile: show actions inside body ─────────────────────────────────────────
 (function(){
-  let _listingId = null;
+  const isMob = () => window.innerWidth <= 640;
+  function applyMobile(){
+    document.querySelectorAll('[id^="mob-actions-"]').forEach(el => {
+      el.style.display = isMob() ? 'flex' : 'none';
+    });
+  }
+  applyMobile();
+  window.addEventListener('resize', applyMobile);
+})();
 
-  window.openWasiliana = function(listingId, cropName, sellerName){
-    _listingId = listingId;
-    document.getElementById('wasiliana-title').textContent = cropName + ' — ' + sellerName;
-    document.getElementById('wasiliana-sub').textContent = 'Tuma ujumbe kwa ' + sellerName + ' kuhusu bidhaa hii.';
-    document.getElementById('wasiliana-msg').value = '';
-    document.getElementById('wasiliana-error').style.display = 'none';
-    const modal = document.getElementById('wasiliana-modal');
-    modal.style.display = 'flex';
-    setTimeout(()=>{ document.getElementById('wasiliana-msg').focus(); }, 100);
-    lucide.createIcons();
-  };
+// ── Ratings ───────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('[id^="stars-"]').forEach(el => {
+    const id = el.id.replace('stars-','');
+    loadRating(id);
+  });
+});
 
-  window.closeWasiliana = function(){
-    document.getElementById('wasiliana-modal').style.display = 'none';
-    _listingId = null;
-  };
+async function loadRating(id){
+  try{
+    const res = await fetch('/api/listing/'+id+'/rating');
+    if(!res.ok) return;
+    const d = await res.json();
+    const starsEl = document.getElementById('stars-'+id);
+    const countEl = document.getElementById('rcount-'+id);
+    if(!starsEl) return;
+    let html='';
+    for(let i=1;i<=5;i++) html += i<=Math.round(d.avg) ? '<span class="sl-star-f">★</span>' : '<span class="sl-star-e">☆</span>';
+    starsEl.innerHTML = html;
+    if(d.count > 0) countEl.textContent = d.avg.toFixed(1)+' ('+d.count+')';
+  }catch(e){}
+}
 
-  window.submitWasiliana = async function(){
-    const msg = document.getElementById('wasiliana-msg').value.trim();
-    const errEl = document.getElementById('wasiliana-error');
-    const btn = document.getElementById('wasiliana-submit');
-    const btnText = document.getElementById('wasiliana-btn-text');
+// ── Filter ────────────────────────────────────────────────────────────────────
+let _activeCat = 'all';
+const CATS={
+  "mboga":["nyanya","kabichi","spinach","mchicha","sukuma","bamia","pilipili","hoho","karoti","boga","bilinganya","vitunguu"],
+  "nafaka":["mahindi","mpunga","mchele","ngano","mtama","uwele","sorgham","shayiri"],
+  "jamii":["maharage","kunde","choroko","mbaazi","njugu","karanga","soya","dengu"],
+  "matunda":["ndizi","embe","parachichi","avocado","papai","fenesi","nanasi","chungwa","limau","tikiti","zabibu","tofaa","pera"],
+  "biashara":["korosho","kahawa","chai","tumbaku","pamba","ufuta","alizeti","miwa","vanilla","cardamom"]
+};
+function getCat(crop){
+  const c=crop.toLowerCase();
+  for(const[cat,crops] of Object.entries(CATS)){
+    if(crops.some(x=>c.includes(x)||x.includes(c))) return cat;
+  }
+  return "nyingine";
+}
+function filterListings(){
+  const search=(document.getElementById('search-input')?.value||'').toLowerCase().trim();
+  const region=(document.getElementById('region-filter')?.value||'all').toLowerCase();
+  let visible=0;
+  document.querySelectorAll('#sl-list [id^="sl-row-"]').forEach(row=>{
+    const crop=row.dataset.crop||'';
+    const r=row.dataset.region||'';
+    const matchS=!search||crop.includes(search)||r.includes(search);
+    const matchC=_activeCat==='all'||getCat(crop)===_activeCat||crop.includes(_activeCat);
+    const matchR=region==='all'||r.includes(region);
+    const show=matchS&&matchC&&matchR;
+    row.style.display=show?'':'none';
+    if(show) visible++;
+  });
+  const c=document.getElementById('sl-count');
+  if(c) c.innerHTML='Orodha <strong>'+visible+'</strong> zinapatikana';
+}
+function filterCategory(cat,btn){
+  _activeCat=cat.toLowerCase().trim();
+  document.querySelectorAll('.sl-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterListings();
+}
 
-    if(!msg){
-      errEl.textContent = 'Andika ujumbe kwanza.';
-      errEl.style.display = 'block';
-      return;
-    }
-    if(msg.length < 5){
-      errEl.textContent = 'Ujumbe mfupi sana.';
-      errEl.style.display = 'block';
-      return;
-    }
+// ── Rate modal ────────────────────────────────────────────────────────────────
+let _currentListingId=null, _selectedStars=0;
+function openRateModal(id,name){
+  _currentListingId=id; _selectedStars=0;
+  document.getElementById('rate-modal-name').textContent='Mpe '+name+' nyota';
+  document.getElementById('rate-comment').value='';
+  document.getElementById('star-picker').querySelectorAll('span').forEach(s=>{ s.textContent='☆'; s.style.color='var(--border-strong)'; });
+  document.getElementById('rate-modal-overlay').style.display='flex';
+}
+function closeRateModal(){ document.getElementById('rate-modal-overlay').style.display='none'; }
+function selectStar(n){
+  _selectedStars=n;
+  document.getElementById('star-picker').querySelectorAll('span').forEach((s,i)=>{
+    s.textContent=i<n?'★':'☆';
+    s.style.color=i<n?'var(--accent)':'var(--border-strong)';
+  });
+}
+async function submitRating(){
+  if(!_selectedStars){ alert('Chagua nyota kwanza!'); return; }
+  const btn=document.getElementById('btn-submit-rate');
+  btn.disabled=true; btn.textContent='Inatuma...';
+  const res=await fetch('/listings/'+_currentListingId+'/rate',{
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({stars:_selectedStars,comment:document.getElementById('rate-comment').value.trim()})
+  });
+  const d=await res.json();
+  if(res.ok){ loadRating(_currentListingId); closeRateModal(); }
+  else alert(d.error||'Hitilafu. Jaribu tena.');
+  btn.disabled=false; btn.textContent='Tuma';
+}
 
-    btn.disabled = true;
-    btnText.innerHTML = '<i data-lucide="loader" style="width:14px;height:14px"></i> Inatuma...';
-    lucide.createIcons();
-    errEl.style.display = 'none';
+// ── Report ────────────────────────────────────────────────────────────────────
+async function reportListing(id,btn){
+  const reason=prompt('Taja sababu ya ripoti:');
+  if(!reason||!reason.trim()) return;
+  btn.disabled=true;
+  const res=await fetch('/listings/report/'+id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason:reason.trim()})});
+  const d=await res.json();
+  if(res.ok){ btn.textContent='Imeripotiwa'; btn.style.color='var(--emerald-bright)'; }
+  else{ alert(d.error||'Hitilafu.'); btn.disabled=false; }
+}
 
-    try {
-      const res = await fetch('/api/conversations/start', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ listing_id: _listingId, message: msg })
-      });
-      const data = await res.json();
-      if(res.ok && data.success){
-        window.location.href = '/messages/' + data.conversation_id;
-      } else {
-        errEl.textContent = data.error || 'Imeshindwa kutuma. Jaribu tena.';
-        errEl.style.display = 'block';
-        btn.disabled = false;
-        btnText.innerHTML = '<i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe';
+// ── Delete ────────────────────────────────────────────────────────────────────
+async function deleteListing(id,btn){
+  if(!confirm('Futa orodha hii?')) return;
+  btn.disabled=true;
+  const res=await fetch('/dashboard/delete-listing/'+id,{method:'POST'});
+  const d=await res.json();
+  if(res.ok){
+    const row=document.getElementById('sl-row-'+id);
+    row.style.opacity='0'; row.style.transition='opacity 0.3s';
+    setTimeout(()=>{ row.remove(); filterListings(); },300);
+  } else{ alert(d.error||'Hitilafu.'); btn.disabled=false; }
+}
+
+// ── Sponsor ───────────────────────────────────────────────────────────────────
+async function sponsorListing(id,btn){
+  if(!confirm('Shinikiza orodha hii juu kwa siku 7? (Mock — bila malipo ya kweli sasa)')) return;
+  btn.disabled=true; btn.textContent='Inaendelea...';
+  try{
+    const res=await fetch('/api/listings/'+id+'/sponsor',{method:'POST'});
+    const d=await res.json();
+    if(res.ok){
+      const row=document.getElementById('sl-row-'+id);
+      row.classList.add('is-sponsored');
+      let tag=row.querySelector('.sl-sponsored-tag');
+      if(!tag){
+        tag=document.createElement('div');
+        tag.className='sl-sponsored-tag';
+        tag.innerHTML='<i data-lucide="zap" style="width:10px;height:10px"></i>Iliyoshinikizwa';
+        row.appendChild(tag);
         lucide.createIcons();
       }
-    } catch(e){
-      errEl.textContent = 'Tatizo la mtandao. Angalia connection yako.';
-      errEl.style.display = 'block';
-      btn.disabled = false;
-      btnText.innerHTML = '<i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe';
+      tag.style.display='inline-flex';
+      btn.textContent='Imeshinikizwa hadi '+d.sponsored_until;
+      btn.style.background='rgba(16,185,129,0.12)';
+      btn.style.borderColor='rgba(16,185,129,0.3)';
+      btn.style.color='var(--emerald-bright)';
+    } else{
+      alert(d.error||'Hitilafu. Jaribu tena.');
+      btn.disabled=false;
+      btn.innerHTML='<i data-lucide="zap" style="width:11px;height:11px"></i>Shinikiza';
       lucide.createIcons();
     }
+  }catch(e){ alert('Tatizo la mtandao.'); btn.disabled=false; }
+}
+
+// ── Wasiliana ─────────────────────────────────────────────────────────────────
+(function(){
+  let _lid=null;
+  window.openWasiliana=function(id,crop,seller){
+    _lid=id;
+    document.getElementById('wasiliana-title').textContent=crop+' — '+seller;
+    document.getElementById('wasiliana-sub').textContent='Tuma ujumbe kwa '+seller+' kuhusu bidhaa hii.';
+    document.getElementById('wasiliana-msg').value='';
+    document.getElementById('wasiliana-error').style.display='none';
+    const m=document.getElementById('wasiliana-modal');
+    m.style.display='flex';
+    setTimeout(()=>document.getElementById('wasiliana-msg').focus(),100);
+    lucide.createIcons();
   };
-
-  document.getElementById('wasiliana-modal').addEventListener('click', function(e){
-    if(e.target === this) closeWasiliana();
-  });
-
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') closeWasiliana();
-  });
+  window.closeWasiliana=function(){ document.getElementById('wasiliana-modal').style.display='none'; _lid=null; };
+  window.submitWasiliana=async function(){
+    const msg=document.getElementById('wasiliana-msg').value.trim();
+    const errEl=document.getElementById('wasiliana-error');
+    const btn=document.getElementById('wasiliana-submit');
+    const btnText=document.getElementById('wasiliana-btn-text');
+    if(!msg||msg.length<5){ errEl.textContent='Andika ujumbe kwanza (herufi 5+).'; errEl.style.display='block'; return; }
+    btn.disabled=true;
+    btnText.innerHTML='<i data-lucide="loader" style="width:14px;height:14px"></i> Inatuma...';
+    lucide.createIcons();
+    errEl.style.display='none';
+    try{
+      const res=await fetch('/api/conversations/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({listing_id:_lid,message:msg})});
+      const d=await res.json();
+      if(res.ok&&d.success){ window.location.href='/messages/'+d.conversation_id; }
+      else{ errEl.textContent=d.error||'Imeshindwa kutuma. Jaribu tena.'; errEl.style.display='block'; btn.disabled=false; btnText.innerHTML='<i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe'; lucide.createIcons(); }
+    }catch(e){ errEl.textContent='Tatizo la mtandao.'; errEl.style.display='block'; btn.disabled=false; btnText.innerHTML='<i data-lucide="send" style="width:14px;height:14px"></i>Tuma Ujumbe'; lucide.createIcons(); }
+  };
+  document.getElementById('wasiliana-modal').addEventListener('click',function(e){ if(e.target===this) closeWasiliana(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeWasiliana(); });
 })();
 </script>
 {% endblock %}

@@ -1,5 +1,6 @@
 import os
 import requests
+from functools import wraps
 from email_service import send_welcome_email
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
@@ -257,6 +258,8 @@ class MarketListing(db.Model):
     is_available = db.Column(db.Boolean, default=True)
     image_url = db.Column(db.String(300), nullable=True)
     posted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    is_sponsored = db.Column(db.Boolean, default=False, nullable=False)
+    sponsored_until = db.Column(db.DateTime, nullable=True)
 
 
 class ListingReport(db.Model):
@@ -731,6 +734,21 @@ def get_forecast(city="Mbeya"):
 # ── Routes ────────────────────────────────────────────────────────────────────
 
 
+# ── Auth decorators ───────────────────────────────────────────────────────────
+def require_phone_verified(f):
+    """Zuia endpoint kama namba ya simu haijathibitishwa via OTP."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not getattr(current_user, "phone_verified", False):
+            return jsonify({
+                "error": "Thibitisha namba yako ya simu kwanza.",
+                "code": "PHONE_NOT_VERIFIED",
+                "redirect": "/verify-phone"
+            }), 403
+        return f(*args, **kwargs)
+    return decorated
+
+
 @app.route("/")
 def index():
     # Auth wall: guest anaona landing page tu
@@ -1153,9 +1171,17 @@ def listings():
     page = request.args.get("page", 1, type=int)
     per_page = 12  # Listings 12 kwa ukurasa
 
+    from sqlalchemy import case
+    now = datetime.utcnow()
     pagination = (
         MarketListing.query.filter_by(is_available=True)
-        .order_by(MarketListing.posted_at.desc())
+        .order_by(
+            case(
+                (db.and_(MarketListing.is_sponsored == True, MarketListing.sponsored_until > now), 1),
+                else_=0
+            ).desc(),
+            MarketListing.posted_at.desc()
+        )
         .paginate(page=page, per_page=per_page, error_out=False)
     )
     is_guest = not current_user.is_authenticated
@@ -1166,6 +1192,7 @@ def listings():
         current_page=page,
         total_pages=pagination.pages,
         is_guest=is_guest,
+        now=datetime.utcnow(),
     )
 
 
@@ -1515,6 +1542,42 @@ def create_listing():
     db.session.add(listing)
     db.session.commit()
     return jsonify({"message": "Orodha imeongezwa.", "id": listing.id}), 201
+
+
+@app.route("/api/listings/<int:listing_id>/sponsor", methods=["POST"])
+@login_required
+@require_active_account
+@require_phone_verified
+def sponsor_listing(listing_id):
+    """Muuzaji anasponsor listing yake — mock payment, siku 7."""
+    listing = MarketListing.query.get_or_404(listing_id)
+    if listing.seller_id != current_user.id and current_user.role != "admin":
+        return jsonify({"error": "Huna ruhusa."}), 403
+    now = datetime.utcnow()
+    # Ikiwa bado ina sponsorship hai, ongeza siku 7 zaidi
+    if listing.is_sponsored and listing.sponsored_until and listing.sponsored_until > now:
+        listing.sponsored_until = listing.sponsored_until + timedelta(days=7)
+    else:
+        listing.is_sponsored = True
+        listing.sponsored_until = now + timedelta(days=7)
+    db.session.commit()
+    return jsonify({
+        "message": "Orodha yako imeshinikizwa kwa siku 7.",
+        "sponsored_until": listing.sponsored_until.strftime("%d %b %Y")
+    }), 200
+
+
+@app.route("/api/listings/<int:listing_id>/unsponsor", methods=["POST"])
+@login_required
+def unsponsor_listing(listing_id):
+    """Admin anaweza kuondoa sponsorship."""
+    if current_user.role != "admin":
+        return jsonify({"error": "Admins tu."}), 403
+    listing = MarketListing.query.get_or_404(listing_id)
+    listing.is_sponsored = False
+    listing.sponsored_until = None
+    db.session.commit()
+    return jsonify({"message": "Sponsorship imeondolewa."}), 200
 
 
 @app.route("/api/listing/<int:listing_id>/rating")
