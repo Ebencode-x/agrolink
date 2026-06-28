@@ -3596,7 +3596,7 @@ def admin_analytics():
 @login_required
 @require_active_account
 def admin_escrow_fees():
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return redirect(url_for("index"))
     from datetime import timedelta
     fee_active = os.environ.get("ESCROW_FEE_ACTIVE", "false").lower() == "true"
