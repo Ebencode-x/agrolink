@@ -460,6 +460,36 @@ class Order(db.Model):
     listing         = db.relationship("MarketListing", foreign_keys=[listing_id], lazy=True)
     conversation    = db.relationship("Conversation", foreign_keys=[conversation_id], lazy=True)
 
+
+# ── EscrowFee (Sprint 8 — Framework-ready, off by default) ───────────────────
+class EscrowFee(db.Model):
+    __tablename__ = "escrow_fees"
+    id             = db.Column(db.Integer, primary_key=True)
+    order_id       = db.Column(db.Integer, db.ForeignKey("orders.id"), nullable=False, unique=True)
+    buyer_id       = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    seller_id      = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    order_amount   = db.Column(db.BigInteger, nullable=False)
+    fee_rate       = db.Column(db.Float, default=0.025, nullable=False)
+    fee_amount     = db.Column(db.BigInteger, default=0, nullable=False)
+    status         = db.Column(db.String(20), default="pending", nullable=False)
+    is_active      = db.Column(db.Boolean, default=False, nullable=False)
+    waived_reason  = db.Column(db.String(255), nullable=True)
+    created_at     = db.Column(db.DateTime, default=datetime.utcnow)
+    released_at    = db.Column(db.DateTime, nullable=True)
+    order          = db.relationship("Order", foreign_keys=[order_id], lazy=True)
+    buyer          = db.relationship("User", foreign_keys=[buyer_id], lazy=True)
+    seller         = db.relationship("User", foreign_keys=[seller_id], lazy=True)
+
+    def calculate_fee(self):
+        """Hesabu fee — returns 0 kama is_active=False (framework-ready)."""
+        if not self.is_active:
+            self.fee_amount = 0
+            self.waived_reason = "Escrow fees not yet active"
+            return 0
+        fee = int(self.order_amount * self.fee_rate)
+        self.fee_amount = fee
+        return fee
+
 # ── Login Manager ─────────────────────────────────────────────────────────────
 
 
@@ -2847,6 +2877,23 @@ def order_create():
     )
     db.session.add(order)
     db.session.commit()
+
+    # Sprint 8 — EscrowFee: tengeneza record automatically (is_active=False by default)
+    import os
+    fee_active = os.environ.get("ESCROW_FEE_ACTIVE", "false").lower() == "true"
+    fee_rate = float(os.environ.get("ESCROW_FEE_RATE", "0.025"))
+    escrow_fee = EscrowFee(
+        order_id=order.id,
+        buyer_id=order.buyer_id,
+        seller_id=order.seller_id,
+        order_amount=order.price_tzs,
+        fee_rate=fee_rate,
+        is_active=fee_active,
+    )
+    escrow_fee.calculate_fee()
+    db.session.add(escrow_fee)
+    db.session.commit()
+
     return jsonify({"success": True, "order_id": order.id, "status": order.status.value,
                     "total_tzs": order.price_tzs})
 
@@ -3390,6 +3437,13 @@ def payment_release(order_id):
             # Badilisha status zote
             escrow.status = EscrowStatus.released
             order.status  = OrderStatus.completed
+
+            # Sprint 8 — release EscrowFee record wakati order imekamilika
+            fee_record = EscrowFee.query.filter_by(order_id=order.id).first()
+            if fee_record:
+                fee_record.status = "released"
+                fee_record.released_at = datetime.utcnow()
+
             db.session.commit()
 
             # Sasisha trust score ya muuzaji
@@ -3534,6 +3588,48 @@ def admin_analytics():
         android_installs=android_installs,
         ios_installs=ios_installs,
         daily_views=daily_views,
+    )
+
+
+# ─── ADMIN: ESCROW FEES (Sprint 8) ─────────────────────────────────────────
+@app.route("/admin/escrow-fees")
+@login_required
+@require_active_account
+def admin_escrow_fees():
+    if not current_user.is_admin:
+        return redirect(url_for("index"))
+    from datetime import timedelta
+    fee_active = os.environ.get("ESCROW_FEE_ACTIVE", "false").lower() == "true"
+    fee_rate   = float(os.environ.get("ESCROW_FEE_RATE", "0.025"))
+
+    all_fees   = EscrowFee.query.order_by(EscrowFee.created_at.desc()).all()
+    total_fees = EscrowFee.query.count()
+
+    # Potential revenue (order_amount * fee_rate ya kila record)
+    potential_revenue = db.session.query(
+        db.func.sum(EscrowFee.order_amount * EscrowFee.fee_rate)
+    ).scalar() or 0
+
+    # Released fees
+    released_fees = EscrowFee.query.filter_by(status="released").all()
+    total_released = sum(f.fee_amount for f in released_fees)
+
+    # Pending fees
+    pending_count = EscrowFee.query.filter_by(status="pending").count()
+
+    # Last 30 days
+    month_ago = datetime.utcnow() - timedelta(days=30)
+    fees_month = EscrowFee.query.filter(EscrowFee.created_at >= month_ago).count()
+
+    return render_template("admin/escrow_fees.html",
+        fee_active=fee_active,
+        fee_rate=fee_rate,
+        all_fees=all_fees,
+        total_fees=total_fees,
+        potential_revenue=int(potential_revenue),
+        total_released=total_released,
+        pending_count=pending_count,
+        fees_month=fees_month,
     )
 
 # ─── PWA ────────────────────────────────────────────────
