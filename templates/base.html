@@ -330,6 +330,7 @@
     <ul class="nav-links">
       <li><a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint=='index' }}">Nyumbani</a></li>
       <li><a href="/listings" class="{{ 'active' if request.endpoint=='listings' }}">Soko</a></li>
+      <li><a href="/market-data" class="{{ 'active' if request.endpoint=='market_data' }}">Bei za Masoko</a></li>
       <li><a href="/bei" class="{{ 'active' if request.endpoint=='price_intelligence' }}">Bei ya AI</a></li>
       <li><a href="/ai-daktari" class="{{ 'active' if request.endpoint=='ai_daktari' }}">Daktari wa Zao</a></li>
       <li class="nav-dropdown" id="nav-more-dropdown">
@@ -372,6 +373,7 @@
     <div class="nav-drawer-links">
       <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint=='index' }}"><i data-lucide="home" style="width:18px;height:18px"></i>Nyumbani</a>
       <a href="/listings" class="{{ 'active' if request.endpoint=='listings' }}"><i data-lucide="store" style="width:18px;height:18px"></i>Soko</a>
+      <a href="/market-data" class="{{ 'active' if request.endpoint=='market_data' }}"><i data-lucide="bar-chart-2" style="width:18px;height:18px"></i>Bei za Masoko</a>
       <a href="/bei" class="{{ 'active' if request.endpoint=='price_intelligence' }}"><i data-lucide="trending-up" style="width:18px;height:18px"></i>Bei ya AI</a>
       <a href="/#huduma"><i data-lucide="layers" style="width:18px;height:18px"></i>Huduma</a>
       <a href="/#hali-ya-hewa"><i data-lucide="cloud-sun" style="width:18px;height:18px"></i>Hali ya Hewa</a>
@@ -441,6 +443,7 @@
           <div class="footer-links-col">
             <a href="/"><i data-lucide="chevron-right" style="width:12px;height:12px;color:var(--brand-mid)"></i>Nyumbani</a>
             <a href="/listings"><i data-lucide="chevron-right" style="width:12px;height:12px;color:var(--brand-mid)"></i>Soko</a>
+            <a href="/market-data"><i data-lucide="chevron-right" style="width:12px;height:12px;color:var(--brand-mid)"></i>Bei za Masoko</a>
             <a href="/#hali-ya-hewa"><i data-lucide="chevron-right" style="width:12px;height:12px;color:var(--brand-mid)"></i>Hali ya Hewa</a>
             <a href="/about"><i data-lucide="chevron-right" style="width:12px;height:12px;color:var(--brand-mid)"></i>Kuhusu</a>
           </div>

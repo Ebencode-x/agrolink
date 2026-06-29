@@ -233,14 +233,27 @@ class Crop(db.Model):
 
 class MarketPrice(db.Model):
     __tablename__ = "market_prices"
-    id = db.Column(db.Integer, primary_key=True)
-    crop_id = db.Column(db.Integer, db.ForeignKey("crops.id"), nullable=False)
-    region = db.Column(db.String(80), nullable=False)
-    market = db.Column(db.String(120), nullable=True)
-    price_tzs = db.Column(db.Float, nullable=False)
-    unit = db.Column(db.String(20), default="kg")
-    recorded_at = db.Column(db.DateTime, default=datetime.utcnow)
-    source = db.Column(db.String(100), nullable=True)
+    id            = db.Column(db.Integer, primary_key=True)
+    crop_name     = db.Column(db.String(100), nullable=False)
+    unit          = db.Column(db.String(30), nullable=False, default="kg")
+    price_tzs     = db.Column(db.Numeric(12, 2), nullable=False)
+    region        = db.Column(db.String(100), nullable=False, default="Kitaifa")
+    market        = db.Column(db.String(120), nullable=True)
+    source        = db.Column(db.String(50), nullable=False, default="manual")
+    recorded_at   = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    created_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+
+    def to_dict(self):
+        return {
+            "id":          self.id,
+            "crop_name":   self.crop_name,
+            "unit":        self.unit,
+            "price_tzs":   float(self.price_tzs),
+            "region":      self.region,
+            "market":      self.market or "",
+            "source":      self.source,
+            "recorded_at": self.recorded_at.strftime("%Y-%m-%d"),
+        }
 
 
 class MarketListing(db.Model):
@@ -2579,6 +2592,168 @@ def server_error(e):
 
 
 # ── Init DB & Run ─────────────────────────────────────────────────────────────
+
+# ============================================================
+# SPRINT 9 — MARKET DATA DASHBOARD
+# ============================================================
+
+MARKET_CROPS = [
+    "Mahindi","Mpunga","Viazi","Nyanya","Vitunguu","Maharage",
+    "Ndizi","Miwa","Alizeti","Pamba","Kahawa","Chai","Korosho","Karanga"
+]
+
+MARKET_REGIONS = [
+    "Kitaifa","Dar es Salaam","Mbeya","Arusha","Dodoma",
+    "Mwanza","Morogoro","Iringa","Ruvuma","Kilimanjaro"
+]
+
+@app.route("/market-data")
+def market_data():
+    crops = request.args.get("crop", "")
+    region = request.args.get("region", "")
+
+    query = MarketPrice.query
+    if crops:
+        query = query.filter(MarketPrice.crop_name == crops)
+    if region:
+        query = query.filter(MarketPrice.region == region)
+
+    prices = query.order_by(MarketPrice.recorded_at.desc()).limit(200).all()
+
+    # Latest bei kwa kila zao
+    latest = {}
+    for p in prices:
+        if p.crop_name not in latest:
+            latest[p.crop_name] = p
+
+    return render_template(
+        "market_data.html",
+        prices=prices,
+        latest=latest,
+        crops=MARKET_CROPS,
+        regions=MARKET_REGIONS,
+        selected_crop=crops,
+        selected_region=region,
+    )
+
+@app.route("/api/market-data")
+def api_market_data():
+    crop = request.args.get("crop", "")
+    region = request.args.get("region", "")
+    days = int(request.args.get("days", 30))
+
+    from datetime import timedelta
+    since = datetime.utcnow() - timedelta(days=days)
+    query = MarketPrice.query.filter(MarketPrice.recorded_at >= since)
+    if crop:
+        query = query.filter(MarketPrice.crop_name == crop)
+    if region:
+        query = query.filter(MarketPrice.region == region)
+
+    data = query.order_by(MarketPrice.recorded_at.asc()).all()
+    return jsonify({"status": "ok", "count": len(data), "data": [p.to_dict() for p in data]})
+
+@app.route("/admin/market-data")
+@login_required
+def admin_market_data():
+    if current_user.role != "admin":
+        abort(403)
+    prices = MarketPrice.query.order_by(MarketPrice.recorded_at.desc()).limit(500).all()
+    return render_template("admin_market_data.html", prices=prices,
+                           crops=MARKET_CROPS, regions=MARKET_REGIONS,
+                           now=datetime.utcnow())
+
+@app.route("/admin/market-data/add", methods=["POST"])
+@login_required
+def admin_market_data_add():
+    if current_user.role != "admin":
+        abort(403)
+    try:
+        crop_name  = request.form.get("crop_name", "").strip()
+        unit       = request.form.get("unit", "kg").strip()
+        price_tzs  = float(request.form.get("price_tzs", 0))
+        region     = request.form.get("region", "Kitaifa").strip()
+        market     = request.form.get("market", "").strip()
+        rec_date   = request.form.get("recorded_at", "")
+
+        if not crop_name or price_tzs <= 0:
+            flash("Jaza taarifa zote sahihi.", "danger")
+            return redirect(url_for("admin_market_data"))
+
+        from datetime import datetime as dt
+        recorded_at = dt.strptime(rec_date, "%Y-%m-%d") if rec_date else datetime.utcnow()
+
+        entry = MarketPrice(
+            crop_name=crop_name, unit=unit, price_tzs=price_tzs,
+            region=region, market=market or None,
+            source="manual", recorded_at=recorded_at,
+            created_by_id=current_user.id
+        )
+        db.session.add(entry)
+        db.session.commit()
+        flash(f"Bei ya {crop_name} imeongezwa.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Hitilafu: {e}", "danger")
+    return redirect(url_for("admin_market_data"))
+
+@app.route("/admin/market-data/delete/<int:entry_id>", methods=["POST"])
+@login_required
+def admin_market_data_delete(entry_id):
+    if current_user.role != "admin":
+        abort(403)
+    entry = MarketPrice.query.get_or_404(entry_id)
+    db.session.delete(entry)
+    db.session.commit()
+    flash("Rekodi imefutwa.", "success")
+    return redirect(url_for("admin_market_data"))
+
+@app.route("/admin/market-data/import-csv", methods=["POST"])
+@login_required
+def admin_market_data_import_csv():
+    if current_user.role != "admin":
+        abort(403)
+    f = request.files.get("csv_file")
+    if not f:
+        flash("Chagua faili la CSV.", "danger")
+        return redirect(url_for("admin_market_data"))
+    try:
+        import csv, io
+        stream = io.StringIO(f.stream.read().decode("utf-8"))
+        reader = csv.DictReader(stream)
+        count = 0
+        for row in reader:
+            try:
+                price = float(row.get("price_tzs", 0))
+                if not row.get("crop_name") or price <= 0:
+                    continue
+                from datetime import datetime as dt
+                rec = row.get("recorded_at", "")
+                recorded_at = dt.strptime(rec, "%Y-%m-%d") if rec else datetime.utcnow()
+                entry = MarketPrice(
+                    crop_name=row["crop_name"].strip(),
+                    unit=row.get("unit", "kg").strip(),
+                    price_tzs=price,
+                    region=row.get("region", "Kitaifa").strip(),
+                    market=row.get("market", "").strip() or None,
+                    source="csv_import",
+                    recorded_at=recorded_at,
+                    created_by_id=current_user.id
+                )
+                db.session.add(entry)
+                count += 1
+            except Exception:
+                continue
+        db.session.commit()
+        flash(f"Rekodi {count} zimeingizwa kutoka CSV.", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Hitilafu ya CSV: {e}", "danger")
+    return redirect(url_for("admin_market_data"))
+
+# ============================================================
+# END SPRINT 9
+# ============================================================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

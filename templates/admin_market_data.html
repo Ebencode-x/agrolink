@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}Usimamizi wa Bei — Admin{% endblock %}
+{% block content %}
+<style>
+*{box-sizing:border-box;}
+:root{--brand-dark:#1C3D2A;--brand-mid:#2E6B47;--accent:#E8B84B;--gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;--gray-400:#9CA3AF;--gray-600:#4B5563;--gray-900:#111827;}
+
+.adm-header{background:var(--brand-dark);padding:32px 0;}
+.adm-header-inner{max-width:1100px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.adm-header h1{font-size:1.25rem;font-weight:700;color:#fff;margin:0;}
+.adm-header p{font-size:.8rem;color:rgba(255,255,255,.55);margin:4px 0 0;}
+.adm-back{font-size:.8rem;color:rgba(255,255,255,.6);text-decoration:none;border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:6px;}
+.adm-back:hover{background:rgba(255,255,255,.08);}
+
+.adm-body{max-width:1100px;margin:0 auto;padding:32px 24px;}
+.adm-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;}
+@media(max-width:720px){.adm-grid{grid-template-columns:1fr;}}
+
+.adm-card{background:#fff;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;}
+.adm-card-head{padding:16px 20px;border-bottom:1px solid var(--gray-200);background:var(--gray-50);}
+.adm-card-head h2{font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;margin:0;}
+.adm-card-body{padding:20px;}
+
+.adm-field{margin-bottom:14px;}
+.adm-field label{display:block;font-size:.75rem;font-weight:600;color:var(--gray-600);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.adm-field input,.adm-field select{width:100%;height:38px;padding:0 12px;border:1px solid var(--gray-200);border-radius:6px;font-size:.875rem;color:var(--gray-900);background:#fff;outline:none;}
+.adm-field input:focus,.adm-field select:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(46,107,71,.08);}
+.adm-field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+.adm-btn{height:38px;padding:0 20px;border:none;border-radius:6px;font-size:.875rem;font-weight:600;cursor:pointer;}
+.adm-btn-primary{background:var(--brand-mid);color:#fff;}
+.adm-btn-primary:hover{background:var(--brand-dark);}
+.adm-btn-danger{background:#fff;color:#DC2626;border:1px solid #FCA5A5;font-size:.75rem;height:30px;padding:0 10px;}
+.adm-btn-danger:hover{background:#FEF2F2;}
+
+.adm-csv-zone{border:1px dashed var(--gray-200);border-radius:8px;padding:20px;text-align:center;background:var(--gray-50);}
+.adm-csv-zone label{font-size:.8rem;color:var(--gray-600);cursor:pointer;display:block;}
+.adm-csv-zone input[type=file]{margin:10px auto 0;display:block;font-size:.8rem;}
+.adm-csv-hint{font-size:.72rem;color:var(--gray-400);margin-top:8px;}
+.adm-csv-hint code{background:var(--gray-100);padding:1px 5px;border-radius:3px;font-size:.7rem;}
+
+.adm-table-card{background:#fff;border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;}
+.adm-table-head{padding:14px 20px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;}
+.adm-table-head span{font-size:.8rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;}
+.adm-table-head small{font-size:.75rem;color:var(--gray-400);}
+.adm-table{width:100%;border-collapse:collapse;font-size:.84rem;}
+.adm-table thead th{padding:10px 14px;text-align:left;font-size:.7rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;background:var(--gray-50);border-bottom:1px solid var(--gray-200);}
+.adm-table tbody td{padding:11px 14px;border-bottom:1px solid var(--gray-100);color:var(--gray-900);}
+.adm-table tbody tr:last-child td{border-bottom:none;}
+.adm-table tbody tr:hover td{background:var(--gray-50);}
+.adm-num{font-variant-numeric:tabular-nums;font-weight:600;}
+.adm-tag{display:inline-block;padding:2px 7px;border-radius:4px;font-size:.68rem;font-weight:600;background:var(--gray-100);color:var(--gray-600);}
+.adm-empty{text-align:center;padding:48px 20px;color:var(--gray-400);font-size:.875rem;}
+
+.flash-msg{padding:12px 20px;border-radius:8px;font-size:.875rem;margin-bottom:20px;}
+.flash-success{background:#ECFDF5;color:#065F46;border:1px solid #A7F3D0;}
+.flash-danger{background:#FEF2F2;color:#991B1B;border:1px solid #FCA5A5;}
+</style>
+
+<div class="adm-header">
+  <div class="adm-header-inner">
+    <div>
+      <h1>Usimamizi wa Bei za Masoko</h1>
+      <p>Ongeza, ingiza, au futa rekodi za bei</p>
+    </div>
+    <a class="adm-back" href="/admin">Rudi Admin</a>
+  </div>
+</div>
+
+<div class="adm-body">
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash-msg flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="adm-grid">
+
+    <!-- Fomu ya Kuongeza Bei -->
+    <div class="adm-card">
+      <div class="adm-card-head"><h2>Ongeza Bei Moja kwa Moja</h2></div>
+      <div class="adm-card-body">
+        <form method="post" action="/admin/market-data/add">
+          <div class="adm-field">
+            <label>Zao</label>
+            <select name="crop_name" required>
+              <option value="">Chagua zao</option>
+              {% for c in crops %}
+              <option value="{{ c }}">{{ c }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="adm-field-row">
+            <div class="adm-field">
+              <label>Bei (TZS)</label>
+              <input type="number" name="price_tzs" min="1" step="0.01" placeholder="0" required>
+            </div>
+            <div class="adm-field">
+              <label>Kiasi</label>
+              <select name="unit">
+                <option value="kg">kg</option>
+                <option value="debe">debe</option>
+                <option value="gunia">gunia</option>
+                <option value="tani">tani</option>
+                <option value="100kg">100kg</option>
+              </select>
+            </div>
+          </div>
+          <div class="adm-field">
+            <label>Mkoa</label>
+            <select name="region">
+              {% for r in regions %}
+              <option value="{{ r }}">{{ r }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="adm-field">
+            <label>Soko (hiari)</label>
+            <input type="text" name="market" placeholder="mfano: Soko la Kariakoo">
+          </div>
+          <div class="adm-field">
+            <label>Tarehe ya Bei</label>
+            <input type="date" name="recorded_at" value="{{ now.strftime('%Y-%m-%d') if now else '' }}">
+          </div>
+          <button class="adm-btn adm-btn-primary" type="submit">Hifadhi Bei</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- CSV Import -->
+    <div class="adm-card">
+      <div class="adm-card-head"><h2>Ingiza Kwa CSV</h2></div>
+      <div class="adm-card-body">
+        <form method="post" action="/admin/market-data/import-csv" enctype="multipart/form-data">
+          <div class="adm-csv-zone">
+            <label for="csv_file">Chagua faili la CSV kupakia</label>
+            <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+          </div>
+          <div class="adm-csv-hint" style="margin-top:14px;">
+            <strong>Muundo wa CSV unaohitajika:</strong><br><br>
+            <code>crop_name, price_tzs, unit, region, market, recorded_at</code><br><br>
+            Safu ya kwanza lazima iwe vichwa. Mfano wa mstari:<br><br>
+            <code>Mahindi, 850, kg, Mbeya, Soko Kuu, 2026-06-29</code><br><br>
+            Rekodi zenye bei ya sifuri au zao tupu zitarukiwa.
+          </div>
+          <br>
+          <button class="adm-btn adm-btn-primary" type="submit">Pakia CSV</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Jedwali la Rekodi -->
+  <div class="adm-table-card">
+    <div class="adm-table-head">
+      <span>Rekodi Zote</span>
+      <small>{{ prices|length }} rekodi</small>
+    </div>
+    {% if prices %}
+    <div style="overflow-x:auto;">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Zao</th>
+            <th>Bei (TZS)</th>
+            <th>Kiasi</th>
+            <th>Mkoa</th>
+            <th>Soko</th>
+            <th>Chanzo</th>
+            <th>Tarehe</th>
+            <th>Hatua</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in prices %}
+          <tr>
+            <td style="color:var(--gray-400);">{{ p.id }}</td>
+            <td><strong>{{ p.crop_name }}</strong></td>
+            <td class="adm-num">{{ "{:,.0f}".format(p.price_tzs) }}</td>
+            <td>{{ p.unit }}</td>
+            <td>{{ p.region }}</td>
+            <td>{{ p.market or "&mdash;" }}</td>
+            <td><span class="adm-tag">{{ p.source }}</span></td>
+            <td>{{ p.recorded_at.strftime("%d %b %Y") }}</td>
+            <td>
+              <form method="post" action="/admin/market-data/delete/{{ p.id }}"
+                    onsubmit="return confirm('Futa rekodi hii?')">
+                <button class="adm-btn adm-btn-danger" type="submit">Futa</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="adm-empty">Hakuna rekodi bado. Ongeza bei ya kwanza hapo juu.</div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
