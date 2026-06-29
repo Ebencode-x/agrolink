@@ -228,7 +228,6 @@ class Crop(db.Model):
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    market_prices = db.relationship("MarketPrice", backref="crop", lazy=True)
 
 
 class MarketPrice(db.Model):
