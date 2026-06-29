@@ -182,7 +182,7 @@
             <td class="adm-num">{{ "{:,.0f}".format(p.price_tzs) }}</td>
             <td>{{ p.unit }}</td>
             <td>{{ p.region }}</td>
-            <td>{{ p.market or "&mdash;" }}</td>
+            <td>{{ p.market or "—" }}</td>
             <td><span class="adm-tag">{{ p.source }}</span></td>
             <td>{{ p.recorded_at.strftime("%d %b %Y") }}</td>
             <td>

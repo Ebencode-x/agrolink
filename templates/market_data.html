@@ -142,7 +142,7 @@ canvas{max-height:280px;}
             <td class="md-num">{{ "{:,.0f}".format(p.price_tzs) }}</td>
             <td>{{ p.unit }}</td>
             <td>{{ p.region }}</td>
-            <td>{{ p.market or "&mdash;" }}</td>
+            <td>{{ p.market or "—" }}</td>
             <td><span class="md-tag">{{ p.source }}</span></td>
             <td>{{ p.recorded_at.strftime("%d %b %Y") }}</td>
           </tr>
