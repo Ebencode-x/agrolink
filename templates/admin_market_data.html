@@ -152,6 +152,48 @@
 
   </div>
 
+  <!-- Pending Approvals -->
+  {% if pending %}
+  <div class="adm-table-card" style="margin-bottom:24px;border-color:#FCD34D;">
+    <div class="adm-table-head" style="background:#FFFBEB;">
+      <span style="color:#92400E;">Zinasubiri Idhini</span>
+      <small style="color:#92400E;">{{ pending|length }} zinasubiri</small>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="adm-table">
+        <thead>
+          <tr>
+            <th>Zao</th><th>Bei (TZS)</th><th>Kiasi</th><th>Mkoa</th><th>Soko</th><th>Tarehe</th><th>Mtumiaji</th><th>Hatua</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pending %}
+          <tr>
+            <td><strong>{{ p.crop_name }}</strong></td>
+            <td class="adm-num">{{ "{:,.0f}".format(p.price_tzs) }}</td>
+            <td>{{ p.unit }}</td>
+            <td>{{ p.region }}</td>
+            <td>{{ p.market or "—" }}</td>
+            <td>{{ p.recorded_at.strftime("%d %b %Y") }}</td>
+            <td style="font-size:.75rem;color:var(--gray-400);">
+              {% if p.submitted_by_id %}#{{ p.submitted_by_id }}{% else %}Admin{% endif %}
+            </td>
+            <td style="display:flex;gap:6px;">
+              <form method="post" action="/admin/market-data/approve/{{ p.id }}">
+                <button class="adm-btn" style="height:30px;padding:0 12px;background:var(--brand-mid);color:#fff;font-size:.75rem;" type="submit">Idhinisha</button>
+              </form>
+              <form method="post" action="/admin/market-data/reject/{{ p.id }}">
+                <button class="adm-btn adm-btn-danger" type="submit">Kataa</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Jedwali la Rekodi -->
   <div class="adm-table-card">
     <div class="adm-table-head">

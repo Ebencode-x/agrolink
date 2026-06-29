@@ -240,7 +240,9 @@ class MarketPrice(db.Model):
     market        = db.Column(db.String(120), nullable=True)
     source        = db.Column(db.String(50), nullable=False, default="manual")
     recorded_at   = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    created_by_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_by_id  = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    submitted_by_id= db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    status         = db.Column(db.String(20), nullable=False, default="approved")
 
     def to_dict(self):
         return {
@@ -2611,7 +2613,7 @@ def market_data():
     crops = request.args.get("crop", "")
     region = request.args.get("region", "")
 
-    query = MarketPrice.query
+    query = MarketPrice.query.filter_by(status="approved")
     if crops:
         query = query.filter(MarketPrice.crop_name == crops)
     if region:
@@ -2657,8 +2659,11 @@ def api_market_data():
 def admin_market_data():
     if current_user.role != "admin":
         abort(403)
-    prices = MarketPrice.query.order_by(MarketPrice.recorded_at.desc()).limit(500).all()
+    prices    = MarketPrice.query.filter_by(status="approved").order_by(MarketPrice.recorded_at.desc()).limit(500).all()
+    pending   = MarketPrice.query.filter_by(status="pending").order_by(MarketPrice.recorded_at.desc()).all()
+    rejected  = MarketPrice.query.filter_by(status="rejected").order_by(MarketPrice.recorded_at.desc()).limit(50).all()
     return render_template("admin_market_data.html", prices=prices,
+                           pending=pending, rejected=rejected,
                            crops=MARKET_CROPS, regions=MARKET_REGIONS,
                            now=datetime.utcnow())
 
@@ -2748,6 +2753,68 @@ def admin_market_data_import_csv():
     except Exception as e:
         db.session.rollback()
         flash(f"Hitilafu ya CSV: {e}", "danger")
+    return redirect(url_for("admin_market_data"))
+
+
+@app.route("/market-data/submit", methods=["GET", "POST"])
+@login_required
+def market_data_submit():
+    if request.method == "POST":
+        try:
+            crop_name = request.form.get("crop_name", "").strip()
+            unit      = request.form.get("unit", "kg").strip()
+            price_tzs = float(request.form.get("price_tzs", 0))
+            region    = request.form.get("region", "").strip()
+            market    = request.form.get("market", "").strip()
+            rec_date  = request.form.get("recorded_at", "")
+
+            if not crop_name or price_tzs <= 0 or not region:
+                flash("Jaza taarifa zote sahihi — zao, bei, na mkoa.", "danger")
+                return redirect(url_for("market_data_submit"))
+
+            from datetime import datetime as dt
+            recorded_at = dt.strptime(rec_date, "%Y-%m-%d") if rec_date else datetime.utcnow()
+
+            entry = MarketPrice(
+                crop_name=crop_name, unit=unit, price_tzs=price_tzs,
+                region=region, market=market or None,
+                source="crowdsource", recorded_at=recorded_at,
+                submitted_by_id=current_user.id,
+                created_by_id=None,
+                status="pending"
+            )
+            db.session.add(entry)
+            db.session.commit()
+            flash("Asante! Bei yako imepokelewa na itakaguliwa na timu yetu.", "success")
+            return redirect(url_for("market_data"))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Hitilafu: {e}", "danger")
+
+    return render_template("market_data_submit.html",
+                           crops=MARKET_CROPS, regions=MARKET_REGIONS,
+                           now=datetime.utcnow())
+
+@app.route("/admin/market-data/approve/<int:entry_id>", methods=["POST"])
+@login_required
+def admin_market_data_approve(entry_id):
+    if current_user.role != "admin":
+        abort(403)
+    entry = MarketPrice.query.get_or_404(entry_id)
+    entry.status = "approved"
+    db.session.commit()
+    flash(f"Bei ya {entry.crop_name} imeidhinishwa.", "success")
+    return redirect(url_for("admin_market_data"))
+
+@app.route("/admin/market-data/reject/<int:entry_id>", methods=["POST"])
+@login_required
+def admin_market_data_reject(entry_id):
+    if current_user.role != "admin":
+        abort(403)
+    entry = MarketPrice.query.get_or_404(entry_id)
+    entry.status = "rejected"
+    db.session.commit()
+    flash(f"Bei ya {entry.crop_name} imekataliwa.", "warning")
     return redirect(url_for("admin_market_data"))
 
 # ============================================================
