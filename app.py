@@ -2890,7 +2890,6 @@ def admin_debug_hdx_csv():
             break
 
     # Pata data ya hivi karibuni - tunakimbia kupitia rows zote tukitafuta tarehe za hivi karibuni
-    f.seek(0) if hasattr(f, "seek") else None
     reader2 = csvmod.DictReader(lines)
     next(reader2, None)  # ruka HXL row
     all_dates = []
