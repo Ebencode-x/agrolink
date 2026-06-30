@@ -2889,11 +2889,30 @@ def admin_debug_hdx_csv():
         if i > 300:
             break
 
+    # Pata data ya hivi karibuni - tunakimbia kupitia rows zote tukitafuta tarehe za hivi karibuni
+    f.seek(0) if hasattr(f, "seek") else None
+    reader2 = csvmod.DictReader(lines)
+    next(reader2, None)  # ruka HXL row
+    all_dates = []
+    recent_commodities = set()
+    count_rows = 0
+    for row in reader2:
+        count_rows += 1
+        d = row.get("date", "")
+        if d:
+            all_dates.append(d)
+        if d >= "2026-01-01":
+            recent_commodities.add(row.get("commodity", ""))
+
     result = {
         "headers": headers_list,
         "row0_sample": dict(row0),
         "commodities_sample": sorted(commodities)[:40],
         "regions_sample": sorted(admin1s)[:20],
+        "total_rows": count_rows,
+        "max_date": max(all_dates) if all_dates else None,
+        "min_date": min(all_dates) if all_dates else None,
+        "recent_2026_commodities": sorted(recent_commodities),
     }
     return jsonify(result)
 
