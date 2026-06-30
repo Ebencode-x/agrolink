@@ -177,13 +177,6 @@ def run_import():
             if price_val <= 0:
                 continue
 
-            if currency == "USD":
-                price_tzs = (price_val * usd_to_tzs) / unit_multiplier
-            elif currency == "TZS":
-                price_tzs = price_val / unit_multiplier
-            else:
-                continue
-
             unit_clean = unit_raw.strip()
             unit_multiplier = 1.0
             if "100 kg" in unit_clean or "100kg" in unit_clean:
@@ -193,6 +186,13 @@ def run_import():
                 unit = "kg"
             else:
                 unit = unit_clean[:30] or "kg"
+
+            if currency == "USD":
+                price_tzs = (price_val * usd_to_tzs) / unit_multiplier
+            elif currency == "TZS":
+                price_tzs = price_val / unit_multiplier
+            else:
+                continue
 
             exists = MarketPrice.query.filter_by(
                 crop_name=crop_name, region=region,
