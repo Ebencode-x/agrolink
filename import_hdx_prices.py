@@ -26,26 +26,37 @@ EXCHANGE_RATE_API = "https://api.exchangerate-api.com/v4/latest/USD"
 CROP_MAP = {
     "maize": "Mahindi",
     "maize (white)": "Mahindi",
+    "maize (yellow)": "Mahindi",
     "rice": "Mpunga",
     "rice (imported)": "Mpunga",
+    "rice (local)": "Mpunga",
     "beans": "Maharage",
     "beans (dry)": "Maharage",
+    "beans (yellow)": "Maharage",
     "potatoes (irish)": "Viazi",
     "potatoes": "Viazi",
     "tomatoes": "Nyanya",
     "onions": "Vitunguu",
+    "onions (red)": "Vitunguu",
     "bananas": "Ndizi",
     "sugar": "Miwa",
-    "sunflower oil": "Alizeti",
+    "sugar (brown)": "Miwa",
+    "oil (sunflower)": "Alizeti",
+    "oil (vegetable)": "Alizeti",
     "cotton": "Pamba",
     "coffee": "Kahawa",
     "tea": "Chai",
     "cashew nuts": "Korosho",
     "groundnuts": "Karanga",
     "groundnuts (shelled)": "Karanga",
+    "wheat": "Ngano",
+    "sorghum": "Mtama",
+    "millet": "Ulezi",
+    "cassava": "Muhogo",
 }
 
 REGION_MAP = {
+    "dar-es-salaam": "Dar es Salaam",
     "dar es salaam": "Dar es Salaam",
     "mbeya": "Mbeya",
     "arusha": "Arusha",
@@ -55,6 +66,17 @@ REGION_MAP = {
     "iringa": "Iringa",
     "ruvuma": "Ruvuma",
     "kilimanjaro": "Kilimanjaro",
+    "kagera": "Kitaifa",
+    "kigoma": "Kitaifa",
+    "lindi": "Kitaifa",
+    "manyara": "Kitaifa",
+    "mara": "Kitaifa",
+    "mtwara": "Kitaifa",
+    "rukwa": "Kitaifa",
+    "shinyanga": "Kitaifa",
+    "singida": "Kitaifa",
+    "tabora": "Kitaifa",
+    "tanga": "Kitaifa",
 }
 
 
@@ -154,13 +176,21 @@ def run_import():
                 continue
 
             if currency == "USD":
-                price_tzs = price_val * usd_to_tzs
+                price_tzs = (price_val * usd_to_tzs) / unit_multiplier
             elif currency == "TZS":
-                price_tzs = price_val
+                price_tzs = price_val / unit_multiplier
             else:
                 continue
 
-            unit = "kg" if "kg" in unit_raw else unit_raw[:30]
+            unit_clean = unit_raw.strip()
+            unit_multiplier = 1.0
+            if "100 kg" in unit_clean or "100kg" in unit_clean:
+                unit_multiplier = 100.0
+                unit = "kg"
+            elif "kg" in unit_clean:
+                unit = "kg"
+            else:
+                unit = unit_clean[:30] or "kg"
 
             exists = MarketPrice.query.filter_by(
                 crop_name=crop_name, region=region,
