@@ -2827,17 +2827,20 @@ def admin_run_hdx_import():
         import import_hdx_prices
         import io
         import contextlib
+        import traceback
 
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             import_hdx_prices.run_import()
         output = buf.getvalue()
-        flash(f"HDX import imekamilika. Angalia logs za Render kwa maelezo.", "success")
+        last_line = output.strip().splitlines()[-1] if output.strip() else "Hakuna output"
+        flash(f"HDX import: {last_line}", "success")
         app.logger.info(f"HDX IMPORT OUTPUT:\n{output}")
     except Exception as e:
         db.session.rollback()
-        flash(f"HDX import imeshindwa: {e}", "danger")
-        app.logger.error(f"HDX import error: {e}")
+        tb = traceback.format_exc()
+        flash(f"HDX import imeshindwa: {type(e).__name__}: {e}", "danger")
+        app.logger.error(f"HDX import error:\n{tb}")
     return redirect(url_for("admin_market_data"))
 
 # ============================================================
