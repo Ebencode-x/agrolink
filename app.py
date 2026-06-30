@@ -2833,8 +2833,9 @@ def admin_run_hdx_import():
         with contextlib.redirect_stdout(buf):
             import_hdx_prices.run_import()
         output = buf.getvalue()
-        last_line = output.strip().splitlines()[-1] if output.strip() else "Hakuna output"
-        flash(f"HDX import: {last_line}", "success")
+        summary_lines = [l for l in output.strip().splitlines() if l.startswith(("CSV URL", "USD", "Imeingizwa", "Imerukwa"))]
+        summary = " | ".join(summary_lines) if summary_lines else "Hakuna summary — angalia output kamili"
+        flash(f"HDX: {summary}", "success")
         app.logger.info(f"HDX IMPORT OUTPUT:\n{output}")
     except Exception as e:
         db.session.rollback()
