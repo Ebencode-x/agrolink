@@ -2817,6 +2817,29 @@ def admin_market_data_reject(entry_id):
     flash(f"Bei ya {entry.crop_name} imekataliwa.", "warning")
     return redirect(url_for("admin_market_data"))
 
+
+@app.route("/admin/market-data/run-hdx-import", methods=["POST"])
+@login_required
+def admin_run_hdx_import():
+    if current_user.role != "admin":
+        abort(403)
+    try:
+        import import_hdx_prices
+        import io
+        import contextlib
+
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            import_hdx_prices.run_import()
+        output = buf.getvalue()
+        flash(f"HDX import imekamilika. Angalia logs za Render kwa maelezo.", "success")
+        app.logger.info(f"HDX IMPORT OUTPUT:\n{output}")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"HDX import imeshindwa: {e}", "danger")
+        app.logger.error(f"HDX import error: {e}")
+    return redirect(url_for("admin_market_data"))
+
 # ============================================================
 # END SPRINT 9
 # ============================================================

@@ -63,7 +63,12 @@
       <h1>Usimamizi wa Bei za Masoko</h1>
       <p>Ongeza, ingiza, au futa rekodi za bei</p>
     </div>
-    <a class="adm-back" href="/admin">Rudi Admin</a>
+    <div style="display:flex;gap:10px;">
+      <form method="post" action="/admin/market-data/run-hdx-import" onsubmit="return confirm('Kuendesha HDX import sasa? Hii itachukua sekunde 10-30.')">
+        <button type="submit" style="height:34px;padding:0 16px;background:var(--brand-mid);color:#fff;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;">Run HDX Import</button>
+      </form>
+      <a class="adm-back" href="/admin">Rudi Admin</a>
+    </div>
   </div>
 </div>
 
