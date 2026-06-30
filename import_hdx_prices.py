@@ -52,6 +52,8 @@ CROP_MAP = {
     "wheat": "Ngano",
     "sorghum": "Mtama",
     "millet": "Ulezi",
+    "millet (bulrush)": "Ulezi",
+    "millet (finger)": "Ulezi",
     "cassava": "Muhogo",
 }
 
@@ -137,7 +139,7 @@ def run_import():
     skipped_crop = 0
     skipped_duplicate = 0
 
-    cutoff_date = datetime.utcnow() - timedelta(days=60)
+    cutoff_date = datetime.utcnow() - timedelta(days=200)
 
     with app.app_context():
         for i, row in enumerate(reader):
