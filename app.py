@@ -2844,6 +2844,59 @@ def admin_run_hdx_import():
         app.logger.error(f"HDX import error:\n{tb}")
     return redirect(url_for("admin_market_data"))
 
+
+@app.route("/admin/market-data/debug-hdx-csv")
+@login_required
+def admin_debug_hdx_csv():
+    if current_user.role != "admin":
+        abort(403)
+    import urllib.request, json, csv as csvmod
+
+    req = urllib.request.Request(
+        "https://data.humdata.org/api/3/action/package_show?id=wfp-food-prices-for-united-republic-of-tanzania",
+        headers={"User-Agent": "AgroLink-Tanzania/1.0"}
+    )
+    with urllib.request.urlopen(req, timeout=30) as res:
+        data = json.loads(res.read().decode())
+
+    csv_url = None
+    for r in data["result"]["resources"]:
+        if r.get("format", "").upper() == "CSV" and "qc" not in r.get("name", "").lower():
+            csv_url = r["url"]
+            break
+
+    req2 = urllib.request.Request(csv_url, headers={"User-Agent": "AgroLink-Tanzania/1.0"})
+    chunks = []
+    with urllib.request.urlopen(req2, timeout=60) as res2:
+        while True:
+            chunk = res2.read(65536)
+            if not chunk:
+                break
+            chunks.append(chunk)
+    raw = b"".join(chunks).decode("utf-8", errors="ignore")
+
+    lines = raw.splitlines()
+    reader = csvmod.DictReader(lines)
+
+    headers_list = reader.fieldnames
+    row0 = next(reader, {})
+
+    commodities = set()
+    admin1s = set()
+    for i, row in enumerate(reader):
+        commodities.add(row.get("commodity", ""))
+        admin1s.add(row.get("admin1", ""))
+        if i > 300:
+            break
+
+    result = {
+        "headers": headers_list,
+        "row0_sample": dict(row0),
+        "commodities_sample": sorted(commodities)[:40],
+        "regions_sample": sorted(admin1s)[:20],
+    }
+    return jsonify(result)
+
 # ============================================================
 # END SPRINT 9
 # ============================================================
