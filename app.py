@@ -2848,6 +2848,8 @@ def admin_run_hdx_import():
 @app.route("/admin/market-data/debug-hdx-csv")
 @login_required
 def admin_debug_hdx_csv():
+    if not os.environ.get("DEBUG_ROUTES_ENABLED"):
+        abort(404)
     if current_user.role != "admin":
         abort(403)
     import urllib.request, json, csv as csvmod
