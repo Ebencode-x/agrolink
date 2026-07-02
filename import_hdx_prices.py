@@ -152,6 +152,7 @@ def run_import():
             price_raw = (row.get("price") or row.get("usdprice") or "").strip()
             currency = (row.get("currency") or "").strip().upper()
             unit_raw = (row.get("unit") or "kg").strip().lower()
+            pricetype_raw = (row.get("pricetype") or "").strip()
 
             crop_name = CROP_MAP.get(commodity_raw)
             if not crop_name:
@@ -207,7 +208,7 @@ def run_import():
                 unit=unit,
                 price_tzs=round(price_tzs, 2),
                 region=region,
-                market=None,
+                market=pricetype_raw if pricetype_raw else None,
                 source="hdx_wfp",
                 recorded_at=recorded_at,
                 created_by_id=None,
