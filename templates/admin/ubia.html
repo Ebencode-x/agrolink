@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Ushirikiano — AgroLink Admin{% endblock %}
+{% block content %}
+<div class="page-wrapper" style="background:var(--bg-subtle);min-height:100vh;padding:2rem clamp(1rem,4vw,2rem);">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--brand-dark);">Maombi ya Ushirikiano</h1>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2px;">
+        {% if pending_count > 0 %}{{ pending_count }} maombi yanasubiri kupitiwa{% else %}Hakuna ombi jipya linalosubiri{% endif %}
+      </p>
+    </div>
+    <a href="/admin" style="display:inline-flex;align-items:center;gap:6px;background:var(--brand-dark);color:var(--text-on-dark);padding:0.5rem 1.1rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.82rem;text-decoration:none;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Rudi Admin
+    </a>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div style="padding:0.7rem 1rem;border-radius:var(--radius-sm);font-size:0.85rem;margin-bottom:1rem;{% if cat == 'success' %}background:#d1fae5;color:#065f46;{% else %}background:#fef2f2;color:#991b1b;{% endif %}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <!-- Status Filter Tabs -->
+  <div style="display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap;">
+    {% for s, label in [("all","Zote"),("pending","Zinazosubiri"),("reviewing","Zinapopitiwa"),("contacted","Zimewasiliana"),("approved","Zimekubaliwa"),("declined","Zimekataliwa")] %}
+    <a href="{{ url_for('admin_ubia', status=s) }}" style="padding:0.4rem 0.9rem;border-radius:20px;font-family:var(--font-display);font-weight:600;font-size:0.78rem;text-decoration:none;
+      {% if status_filter == s %}background:var(--brand-dark);color:#fff;{% else %}background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border-subtle);{% endif %}">
+      {{ label }}
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if partnerships %}
+  <div style="display:flex;flex-direction:column;gap:1rem;">
+    {% for p in partnerships %}
+    <div style="background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-subtle);padding:1.3rem 1.4rem;">
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--brand-dark);margin:0 0 3px;">{{ p.organization_name }}</h2>
+          <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">
+            {{ p.organization_type|capitalize }} ·
+            {% if p.interest_type == "institutional" %}Kitaasisi{% elif p.interest_type == "commercial" %}Kibiashara{% else %}Zote Mbili{% endif %}
+            · {{ p.created_at.strftime("%d %b %Y") }}
+          </p>
+        </div>
+        <span style="padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;font-family:var(--font-display);
+          {% if p.status == 'pending' %}background:#fef3c7;color:#92400e;
+          {% elif p.status == 'reviewing' %}background:#dbeafe;color:#1e40af;
+          {% elif p.status == 'contacted' %}background:#e0e7ff;color:#3730a3;
+          {% elif p.status == 'approved' %}background:#d1fae5;color:#065f46;
+          {% else %}background:#fee2e2;color:#991b1b;{% endif %}">
+          {% if p.status == 'pending' %}Inasubiri{% elif p.status == 'reviewing' %}Inapitiwa{% elif p.status == 'contacted' %}Imewasiliana{% elif p.status == 'approved' %}Imekubaliwa{% else %}Imekataliwa{% endif %}
+        </span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;font-size:0.83rem;">
+        <div><span style="color:var(--text-muted);">Mtu wa Mawasiliano:</span> <strong style="color:var(--text-main);">{{ p.contact_name }}</strong></div>
+        <div><span style="color:var(--text-muted);">Barua Pepe:</span> <a href="mailto:{{ p.contact_email }}" style="color:var(--brand-mid);">{{ p.contact_email }}</a></div>
+        {% if p.contact_phone %}<div><span style="color:var(--text-muted);">Simu:</span> {{ p.contact_phone }}</div>{% endif %}
+        {% if p.website %}<div><span style="color:var(--text-muted);">Tovuti:</span> <a href="{{ p.website }}" target="_blank" style="color:var(--brand-mid);">{{ p.website }}</a></div>{% endif %}
+      </div>
+
+      <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:0.8rem 1rem;font-size:0.83rem;color:var(--text-main);line-height:1.6;margin-bottom:14px;">
+        {{ p.message }}
+      </div>
+
+      {% if p.admin_notes %}
+      <div style="border-left:3px solid var(--accent);padding:0.6rem 0.9rem;font-size:0.8rem;color:var(--text-muted);margin-bottom:14px;font-style:italic;">
+        Kumbukumbu: {{ p.admin_notes }}
+      </div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('admin_ubia_update_status', partnership_id=p.id) }}" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;border-top:1px solid var(--border-subtle);padding-top:14px;">
+        <div style="flex:1;min-width:140px;">
+          <label style="display:block;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Badili Hali</label>
+          <select name="status" style="width:100%;height:36px;border-radius:6px;border:1px solid var(--border-subtle);padding:0 10px;font-size:0.82rem;">
+            {% for s, label in [("pending","Inasubiri"),("reviewing","Inapitiwa"),("contacted","Imewasiliana"),("approved","Imekubaliwa"),("declined","Imekataliwa")] %}
+            <option value="{{ s }}" {% if p.status == s %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div style="flex:2;min-width:200px;">
+          <label style="display:block;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Kumbukumbu ya Ndani</label>
+          <input type="text" name="admin_notes" placeholder="mfano: Nimeongea nao kwa simu..." style="width:100%;height:36px;border-radius:6px;border:1px solid var(--border-subtle);padding:0 10px;font-size:0.82rem;">
+        </div>
+        <button type="submit" style="height:36px;padding:0 18px;background:var(--brand-mid);color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-weight:700;font-size:0.8rem;cursor:pointer;">Sasisha</button>
+      </form>
+
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-subtle);padding:3rem;text-align:center;color:var(--text-muted);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 1rem;display:block;opacity:0.3;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    <p style="font-family:var(--font-display);font-weight:600;">Hakuna maombi bado</p>
+    <p style="font-size:0.83rem;margin-top:4px;">Maombi ya ushirikiano yataonekana hapa</p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
