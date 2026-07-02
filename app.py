@@ -504,6 +504,25 @@ class EscrowFee(db.Model):
         self.fee_amount = fee
         return fee
 
+
+class Partnership(db.Model):
+    __tablename__ = "partnerships"
+    id                 = db.Column(db.Integer, primary_key=True)
+    organization_name  = db.Column(db.String(150), nullable=False)
+    organization_type  = db.Column(db.String(20), default="company", nullable=False)   # institution/company/ngo/government/other
+    interest_type      = db.Column(db.String(20), default="both", nullable=False)      # institutional/commercial/both
+    contact_name        = db.Column(db.String(100), nullable=False)
+    contact_email       = db.Column(db.String(150), nullable=False)
+    contact_phone       = db.Column(db.String(30), nullable=True)
+    website             = db.Column(db.String(255), nullable=True)
+    message             = db.Column(db.Text, nullable=False)
+    status              = db.Column(db.String(20), default="pending", nullable=False)  # pending/reviewing/contacted/approved/declined
+    admin_notes         = db.Column(db.Text, nullable=True)
+    reviewed_by_id      = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    created_at          = db.Column(db.DateTime, default=datetime.utcnow)
+    reviewed_at         = db.Column(db.DateTime, nullable=True)
+    reviewed_by         = db.relationship("User", foreign_keys=[reviewed_by_id], lazy=True)
+
 # ── Login Manager ─────────────────────────────────────────────────────────────
 
 
