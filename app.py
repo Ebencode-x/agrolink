@@ -4059,7 +4059,11 @@ def ubia():
 
         return redirect(url_for("ubia_thanks"))
 
-    return render_template("ubia.html")
+    farmer_count = User.query.filter_by(role="farmer").count()
+    buyer_count = User.query.filter_by(role="buyer").count()
+    listing_count = MarketListing.query.count()
+    return render_template("ubia.html",
+        farmer_count=farmer_count, buyer_count=buyer_count, listing_count=listing_count)
 
 
 @app.route("/ubia/asante")
