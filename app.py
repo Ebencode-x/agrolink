@@ -1,7 +1,7 @@
 import os
 import requests
 from functools import wraps
-from email_service import send_welcome_email
+from email_service import send_welcome_email, send_partnership_notification
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_migrate import Migrate
@@ -4002,3 +4002,104 @@ def service_worker():
     from flask import send_from_directory
     return send_from_directory(app.static_folder, "sw.js",
                                mimetype="application/javascript")
+# ─── Ushirikiano / Partnerships ────────────────────────────
+ADMIN_NOTIFY_EMAIL = os.environ.get("ADMIN_NOTIFY_EMAIL", "er.masanja01@gmail.com")
+
+@app.route("/ubia", methods=["GET", "POST"])
+def ubia():
+    if request.method == "POST":
+        # Honeypot: field hii haionekani kwa binadamu, bots wanaijaza
+        if request.form.get("website_url"):
+            return redirect(url_for("ubia_thanks"))
+
+        # Rate limit rahisi: max maombi 3 kwa saa kwa IP moja
+        ip = request.remote_addr
+        hour_ago = datetime.utcnow() - timedelta(hours=1)
+        recent_count = Partnership.query.filter(
+            Partnership.created_at >= hour_ago
+        ).count()
+        if recent_count >= 50:  # jumla ya tovuti nzima, usalama wa ziada
+            flash("Kuna maombi mengi kwa sasa. Jaribu tena baadaye.", "danger")
+            return redirect(url_for("ubia"))
+
+        org_name = (request.form.get("organization_name") or "").strip()
+        org_type = (request.form.get("organization_type") or "company").strip()
+        interest_type = (request.form.get("interest_type") or "both").strip()
+        contact_name = (request.form.get("contact_name") or "").strip()
+        contact_email = (request.form.get("contact_email") or "").strip()
+        contact_phone = (request.form.get("contact_phone") or "").strip()
+        website = (request.form.get("website") or "").strip()
+        message = (request.form.get("message") or "").strip()
+
+        if not all([org_name, contact_name, contact_email, message]):
+            flash("Tafadhali jaza sehemu zote muhimu.", "danger")
+            return redirect(url_for("ubia"))
+
+        partnership = Partnership(
+            organization_name=org_name,
+            organization_type=org_type,
+            interest_type=interest_type,
+            contact_name=contact_name,
+            contact_email=contact_email,
+            contact_phone=contact_phone or None,
+            website=website or None,
+            message=message,
+            status="pending",
+        )
+        db.session.add(partnership)
+        db.session.commit()
+
+        try:
+            send_partnership_notification(
+                ADMIN_NOTIFY_EMAIL, org_name, org_type, interest_type,
+                contact_name, contact_email, message
+            )
+        except Exception as e:
+            app.logger.error(f"Partnership notification email error: {e}")
+
+        return redirect(url_for("ubia_thanks"))
+
+    return render_template("ubia.html")
+
+
+@app.route("/ubia/asante")
+def ubia_thanks():
+    return render_template("ubia_thanks.html")
+
+
+@app.route("/admin/ubia")
+@login_required
+def admin_ubia():
+    if current_user.role != "admin":
+        abort(403)
+    status_filter = request.args.get("status", "all")
+    query = Partnership.query
+    if status_filter != "all":
+        query = query.filter_by(status=status_filter)
+    partnerships = query.order_by(Partnership.created_at.desc()).all()
+    pending_count = Partnership.query.filter_by(status="pending").count()
+    return render_template("admin/ubia.html",
+        partnerships=partnerships,
+        status_filter=status_filter,
+        pending_count=pending_count,
+    )
+
+
+@app.route("/admin/ubia/<int:partnership_id>/update-status", methods=["POST"])
+@login_required
+def admin_ubia_update_status(partnership_id):
+    if current_user.role != "admin":
+        abort(403)
+    partnership = Partnership.query.get_or_404(partnership_id)
+    new_status = request.form.get("status")
+    valid_statuses = ["pending", "reviewing", "contacted", "approved", "declined"]
+    if new_status not in valid_statuses:
+        flash("Status batili.", "danger")
+        return redirect(url_for("admin_ubia"))
+    partnership.status = new_status
+    partnership.admin_notes = request.form.get("admin_notes", "").strip() or partnership.admin_notes
+    partnership.reviewed_by_id = current_user.id
+    partnership.reviewed_at = datetime.utcnow()
+    db.session.commit()
+    flash("Hali ya ombi imesasishwa.", "success")
+    return redirect(url_for("admin_ubia"))
