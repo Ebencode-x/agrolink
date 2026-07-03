@@ -4077,14 +4077,18 @@ def admin_ubia():
     if current_user.role != "admin":
         abort(403)
     status_filter = request.args.get("status", "all")
+    search_query = request.args.get("q", "").strip()
     query = Partnership.query
     if status_filter != "all":
         query = query.filter_by(status=status_filter)
+    if search_query:
+        query = query.filter(Partnership.organization_name.ilike(f"%{search_query}%"))
     partnerships = query.order_by(Partnership.created_at.desc()).all()
     pending_count = Partnership.query.filter_by(status="pending").count()
     return render_template("admin/ubia.html",
         partnerships=partnerships,
         status_filter=status_filter,
+        search_query=search_query,
         pending_count=pending_count,
     )
 

@@ -22,10 +22,40 @@
     {% endfor %}
   {% endwith %}
 
+  <!-- Search Bar -->
+  <form method="get" action="{{ url_for('admin_ubia') }}" id="ubia-search-form" style="margin-bottom:1rem;">
+    <input type="hidden" name="status" value="{{ status_filter }}">
+    <div style="position:relative;max-width:380px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" name="q" value="{{ search_query }}" placeholder="Tafuta kwa jina la kampuni..." autocomplete="off"
+        style="width:100%;height:38px;border-radius:8px;border:1px solid var(--border-subtle);background:var(--bg-card);padding:0 36px;font-size:0.85rem;color:var(--text-main);outline:none;transition:border-color .15s;"
+        onfocus="this.style.borderColor='var(--brand-mid)'" onblur="this.style.borderColor='var(--border-subtle)'"
+        id="ubia-search-input">
+      {% if search_query %}
+      <a href="{{ url_for('admin_ubia', status=status_filter) }}" title="Futa utafutaji" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);display:flex;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </a>
+      {% endif %}
+    </div>
+  </form>
+  <script>
+  (function () {
+    var input = document.getElementById('ubia-search-input');
+    var form = document.getElementById('ubia-search-form');
+    var timer = null;
+    if (input && form) {
+      input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(function () { form.submit(); }, 500);
+      });
+    }
+  })();
+  </script>
+
   <!-- Status Filter Tabs -->
   <div style="display:flex;gap:6px;margin-bottom:1.5rem;flex-wrap:wrap;">
     {% for s, label in [("all","Zote"),("pending","Zinazosubiri"),("reviewing","Zinapopitiwa"),("contacted","Zimewasiliana"),("approved","Zimekubaliwa"),("declined","Zimekataliwa")] %}
-    <a href="{{ url_for('admin_ubia', status=s) }}" style="padding:0.4rem 0.9rem;border-radius:20px;font-family:var(--font-display);font-weight:600;font-size:0.78rem;text-decoration:none;
+    <a href="{{ url_for('admin_ubia', status=s, **({'q': search_query} if search_query else {})) }}" style="padding:0.4rem 0.9rem;border-radius:20px;font-family:var(--font-display);font-weight:600;font-size:0.78rem;text-decoration:none;
       {% if status_filter == s %}background:var(--brand-dark);color:#fff;{% else %}background:var(--bg-card);color:var(--text-muted);border:1px solid var(--border-subtle);{% endif %}">
       {{ label }}
     </a>
@@ -102,8 +132,13 @@
   {% else %}
   <div style="background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-subtle);padding:3rem;text-align:center;color:var(--text-muted);">
     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 1rem;display:block;opacity:0.3;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    {% if search_query %}
+    <p style="font-family:var(--font-display);font-weight:600;">Hakuna matokeo kwa "{{ search_query }}"</p>
+    <p style="font-size:0.83rem;margin-top:4px;">Jaribu jina lingine au futa utafutaji</p>
+    {% else %}
     <p style="font-family:var(--font-display);font-weight:600;">Hakuna maombi bado</p>
     <p style="font-size:0.83rem;margin-top:4px;">Maombi ya ushirikiano yataonekana hapa</p>
+    {% endif %}
   </div>
   {% endif %}
 
