@@ -19,3 +19,4 @@ Thumbs.db
 .pytest_cache/
 .coverage
 patch_*.py
+archive/
