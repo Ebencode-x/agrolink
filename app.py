@@ -4107,3 +4107,16 @@ def admin_ubia_update_status(partnership_id):
     db.session.commit()
     flash("Hali ya ombi imesasishwa.", "success")
     return redirect(url_for("admin_ubia"))
+
+
+@app.route("/admin/ubia/<int:partnership_id>/delete", methods=["POST"])
+@login_required
+def admin_ubia_delete(partnership_id):
+    if current_user.role != "admin":
+        abort(403)
+    partnership = Partnership.query.get_or_404(partnership_id)
+    org_name = partnership.organization_name
+    db.session.delete(partnership)
+    db.session.commit()
+    flash(f"Ombi la '{org_name}' limefutwa.", "success")
+    return redirect(url_for("admin_ubia"))
