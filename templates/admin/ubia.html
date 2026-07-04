@@ -46,7 +46,10 @@
     if (input && form) {
       input.addEventListener('input', function () {
         clearTimeout(timer);
-        timer = setTimeout(function () { form.submit(); }, 500);
+        var len = input.value.trim().length;
+        // Usisubiri search kwa herufi 1 tu — inasumbua wakati wa kuandika haraka
+        if (len === 1) { return; }
+        timer = setTimeout(function () { form.submit(); }, 700);
       });
     }
   })();
