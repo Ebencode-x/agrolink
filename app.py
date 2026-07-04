@@ -4124,3 +4124,59 @@ def admin_ubia_delete(partnership_id):
     db.session.commit()
     flash(f"Ombi la '{org_name}' limefutwa.", "success")
     return redirect(url_for("admin_ubia"))
+
+
+@app.route("/admin/ubia/bulk-action", methods=["POST"])
+@login_required
+def admin_ubia_bulk_action():
+    if current_user.role != "admin":
+        abort(403)
+
+    action = request.form.get("action", "").strip()
+    selected_ids = request.form.getlist("selected_ids")
+
+    redirect_kwargs = {}
+    current_status = request.form.get("current_status", "").strip()
+    current_q = request.form.get("current_q", "").strip()
+    if current_status:
+        redirect_kwargs["status"] = current_status
+    if current_q:
+        redirect_kwargs["q"] = current_q
+
+    if not selected_ids:
+        flash("Hakuna maombi yaliyochaguliwa.", "danger")
+        return redirect(url_for("admin_ubia", **redirect_kwargs))
+
+    try:
+        ids = [int(i) for i in selected_ids]
+    except ValueError:
+        abort(400)
+
+    valid_statuses = ["pending", "reviewing", "contacted", "approved", "declined"]
+    partnerships = Partnership.query.filter(Partnership.id.in_(ids)).all()
+
+    if not partnerships:
+        flash("Maombi yaliyochaguliwa hayakupatikana (huenda tayari yamefutwa).", "danger")
+        return redirect(url_for("admin_ubia", **redirect_kwargs))
+
+    if action == "delete":
+        count = len(partnerships)
+        for p in partnerships:
+            db.session.delete(p)
+        db.session.commit()
+        flash(f"Maombi {count} yamefutwa kwa mafanikio.", "success")
+
+    elif action in valid_statuses:
+        count = 0
+        for p in partnerships:
+            p.status = action
+            p.reviewed_by_id = current_user.id
+            p.reviewed_at = datetime.utcnow()
+            count += 1
+        db.session.commit()
+        flash(f"Status ya maombi {count} imebadilishwa kuwa '{action}'.", "success")
+
+    else:
+        abort(400)
+
+    return redirect(url_for("admin_ubia", **redirect_kwargs))

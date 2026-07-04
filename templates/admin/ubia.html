@@ -65,19 +65,32 @@
     {% endfor %}
   </div>
 
+  <form id="bulk-action-form" method="post" action="{{ url_for('admin_ubia_bulk_action') }}">
+    <input type="hidden" name="current_status" value="{{ status_filter }}">
+    <input type="hidden" name="current_q" value="{{ search_query }}">
+    <input type="hidden" name="action" id="ubia-bulk-action-input" value="">
+  </form>
+
   {% if partnerships %}
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:0.9rem;">
+    <input type="checkbox" id="ubia-select-all" aria-label="Chagua zote" style="width:16px;height:16px;accent-color:var(--brand-mid);cursor:pointer;">
+    <label for="ubia-select-all" style="font-size:0.8rem;color:var(--text-muted);font-family:var(--font-display);font-weight:600;cursor:pointer;">Chagua Zote</label>
+  </div>
   <div style="display:flex;flex-direction:column;gap:1rem;">
     {% for p in partnerships %}
     <div style="background:var(--bg-card);border-radius:var(--radius-md);border:1px solid var(--border-subtle);padding:1.3rem 1.4rem;">
 
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
-        <div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <input type="checkbox" name="selected_ids" value="{{ p.id }}" form="bulk-action-form" class="ubia-row-checkbox" aria-label="Chagua {{ p.organization_name }}" style="margin-top:4px;width:16px;height:16px;accent-color:var(--brand-mid);cursor:pointer;flex-shrink:0;">
+          <div>
           <h2 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--brand-dark);margin:0 0 3px;">{{ p.organization_name }}</h2>
           <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">
             {{ p.organization_type|capitalize }} ·
             {% if p.interest_type == "institutional" %}Kitaasisi{% elif p.interest_type == "commercial" %}Kibiashara{% else %}Zote Mbili{% endif %}
             · {{ p.created_at.strftime("%d %b %Y") }}
           </p>
+          </div>
         </div>
         <span style="padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;font-family:var(--font-display);
           {% if p.status == 'pending' %}background:#fef3c7;color:#92400e;
@@ -144,6 +157,98 @@
     {% endif %}
   </div>
   {% endif %}
+
+  <div id="ubia-bulk-bar" hidden style="position:sticky;bottom:0;left:0;right:0;background:var(--brand-dark);color:#fff;padding:0.9rem 1.4rem;border-radius:var(--radius-md);display:flex;align-items:center;flex-wrap:wrap;gap:14px;box-shadow:0 -4px 16px rgba(0,0,0,0.15);margin-top:1.2rem;z-index:10;">
+    <span id="ubia-bulk-count" style="font-family:var(--font-display);font-weight:700;font-size:0.85rem;">0 zimechaguliwa</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <select id="ubia-bulk-status" style="height:34px;border-radius:6px;border:none;padding:0 10px;font-size:0.8rem;">
+        <option value="">— Badilisha status —</option>
+        <option value="pending">Inasubiri</option>
+        <option value="reviewing">Inapitiwa</option>
+        <option value="contacted">Imewasiliana</option>
+        <option value="approved">Imekubaliwa</option>
+        <option value="declined">Imekataliwa</option>
+      </select>
+      <button type="button" id="ubia-bulk-apply-status" style="height:34px;padding:0 14px;background:var(--brand-mid);color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-weight:700;font-size:0.78rem;cursor:pointer;">Tumia</button>
+      <button type="button" id="ubia-bulk-delete" style="height:34px;padding:0 14px;background:#991b1b;color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-weight:700;font-size:0.78rem;cursor:pointer;">Futa Zilizochaguliwa</button>
+      <button type="button" id="ubia-bulk-clear" style="height:34px;padding:0 14px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:6px;font-family:var(--font-display);font-weight:600;font-size:0.78rem;cursor:pointer;">Ghairi</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var selectAll = document.getElementById('ubia-select-all');
+    var bar = document.getElementById('ubia-bulk-bar');
+    var countEl = document.getElementById('ubia-bulk-count');
+    var form = document.getElementById('bulk-action-form');
+    var actionInput = document.getElementById('ubia-bulk-action-input');
+    if (!form) { return; }
+
+    function rowCheckboxes() {
+      return document.querySelectorAll('.ubia-row-checkbox');
+    }
+
+    function updateBar() {
+      var checked = document.querySelectorAll('.ubia-row-checkbox:checked');
+      var total = rowCheckboxes().length;
+      if (checked.length > 0) {
+        bar.hidden = false;
+        countEl.textContent = checked.length + ' zimechaguliwa';
+      } else {
+        bar.hidden = true;
+      }
+      if (selectAll) {
+        selectAll.checked = total > 0 && checked.length === total;
+        selectAll.indeterminate = checked.length > 0 && checked.length < total;
+      }
+    }
+
+    if (selectAll) {
+      selectAll.addEventListener('change', function () {
+        rowCheckboxes().forEach(function (cb) { cb.checked = selectAll.checked; });
+        updateBar();
+      });
+    }
+
+    document.addEventListener('change', function (e) {
+      if (e.target.classList && e.target.classList.contains('ubia-row-checkbox')) {
+        updateBar();
+      }
+    });
+
+    var deleteBtn = document.getElementById('ubia-bulk-delete');
+    if (deleteBtn) {
+      deleteBtn.addEventListener('click', function () {
+        var n = document.querySelectorAll('.ubia-row-checkbox:checked').length;
+        if (n === 0) { return; }
+        if (!confirm('Una uhakika unataka kufuta maombi ' + n + '? Hatua hii haiwezi kurudishwa.')) { return; }
+        actionInput.value = 'delete';
+        form.submit();
+      });
+    }
+
+    var applyBtn = document.getElementById('ubia-bulk-apply-status');
+    if (applyBtn) {
+      applyBtn.addEventListener('click', function () {
+        var status = document.getElementById('ubia-bulk-status').value;
+        var n = document.querySelectorAll('.ubia-row-checkbox:checked').length;
+        if (n === 0) { return; }
+        if (!status) { alert('Chagua status kwanza.'); return; }
+        if (!confirm("Badilisha status ya maombi " + n + " kuwa '" + status + "'?")) { return; }
+        actionInput.value = status;
+        form.submit();
+      });
+    }
+
+    var clearBtn = document.getElementById('ubia-bulk-clear');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        rowCheckboxes().forEach(function (cb) { cb.checked = false; });
+        updateBar();
+      });
+    }
+  })();
+  </script>
 
 </div>
 {% endblock %}
