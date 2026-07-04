@@ -4180,3 +4180,73 @@ def admin_ubia_bulk_action():
         abort(400)
 
     return redirect(url_for("admin_ubia", **redirect_kwargs))
+
+
+@app.route("/admin/ubia/export-csv")
+@login_required
+def admin_ubia_export_csv():
+    if current_user.role != "admin":
+        abort(403)
+
+    import csv
+    import io
+    from flask import Response
+
+    status_filter = request.args.get("status", "all")
+    search_query = request.args.get("q", "").strip()
+    query = Partnership.query
+    if status_filter != "all":
+        query = query.filter_by(status=status_filter)
+    if search_query:
+        query = query.filter(Partnership.organization_name.ilike(f"%{search_query}%"))
+    partnerships = query.order_by(Partnership.created_at.desc()).all()
+
+    interest_labels = {"institutional": "Kitaasisi", "commercial": "Kibiashara", "both": "Zote Mbili"}
+    status_labels = {
+        "pending": "Inasubiri",
+        "reviewing": "Inapitiwa",
+        "contacted": "Imewasiliana",
+        "approved": "Imekubaliwa",
+        "declined": "Imekataliwa",
+    }
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "Jina la Kampuni", "Aina ya Taasisi", "Aina ya Maslahi",
+        "Mtu wa Mawasiliano", "Barua Pepe", "Simu", "Tovuti",
+        "Ujumbe", "Hali", "Kumbukumbu ya Ndani",
+        "Tarehe ya Ombi", "Tarehe ya Kupitiwa",
+    ])
+    for p in partnerships:
+        writer.writerow([
+            p.organization_name,
+            (p.organization_type or "").capitalize(),
+            interest_labels.get(p.interest_type, p.interest_type or ""),
+            p.contact_name,
+            p.contact_email,
+            p.contact_phone or "",
+            p.website or "",
+            p.message or "",
+            status_labels.get(p.status, p.status or ""),
+            p.admin_notes or "",
+            p.created_at.strftime("%Y-%m-%d %H:%M") if p.created_at else "",
+            p.reviewed_at.strftime("%Y-%m-%d %H:%M") if p.reviewed_at else "",
+        ])
+
+    # BOM (\ufeff) kwa Excel kutambua UTF-8 sahihi (majina yenye herufi maalum)
+    csv_data = "\ufeff" + output.getvalue()
+    output.close()
+
+    filename_parts = ["ushirikiano"]
+    if status_filter != "all":
+        filename_parts.append(status_filter)
+    if search_query:
+        safe_q = "".join(c if c.isalnum() else "_" for c in search_query)[:30]
+        filename_parts.append(safe_q)
+    filename_parts.append(datetime.utcnow().strftime("%Y%m%d"))
+    filename = "_".join(filename_parts) + ".csv"
+
+    response = Response(csv_data, mimetype="text/csv; charset=utf-8")
+    response.headers["Content-Disposition"] = f"attachment; filename={filename}"
+    return response
