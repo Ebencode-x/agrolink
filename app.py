@@ -4168,7 +4168,7 @@ def admin_ubia_update_details(partnership_id):
         "contact_email": partnership.contact_email,
         "contact_phone": partnership.contact_phone,
         "website": partnership.website,
-        "edited_at": partnership.edited_at.strftime("%d %b %Y, %H:%M"),
+        "edited_at": partnership.edited_at.strftime("%Y-%m-%dT%H:%M:%SZ"),  # UTC ISO
         "edited_by_name": current_user.full_name,
     })
 
