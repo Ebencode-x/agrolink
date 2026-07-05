@@ -90,7 +90,8 @@
         <div style="display:flex;align-items:flex-start;gap:10px;">
           <input type="checkbox" name="selected_ids" value="{{ p.id }}" form="bulk-action-form" class="ubia-row-checkbox" aria-label="Chagua {{ p.organization_name }}" style="margin-top:4px;width:16px;height:16px;accent-color:var(--brand-mid);cursor:pointer;flex-shrink:0;">
           <div>
-          <h2 style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--brand-dark);margin:0 0 3px;">{{ p.organization_name }}</h2>
+          <h2 class="ubia-view-organization_name" data-pid="{{ p.id }}" style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;color:var(--brand-dark);margin:0 0 3px;">{{ p.organization_name }}</h2>
+          <input type="text" class="ubia-edit-organization_name" data-pid="{{ p.id }}" value="{{ p.organization_name }}" style="display:none;width:100%;height:32px;border-radius:6px;border:1px solid var(--brand-mid);padding:0 8px;font-size:1rem;font-weight:700;color:var(--brand-dark);font-family:var(--font-display);margin:0 0 3px;">
           <p style="color:var(--text-muted);font-size:0.78rem;margin:0;">
             {{ p.organization_type|capitalize }} ·
             {% if p.interest_type == "institutional" %}Kitaasisi{% elif p.interest_type == "commercial" %}Kibiashara{% else %}Zote Mbili{% endif %}
@@ -106,14 +107,44 @@
           {% else %}background:#fee2e2;color:#991b1b;{% endif %}">
           {% if p.status == 'pending' %}Inasubiri{% elif p.status == 'reviewing' %}Inapitiwa{% elif p.status == 'contacted' %}Imewasiliana{% elif p.status == 'approved' %}Imekubaliwa{% else %}Imekataliwa{% endif %}
         </span>
+        <div class="ubia-actions-view" data-pid="{{ p.id }}" style="display:flex;gap:6px;">
+          <button type="button" class="ubia-edit-btn" data-pid="{{ p.id }}" style="height:30px;padding:0 12px;background:transparent;color:var(--brand-mid);border:1px solid var(--brand-mid);border-radius:6px;font-family:var(--font-display);font-weight:600;font-size:0.75rem;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Hariri
+          </button>
+        </div>
+        <div class="ubia-actions-edit" data-pid="{{ p.id }}" style="display:none;gap:6px;">
+          <button type="button" class="ubia-save-btn" data-pid="{{ p.id }}" style="height:30px;padding:0 12px;background:var(--brand-mid);color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-weight:700;font-size:0.75rem;cursor:pointer;">Hifadhi</button>
+          <button type="button" class="ubia-cancel-btn" data-pid="{{ p.id }}" style="height:30px;padding:0 12px;background:transparent;color:var(--text-muted);border:1px solid var(--border-subtle);border-radius:6px;font-family:var(--font-display);font-weight:600;font-size:0.75rem;cursor:pointer;">Ghairi</button>
+        </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;font-size:0.83rem;">
-        <div><span style="color:var(--text-muted);">Mtu wa Mawasiliano:</span> <strong style="color:var(--text-main);">{{ p.contact_name }}</strong></div>
-        <div><span style="color:var(--text-muted);">Barua Pepe:</span> <a href="mailto:{{ p.contact_email }}" style="color:var(--brand-mid);">{{ p.contact_email }}</a></div>
-        {% if p.contact_phone %}<div><span style="color:var(--text-muted);">Simu:</span> {{ p.contact_phone }}</div>{% endif %}
-        {% if p.website %}<div><span style="color:var(--text-muted);">Tovuti:</span> <a href="{{ p.website }}" target="_blank" style="color:var(--brand-mid);">{{ p.website }}</a></div>{% endif %}
+      <div class="ubia-details-view" data-pid="{{ p.id }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;font-size:0.83rem;">
+        <div><span style="color:var(--text-muted);">Mtu wa Mawasiliano:</span> <strong class="ubia-view-contact_name" data-pid="{{ p.id }}" style="color:var(--text-main);">{{ p.contact_name }}</strong></div>
+        <div><span style="color:var(--text-muted);">Barua Pepe:</span> <a href="mailto:{{ p.contact_email }}" class="ubia-view-contact_email" data-pid="{{ p.id }}" style="color:var(--brand-mid);">{{ p.contact_email }}</a></div>
+        <div class="ubia-view-phone-wrap" data-pid="{{ p.id }}" {% if not p.contact_phone %}style="display:none;"{% endif %}><span style="color:var(--text-muted);">Simu:</span> <span class="ubia-view-contact_phone">{{ p.contact_phone or '' }}</span></div>
+        <div class="ubia-view-website-wrap" data-pid="{{ p.id }}" {% if not p.website %}style="display:none;"{% endif %}><span style="color:var(--text-muted);">Tovuti:</span> <a href="{{ p.website or '#' }}" target="_blank" class="ubia-view-website">{{ p.website or '' }}</a></div>
       </div>
+
+      <div class="ubia-details-edit" data-pid="{{ p.id }}" style="display:none;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;font-size:0.83rem;">
+        <div>
+          <label style="display:block;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Mtu wa Mawasiliano</label>
+          <input type="text" class="ubia-edit-contact_name" data-pid="{{ p.id }}" value="{{ p.contact_name }}" style="width:100%;height:34px;border-radius:6px;border:1px solid var(--brand-mid);padding:0 8px;font-size:0.83rem;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Barua Pepe</label>
+          <input type="email" class="ubia-edit-contact_email" data-pid="{{ p.id }}" value="{{ p.contact_email }}" style="width:100%;height:34px;border-radius:6px;border:1px solid var(--brand-mid);padding:0 8px;font-size:0.83rem;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Simu</label>
+          <input type="text" class="ubia-edit-contact_phone" data-pid="{{ p.id }}" value="{{ p.contact_phone or '' }}" style="width:100%;height:34px;border-radius:6px;border:1px solid var(--brand-mid);padding:0 8px;font-size:0.83rem;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.7rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Tovuti</label>
+          <input type="text" class="ubia-edit-website" data-pid="{{ p.id }}" value="{{ p.website or '' }}" placeholder="https://..." style="width:100%;height:34px;border-radius:6px;border:1px solid var(--brand-mid);padding:0 8px;font-size:0.83rem;">
+        </div>
+      </div>
+      <div class="ubia-edit-error" data-pid="{{ p.id }}" style="display:none;color:#991b1b;font-size:0.78rem;margin:-4px 0 12px;"></div>
 
       <div style="background:var(--bg-subtle);border-radius:var(--radius-sm);padding:0.8rem 1rem;font-size:0.83rem;color:var(--text-main);line-height:1.6;margin-bottom:14px;">
         {{ p.message }}
@@ -253,6 +284,134 @@
         updateBar();
       });
     }
+  })();
+  </script>
+
+  <script>
+  (function () {
+    function fieldsFor(pid) {
+      return {
+        actionsView: document.querySelector('.ubia-actions-view[data-pid="' + pid + '"]'),
+        actionsEdit: document.querySelector('.ubia-actions-edit[data-pid="' + pid + '"]'),
+        detailsView: document.querySelector('.ubia-details-view[data-pid="' + pid + '"]'),
+        detailsEdit: document.querySelector('.ubia-details-edit[data-pid="' + pid + '"]'),
+        errorBox: document.querySelector('.ubia-edit-error[data-pid="' + pid + '"]'),
+        nameView: document.querySelector('.ubia-view-organization_name[data-pid="' + pid + '"]'),
+        nameEdit: document.querySelector('.ubia-edit-organization_name[data-pid="' + pid + '"]'),
+        contactNameView: document.querySelector('.ubia-view-contact_name[data-pid="' + pid + '"]'),
+        contactNameEdit: document.querySelector('.ubia-edit-contact_name[data-pid="' + pid + '"]'),
+        emailView: document.querySelector('.ubia-view-contact_email[data-pid="' + pid + '"]'),
+        emailEdit: document.querySelector('.ubia-edit-contact_email[data-pid="' + pid + '"]'),
+        phoneWrap: document.querySelector('.ubia-view-phone-wrap[data-pid="' + pid + '"]'),
+        phoneEdit: document.querySelector('.ubia-edit-contact_phone[data-pid="' + pid + '"]'),
+        websiteWrap: document.querySelector('.ubia-view-website-wrap[data-pid="' + pid + '"]'),
+        websiteEdit: document.querySelector('.ubia-edit-website[data-pid="' + pid + '"]')
+      };
+    }
+
+    function setEditMode(pid, editing) {
+      var f = fieldsFor(pid);
+      if (!f.detailsView || !f.detailsEdit) { return; }
+      f.actionsView.style.display = editing ? 'none' : 'flex';
+      f.actionsEdit.style.display = editing ? 'flex' : 'none';
+      f.detailsView.style.display = editing ? 'none' : 'grid';
+      f.detailsEdit.style.display = editing ? 'grid' : 'none';
+      f.nameView.style.display = editing ? 'none' : 'block';
+      f.nameEdit.style.display = editing ? 'block' : 'none';
+      if (!editing) {
+        f.errorBox.style.display = 'none';
+        f.errorBox.textContent = '';
+      }
+    }
+
+    function resetEdits(pid) {
+      var f = fieldsFor(pid);
+      f.nameEdit.value = f.nameView.textContent.trim();
+      f.contactNameEdit.value = f.contactNameView.textContent.trim();
+      f.emailEdit.value = f.emailView.textContent.trim();
+      f.phoneEdit.value = f.phoneWrap.querySelector('.ubia-view-contact_phone').textContent.trim();
+      var websiteLink = f.websiteWrap.querySelector('.ubia-view-website');
+      f.websiteEdit.value = websiteLink ? websiteLink.textContent.trim() : '';
+    }
+
+    function showError(pid, message) {
+      var f = fieldsFor(pid);
+      f.errorBox.textContent = message;
+      f.errorBox.style.display = 'block';
+    }
+
+    function saveDetails(pid, btn) {
+      var f = fieldsFor(pid);
+      var payload = {
+        organization_name: f.nameEdit.value.trim(),
+        contact_name: f.contactNameEdit.value.trim(),
+        contact_email: f.emailEdit.value.trim(),
+        contact_phone: f.phoneEdit.value.trim(),
+        website: f.websiteEdit.value.trim()
+      };
+      if (!payload.organization_name || !payload.contact_name || !payload.contact_email) {
+        showError(pid, 'Jina la taasisi, mtu wa mawasiliano, na barua pepe havitakiwi kuwa tupu.');
+        return;
+      }
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Inahifadhi...';
+      fetch('/admin/ubia/' + pid + '/update-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+      .then(function (result) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        if (!result.ok || !result.data.success) {
+          showError(pid, (result.data && result.data.error) || 'Imeshindwa kuhifadhi. Jaribu tena.');
+          return;
+        }
+        var updated = result.data.partnership;
+        f.nameView.textContent = updated.organization_name;
+        f.contactNameView.textContent = updated.contact_name;
+        f.emailView.textContent = updated.contact_email;
+        f.emailView.setAttribute('href', 'mailto:' + updated.contact_email);
+        var phoneSpan = f.phoneWrap.querySelector('.ubia-view-contact_phone');
+        phoneSpan.textContent = updated.contact_phone || '';
+        f.phoneWrap.style.display = updated.contact_phone ? '' : 'none';
+        var websiteLink = f.websiteWrap.querySelector('.ubia-view-website');
+        if (updated.website) {
+          websiteLink.textContent = updated.website;
+          websiteLink.setAttribute('href', updated.website);
+          f.websiteWrap.style.display = '';
+        } else {
+          websiteLink.textContent = '';
+          f.websiteWrap.style.display = 'none';
+        }
+        setEditMode(pid, false);
+      })
+      .catch(function () {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        showError(pid, 'Hitilafu ya mtandao. Jaribu tena.');
+      });
+    }
+
+    document.addEventListener('click', function (e) {
+      var editBtn = e.target.closest('.ubia-edit-btn');
+      if (editBtn) { setEditMode(editBtn.getAttribute('data-pid'), true); return; }
+
+      var cancelBtn = e.target.closest('.ubia-cancel-btn');
+      if (cancelBtn) {
+        var pid1 = cancelBtn.getAttribute('data-pid');
+        resetEdits(pid1);
+        setEditMode(pid1, false);
+        return;
+      }
+
+      var saveBtn = e.target.closest('.ubia-save-btn');
+      if (saveBtn) {
+        saveDetails(saveBtn.getAttribute('data-pid'), saveBtn);
+      }
+    });
   })();
   </script>
 

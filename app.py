@@ -4126,6 +4126,46 @@ def admin_ubia_delete(partnership_id):
     return redirect(url_for("admin_ubia"))
 
 
+@app.route("/admin/ubia/<int:partnership_id>/update-details", methods=["POST"])
+@login_required
+def admin_ubia_update_details(partnership_id):
+    if current_user.role != "admin":
+        abort(403)
+    partnership = Partnership.query.get_or_404(partnership_id)
+    data = request.get_json(silent=True) or {}
+
+    organization_name = (data.get("organization_name") or "").strip()
+    contact_name = (data.get("contact_name") or "").strip()
+    contact_email = (data.get("contact_email") or "").strip()
+    contact_phone = (data.get("contact_phone") or "").strip()
+    website = (data.get("website") or "").strip()
+
+    if not organization_name or not contact_name or not contact_email:
+        return jsonify(success=False, error="Jina la taasisi, mtu wa mawasiliano, na barua pepe havitakiwi kuwa tupu."), 400
+
+    email_pattern = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+    if not re.match(email_pattern, contact_email):
+        return jsonify(success=False, error="Barua pepe si sahihi."), 400
+
+    if website and not (website.startswith("http://") or website.startswith("https://")):
+        website = "https://" + website
+
+    partnership.organization_name = organization_name
+    partnership.contact_name = contact_name
+    partnership.contact_email = contact_email
+    partnership.contact_phone = contact_phone or None
+    partnership.website = website or None
+    db.session.commit()
+
+    return jsonify(success=True, partnership={
+        "organization_name": partnership.organization_name,
+        "contact_name": partnership.contact_name,
+        "contact_email": partnership.contact_email,
+        "contact_phone": partnership.contact_phone,
+        "website": partnership.website,
+    })
+
+
 @app.route("/admin/ubia/bulk-action", methods=["POST"])
 @login_required
 def admin_ubia_bulk_action():
