@@ -522,6 +522,9 @@ class Partnership(db.Model):
     created_at          = db.Column(db.DateTime, default=datetime.utcnow)
     reviewed_at         = db.Column(db.DateTime, nullable=True)
     reviewed_by         = db.relationship("User", foreign_keys=[reviewed_by_id], lazy=True)
+    edited_at           = db.Column(db.DateTime, nullable=True)
+    edited_by_id        = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    edited_by           = db.relationship("User", foreign_keys=[edited_by_id], lazy=True)
 
 # ── Login Manager ─────────────────────────────────────────────────────────────
 
@@ -4155,6 +4158,8 @@ def admin_ubia_update_details(partnership_id):
     partnership.contact_email = contact_email
     partnership.contact_phone = contact_phone or None
     partnership.website = website or None
+    partnership.edited_at = datetime.utcnow()
+    partnership.edited_by_id = current_user.id
     db.session.commit()
 
     return jsonify(success=True, partnership={
@@ -4163,6 +4168,8 @@ def admin_ubia_update_details(partnership_id):
         "contact_email": partnership.contact_email,
         "contact_phone": partnership.contact_phone,
         "website": partnership.website,
+        "edited_at": partnership.edited_at.strftime("%d %b %Y, %H:%M"),
+        "edited_by_name": current_user.full_name,
     })
 
 

@@ -124,6 +124,9 @@
         <div><span style="color:var(--text-muted);">Barua Pepe:</span> <a href="mailto:{{ p.contact_email }}" class="ubia-view-contact_email" data-pid="{{ p.id }}" style="color:var(--brand-mid);">{{ p.contact_email }}</a></div>
         <div class="ubia-view-phone-wrap" data-pid="{{ p.id }}" {% if not p.contact_phone %}style="display:none;"{% endif %}><span style="color:var(--text-muted);">Simu:</span> <span class="ubia-view-contact_phone">{{ p.contact_phone or '' }}</span></div>
         <div class="ubia-view-website-wrap" data-pid="{{ p.id }}" {% if not p.website %}style="display:none;"{% endif %}><span style="color:var(--text-muted);">Tovuti:</span> <a href="{{ p.website or '#' }}" target="_blank" class="ubia-view-website">{{ p.website or '' }}</a></div>
+        <div class="ubia-edited-info" data-pid="{{ p.id }}" style="grid-column:1/-1;font-size:0.72rem;color:var(--text-muted);font-style:italic;{% if not p.edited_at %}display:none;{% endif %}">
+          Ilihaririwa: <span class="ubia-edited-at">{{ p.edited_at.strftime("%d %b %Y, %H:%M") if p.edited_at else '' }}</span> na <span class="ubia-edited-by">{{ p.edited_by.full_name if p.edited_by else '' }}</span>
+        </div>
       </div>
 
       <div class="ubia-details-edit" data-pid="{{ p.id }}" style="display:none;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;font-size:0.83rem;">
@@ -385,6 +388,12 @@
         } else {
           websiteLink.textContent = '';
           f.websiteWrap.style.display = 'none';
+        }
+        var editedInfo = document.querySelector('.ubia-edited-info[data-pid="' + pid + '"]');
+        if (editedInfo && updated.edited_at) {
+          editedInfo.querySelector('.ubia-edited-at').textContent = updated.edited_at;
+          editedInfo.querySelector('.ubia-edited-by').textContent = updated.edited_by_name;
+          editedInfo.style.display = '';
         }
         setEditMode(pid, false);
       })
