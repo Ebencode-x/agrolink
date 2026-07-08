@@ -96,12 +96,17 @@
   .listing-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.5rem 1rem;font-size:0.8rem;font-weight:600;color:var(--text-secondary);text-decoration:none;transition:all var(--transition)}
   .listing-btn:hover{background:rgba(46,107,71,0.08);border-color:var(--border-strong);color:var(--brand-mid)}
 
-  /* ── Stats ── */
-  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1.25rem}
-  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.75rem;text-align:center;box-shadow:var(--shadow-sm)}
-  .stat-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
-  .stat-card-val{font-family:var(--font-display);font-size:2.2rem;font-weight:800;color:var(--text-primary);line-height:1}
-  .stat-card-lbl{font-size:0.83rem;color:var(--text-muted);margin-top:0.4rem}
+  /* ── Jinsi Inavyofanya Kazi ── */
+  .steps-row{display:flex;align-items:flex-start;gap:0;max-width:900px;margin:0 auto}
+  .step-item{flex:1;text-align:center;padding:0 1rem}
+  .step-num{width:44px;height:44px;border-radius:50%;background:var(--brand-mid);color:#fff;font-family:var(--font-display);font-weight:800;font-size:1.1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem}
+  .step-title{font-family:var(--font-display);font-weight:700;font-size:0.95rem;color:var(--text-primary);margin-bottom:0.5rem}
+  .step-desc{font-size:0.85rem;color:var(--text-secondary);line-height:1.6}
+  .step-connector{width:60px;height:2px;background:var(--border);margin-top:22px;flex-shrink:0}
+  @media(max-width:768px){
+    .steps-row{flex-direction:column;gap:2rem}
+    .step-connector{display:none}
+  }
 
   /* ── Weather widget ── */
   .weather-widget{max-width:560px;margin:0 auto;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:2rem;box-shadow:var(--shadow-sm)}
@@ -279,42 +284,31 @@
   </div>
 </section>
 
-<!-- STATS -->
-<section class="section section-alt" id="takwimu">
+<!-- JINSI INAVYOFANYA KAZI -->
+<section class="section section-alt" id="jinsi-inavyofanya-kazi">
   <div class="section-inner">
     <div class="section-header section-header-center">
-      <div class="section-eyebrow">Takwimu za Mfumo</div>
-      <h2 class="section-title">AgroLink Tanzania kwa Nambari</h2>
-      <p class="section-subtitle">Data halisi kutoka kwenye mfumo wetu — inasasishwa mara kwa mara.</p>
+      <div class="section-eyebrow">Mchakato</div>
+      <h2 class="section-title">Jinsi AgroLink Inavyofanya Kazi</h2>
+      <p class="section-subtitle">Hatua tatu rahisi kuanza kuuza au kununua mazao.</p>
     </div>
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-card-icon" style="background:rgba(46,107,71,0.10);border:1px solid rgba(46,107,71,0.20)">
-          <i data-lucide="users" style="color:var(--brand-mid)" style="width:22px;height:22px;color:var(--brand-dark)"></i>
-        </div>
-        <div class="stat-card-val">{{ stats.users }}</div>
-        <div class="stat-card-lbl">Watumiaji Waliojisajili</div>
+    <div class="steps-row">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-title">Jisajili</div>
+        <div class="step-desc">Fungua akaunti bure kama mkulima au mnunuzi ndani ya dakika chache.</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card-icon" style="background:rgba(232,184,75,0.12);border:1px solid rgba(232,184,75,0.28)">
-          <i data-lucide="package" style="width:22px;height:22px;color:var(--brand-mid)"></i>
-        </div>
-        <div class="stat-card-val">{{ stats.listings }}</div>
-        <div class="stat-card-lbl">Orodha za Mazao</div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-title">Weka au Tafuta Tangazo</div>
+        <div class="step-desc">Ongeza mazao yako sokoni au tafuta unachohitaji kutoka kwa wakulima wengine.</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-card-icon" style="background:var(--bg-subtle);border:1px solid var(--border)">
-          <i data-lucide="map-pin" style="width:22px;height:22px;color:var(--brand-dark)"></i>
-        </div>
-        <div class="stat-card-val">{{ stats.regions }}</div>
-        <div class="stat-card-lbl">Mikoa Inayofunikwa</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-card-icon" style="background:var(--brand-light)">
-          <i data-lucide="sprout" style="width:22px;height:22px;color:var(--brand-dark)"></i>
-        </div>
-        <div class="stat-card-val">{{ stats.crops }}</div>
-        <div class="stat-card-lbl">Aina za Mazao</div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-title">Wasiliana Moja kwa Moja</div>
+        <div class="step-desc">Ongea na muuzaji au mnunuzi moja kwa moja kupitia mfumo wa ujumbe, bila mtu wa kati.</div>
       </div>
     </div>
   </div>
