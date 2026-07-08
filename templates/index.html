@@ -79,17 +79,20 @@
 
   /* ── Listings ── */
   .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
-  .listing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.35rem;transition:border-color var(--transition),box-shadow var(--transition)}
-  .listing-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-sm)}
-  .listing-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.875rem}
-  .listing-crop{display:flex;align-items:center;gap:8px}
-  .listing-crop-icon{width:36px;height:36px;border-radius:8px;background:rgba(46,107,71,0.10);border:1px solid rgba(46,107,71,0.18);display:flex;align-items:center;justify-content:center;color:var(--brand-mid);flex-shrink:0}
-  .listing-crop-name{font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--text-primary)}
-  .listing-region{display:flex;align-items:center;gap:3px;font-size:0.72rem;color:var(--text-muted);margin-top:1px}
-  .listing-price{text-align:right}
-  .listing-price-val{font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--brand-dark)}
-  .listing-price-unit{font-size:0.66rem;color:var(--text-muted)}
-  .listing-divider{height:1px;background:var(--border);margin:0.875rem 0}
+  .listing-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-md);overflow:hidden;transition:border-left-color var(--transition)}
+  .listing-card:hover{border-left-color:var(--accent)}
+  .listing-thumb{position:relative;width:100%;height:140px;background:var(--bg-surface);overflow:hidden}
+  .listing-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .listing-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(6,78,59,0.18));color:var(--brand-mid)}
+  .listing-region-badge{position:absolute;bottom:8px;left:8px;display:inline-flex;align-items:center;gap:3px;background:rgba(28,61,42,0.82);color:#fff;font-size:0.68rem;font-weight:700;padding:3px 9px;border-radius:50px}
+  .listing-body{padding:1rem 1.1rem 1.1rem}
+  .listing-crop-name{font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--text-primary);margin-bottom:0.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .listing-price-row{display:flex;align-items:baseline;gap:5px;margin-bottom:0.4rem}
+  .listing-price-val{font-family:var(--font-display);font-weight:800;font-size:1.2rem;color:var(--brand-dark)}
+  .listing-price-unit{font-size:0.68rem;color:var(--text-muted)}
+  .listing-title-sub{font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .listing-meta-row{font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem}
+  .listing-meta-row strong{color:var(--text-primary)}
   .listing-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.5rem 1rem;font-size:0.8rem;font-weight:600;color:var(--text-secondary);text-decoration:none;transition:all var(--transition)}
   .listing-btn:hover{background:rgba(46,107,71,0.08);border-color:var(--border-strong);color:var(--brand-mid)}
 
@@ -334,31 +337,32 @@
     <div class="listings-grid">
       {% for l in listings[:6] %}
       <div class="listing-card">
-        <div class="listing-head">
-          <div class="listing-crop">
-            <div class="listing-crop-icon">
-              <i data-lucide="sprout" style="width:16px;height:16px"></i>
-            </div>
-            <div>
-              <div class="listing-crop-name">{{ l.crop_name }}</div>
-              <div class="listing-region">
-                <i data-lucide="map-pin" style="width:10px;height:10px"></i>{{ l.region }}
-              </div>
-            </div>
+        <div class="listing-thumb">
+          {% if l.image_url %}
+          <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
+          {% else %}
+          <div class="listing-thumb-placeholder">
+            <i data-lucide="wheat" style="width:28px;height:28px"></i>
           </div>
-          <div class="listing-price">
-            <div class="listing-price-val">{{ "{:,.0f}".format(l.price_tzs) }}</div>
-            <div class="listing-price-unit">TZS/kg</div>
+          {% endif %}
+          <span class="listing-region-badge">
+            <i data-lucide="map-pin" style="width:10px;height:10px"></i>{{ l.region }}
+          </span>
+        </div>
+        <div class="listing-body">
+          <div class="listing-crop-name">{{ l.crop_name }}</div>
+          <div class="listing-price-row">
+            <span class="listing-price-val">{{ "{:,.0f}".format(l.price_tzs) }}</span>
+            <span class="listing-price-unit">TZS/kg</span>
           </div>
+          <div class="listing-title-sub">{{ l.title }}</div>
+          <div class="listing-meta-row">
+            Kiasi: <strong>{{ "{:,.0f}".format(l.quantity_kg) }} kg</strong>
+          </div>
+          <a href="{{ url_for('login') }}" class="listing-btn">
+            <i data-lucide="lock" style="width:13px;height:13px"></i>Ingia Kuwasiliana
+          </a>
         </div>
-        <div style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:0.5rem">{{ l.title }}</div>
-        <div style="font-size:0.78rem;color:var(--text-muted)">
-          Kiasi: <strong style="color:var(--text-primary)">{{ "{:,.0f}".format(l.quantity_kg) }} kg</strong>
-        </div>
-        <div class="listing-divider"></div>
-        <a href="{{ url_for('login') }}" class="listing-btn">
-          <i data-lucide="lock" style="width:13px;height:13px"></i>Ingia Kuwasiliana
-        </a>
       </div>
       {% endfor %}
     </div>
