@@ -67,8 +67,8 @@
 
   /* ── Features ── */
   .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.25rem}
-  .feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.6rem;transition:border-color var(--transition),box-shadow var(--transition),transform var(--transition);position:relative}
-  .feature-card:hover{border-color:var(--border-strong);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+  .feature-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-md);padding:1.6rem;transition:border-left-color var(--transition);position:relative}
+  .feature-card:hover{border-left-color:var(--accent)}
   .feature-tag{position:absolute;top:1.25rem;right:1.25rem;font-size:0.65rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);background:var(--bg-subtle);padding:2px 8px;border-radius:50px;border:1px solid var(--border)}
   .feature-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
   .feature-icon-primary{background:rgba(46,107,71,0.10);color:var(--brand-mid);border:1px solid rgba(46,107,71,0.20)}
@@ -264,12 +264,12 @@
     </div>
     <div class="features-grid">
       {% for icon,color_class,title,desc,tag in [
-        ('trending-up','feature-icon-green','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania — Kariakoo, Arusha, Mbeya na zaidi.','Bei • Live'),
-        ('cloud-sun','feature-icon-teal','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo — zinazosaidia kupanga kilimo chako.','Hewa • API'),
-        ('users','feature-icon-earth','Mtandao wa Wakulima','Unganika na wakulima wengine, mawakala wa kilimo, na wanunuzi kutoka kila pembe ya Tanzania.','Mtandao'),
-        ('shield-check','feature-icon-green','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco — data yako inalindwa na usimbaji wa hali ya juu.','Cisco • SSL'),
-        ('sprout','feature-icon-teal','Mashauri ya Kilimo','Pata vidokezo vya kitaalamu kuhusu msimu wa kupanda, mbolea, na udhibiti wa wadudu.','Kilimo'),
-        ('smartphone','feature-icon-earth','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.','Mobile')
+        ('trending-up','feature-icon-primary','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania — Kariakoo, Arusha, Mbeya na zaidi.','Bei • Live'),
+        ('radar','feature-icon-accent','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo — zinazosaidia kupanga kilimo chako.','Hewa • API'),
+        ('network','feature-icon-muted','Mtandao wa Wakulima','Unganika na wakulima wengine, mawakala wa kilimo, na wanunuzi kutoka kila pembe ya Tanzania.','Mtandao'),
+        ('shield-check','feature-icon-primary','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco — data yako inalindwa na usimbaji wa hali ya juu.','Cisco • SSL'),
+        ('wheat','feature-icon-accent','Mashauri ya Kilimo','Pata vidokezo vya kitaalamu kuhusu msimu wa kupanda, mbolea, na udhibiti wa wadudu.','Kilimo'),
+        ('smartphone','feature-icon-muted','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.','Mobile')
       ] %}
       <div class="feature-card">
         <div class="feature-tag">{{ tag }}</div>
