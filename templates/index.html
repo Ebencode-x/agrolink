@@ -23,7 +23,7 @@
 <style>
   /* ── Hero ── */
   .hero{background:var(--nav-bg);padding:4.5rem clamp(1rem,5vw,2.5rem) 3.5rem;border-bottom:1px solid rgba(255,255,255,0.08)}
-  .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.15fr 0.85fr 1fr;gap:2.75rem;align-items:center}
+  .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
   .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(74,155,111,0.18);border:1px solid rgba(74,155,111,0.30);color:rgba(240,247,242,0.85);padding:0.28rem 0.85rem;border-radius:50px;font-size:0.73rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:1.25rem}
   .hero-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
   .hero-title .accent{color:var(--accent)}
@@ -125,7 +125,7 @@
   /* ── Mobile ── */
   @media(max-width:768px){
     .hero-inner{grid-template-columns:1fr;gap:2rem}
-    .hero-image-panel{min-height:220px}
+    .hero-panel{order:-1}
     .hero-title{font-size:1.85rem}
     .hero-stats{gap:1.5rem;flex-wrap:wrap}
     .stat-value{font-size:1.5rem}
@@ -166,15 +166,6 @@
         <a href="{{ url_for('register') }}" class="hero-btn-ghost">
           <i data-lucide="user-plus" style="width:17px;height:17px"></i>Jisajili Bure
         </a>
-      </div>
-    </div>
-
-    <!-- Middle: Real Crop Image -->
-    <div class="hero-image-panel">
-      <img src="{{ url_for('static', filename='img/hero-crops.jpg') }}" alt="Mazao halisi kutoka kwa wakulima wa Tanzania" loading="eager">
-      <div class="hero-image-tag">
-        <i data-lucide="wheat" style="width:12px;height:12px"></i>
-        Mazao Halisi
       </div>
     </div>
 
