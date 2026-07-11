@@ -115,6 +115,10 @@
       <div class="section-title">
         <i data-lucide="users" style="width:18px;height:18px;color:var(--brand-mid)"></i>Watumiaji Wote
       </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text-muted);cursor:pointer">
+        <input type="checkbox" id="toggle-inactive" onchange="toggleInactiveUsers()">
+        Onyesha akaunti zilizozimwa
+      </label>
     </div>
     <table class="data-table">
       <thead>
@@ -129,8 +133,8 @@
       </thead>
       <tbody>
         {% for u in users %}
-        <tr id="user-row-{{ u.id }}">
-          <td style="font-weight:600">{{ u.full_name }}</td>
+        <tr id="user-row-{{ u.id }}" data-active="{{ 'true' if u.is_active else 'false' }}" style="{{ 'opacity:0.55;display:none' if not u.is_active else '' }}">
+          <td style="font-weight:600">{{ u.full_name }}{% if not u.is_active %}<span style="margin-left:6px;font-size:0.68rem;font-weight:600;color:var(--danger);background:var(--danger-bg);padding:1px 7px;border-radius:20px">Imezimwa</span>{% endif %}</td>
           <td style="color:var(--text-muted)">{{ u.phone }}</td>
           <td>{{ u.region or '—' }}</td>
           <td>
@@ -143,9 +147,15 @@
           <td>
             <button id="verify-btn-{{ u.id }}" onclick="verifyUser({{ u.id }}, this)" style="display:inline-flex;align-items:center;gap:5px;padding:0.35rem 0.85rem;background:{{ 'var(--success-bg)' if u.is_verified else 'var(--bg-surface)' }};border:1px solid {{ 'rgba(46,107,71,0.25)' if u.is_verified else 'var(--border)' }};border-radius:var(--radius-sm);color:{{ 'var(--success)' if u.is_verified else 'var(--text-muted)' }};font-size:0.78rem;font-weight:600;cursor:pointer;transition:all var(--transition);margin-right:4px"><i data-lucide="badge-check" style="width:13px;height:13px"></i>{{ 'Verified' if u.is_verified else 'Verify' }}</button>
             {% if u.id != current_user.id %}
-            <button class="btn-danger" onclick="deleteUser({{ u.id }}, '{{ u.full_name }}')">
-              <i data-lucide="trash-2" style="width:13px;height:13px"></i>Futa
-            </button>
+              {% if u.is_active %}
+              <button class="btn-danger" onclick="deactivateUser({{ u.id }}, '{{ u.full_name }}')">
+                <i data-lucide="user-x" style="width:13px;height:13px"></i>Zima
+              </button>
+              {% else %}
+              <button class="btn-danger" style="background:var(--success-bg);border-color:rgba(46,107,71,0.25);color:var(--success)" onclick="reactivateUser({{ u.id }}, '{{ u.full_name }}')">
+                <i data-lucide="user-check" style="width:13px;height:13px"></i>Washa
+              </button>
+              {% endif %}
             {% else %}
             <span style="font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;gap:4px">
               <i data-lucide="user" style="width:12px;height:12px"></i>Wewe
@@ -255,12 +265,25 @@ function switchTab(name, btn){
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
 }
-async function deleteUser(id, name){
-  if(!confirm(`Futa mtumiaji "${name}"? Hatua hii haiwezi kurudishwa.`))return;
-  const res=await fetch(`/admin/delete-user/${id}`,{method:'POST'});
+async function deactivateUser(id, name){
+  if(!confirm(`Zima akaunti ya "${name}"? Ataweza kurudishwa wakati wowote.`))return;
+  const res=await fetch(`/admin/deactivate-user/${id}`,{method:'POST'});
   const data=await res.json();
-  if(res.ok){ document.getElementById(`user-row-${id}`).remove(); }
+  if(res.ok){ location.reload(); }
   else{ alert(data.error); }
+}
+async function reactivateUser(id, name){
+  if(!confirm(`Washa akaunti ya "${name}" tena?`))return;
+  const res=await fetch(`/admin/unsuspend-user/${id}`,{method:'POST'});
+  const data=await res.json();
+  if(res.ok){ location.reload(); }
+  else{ alert(data.error); }
+}
+function toggleInactiveUsers(){
+  const show = document.getElementById('toggle-inactive').checked;
+  document.querySelectorAll('tr[data-active="false"]').forEach(function(row){
+    row.style.display = show ? '' : 'none';
+  });
 }
 async function verifyUser(id, btn){
   const res=await fetch('/admin/verify-user/'+id,{method:'POST'});

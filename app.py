@@ -2473,16 +2473,18 @@ def admin_delete_listing(listing_id):
     return jsonify({"message": "Orodha imefutwa."})
 
 
-@app.route("/admin/delete-user/<int:user_id>", methods=["POST"])
+@app.route("/admin/deactivate-user/<int:user_id>", methods=["POST"])
 @login_required
 @require_admin
-def admin_delete_user(user_id):
+def admin_deactivate_user(user_id):
+    """Zima akaunti (soft) — badala ya real DELETE ili kuepuka FK violation
+    (messages, orders, conversations zinazomrejelea mtumiaji huyu)."""
     if user_id == current_user.id:
-        return jsonify({"error": "Huwezi kujifuta mwenyewe."}), 400
+        return jsonify({"error": "Huwezi kujizima mwenyewe."}), 400
     user = User.query.get_or_404(user_id)
-    db.session.delete(user)
+    user.is_active = False
     db.session.commit()
-    return jsonify({"message": "Mtumiaji amefutwa."})
+    return jsonify({"message": f"Akaunti ya {user.full_name} imezimwa.", "is_active": False})
 
 
 @app.route("/admin/verify-user/<int:user_id>", methods=["POST"])
