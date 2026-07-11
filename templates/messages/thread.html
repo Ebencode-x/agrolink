@@ -109,6 +109,9 @@
       <button class="thread-action-btn" onclick="toggleBgPicker()" title="Badilisha mandhari">
         <i data-lucide="palette" style="width:17px;height:17px"></i>
       </button>
+      <button class="thread-action-btn" onclick="clearConversation()" title="Futa Mazungumzo">
+        <i data-lucide="eraser" style="width:17px;height:17px"></i>
+      </button>
     </div>
     <span class="thread-status" id="thread-status"></span>
     <!-- Background picker -->
@@ -279,8 +282,11 @@
   <button class="ctx-item" id="ctx-copy" onclick="ctxCopy()">
     <i data-lucide="copy" style="width:15px;height:15px"></i>Nakili
   </button>
+  <button class="ctx-item" id="ctx-delete-for-me" onclick="ctxDeleteForMe()">
+    <i data-lucide="eye-off" style="width:15px;height:15px"></i>Futa Kwangu
+  </button>
   <button class="ctx-item danger" id="ctx-delete" onclick="ctxDelete()" style="display:none">
-    <i data-lucide="trash-2" style="width:15px;height:15px"></i>Futa
+    <i data-lucide="trash-2" style="width:15px;height:15px"></i>Futa kwa Wote
   </button>
 </div>
 
@@ -686,6 +692,7 @@ function attachContextMenu(bubble){
     const menu = document.getElementById('ctx-menu');
     document.getElementById('ctx-delete').style.display = msg.is_mine && !msg.is_deleted ? 'flex' : 'none';
     document.getElementById('ctx-copy').style.display = msg.is_deleted ? 'none' : 'flex';
+    document.getElementById('ctx-delete-for-me').style.display = msg.is_deleted ? 'none' : 'flex';
 
     // Position
     const menuW = 170, menuH = 130;
@@ -751,6 +758,27 @@ async function ctxDelete(){
   document.getElementById('ctx-menu').classList.remove('visible');
   try {
     const res = await fetch(`/api/messages/${_ctxMsg.id}`, {method:'DELETE'});
+    const data = await res.json();
+    if(!res.ok) { alert(data.error); return; }
+    await loadThread(true);
+    lucide.createIcons();
+  } catch(e){ alert('Hitilafu ya mtandao.'); }
+}
+async function ctxDeleteForMe(){
+  if(!_ctxMsg) return;
+  document.getElementById('ctx-menu').classList.remove('visible');
+  try {
+    const res = await fetch(`/api/messages/${_ctxMsg.id}/delete-for-me`, {method:'POST'});
+    const data = await res.json();
+    if(!res.ok) { alert(data.error); return; }
+    await loadThread(true);
+    lucide.createIcons();
+  } catch(e){ alert('Hitilafu ya mtandao.'); }
+}
+async function clearConversation(){
+  if(!confirm('Futa mazungumzo yote kwako? Mwenzako ataendelea kuyaona.')) return;
+  try {
+    const res = await fetch(`/api/conversations/${CONV_ID}/clear`, {method:'POST'});
     const data = await res.json();
     if(!res.ok) { alert(data.error); return; }
     await loadThread(true);
