@@ -3056,12 +3056,13 @@ def get_messages(conv_id):
     }
     msgs = [
         {
-            "id":        m.id,
-            "body":      m.body,
-            "sender":    m.sender.full_name,
-            "is_mine":   m.sender_id == current_user.id,
-            "is_read":   m.is_read,
-            "sent_at":   m.sent_at.strftime("%Y-%m-%dT%H:%M:%SZ"),  # UTC ISO
+            "id":         m.id,
+            "body":       m.body,
+            "sender":     m.sender.full_name,
+            "is_mine":    m.sender_id == current_user.id,
+            "is_read":    m.is_read,
+            "is_deleted": m.is_deleted,
+            "sent_at":    m.sent_at.strftime("%Y-%m-%dT%H:%M:%SZ"),  # UTC ISO
         }
         for m in conv.messages
         if m.id not in hidden_ids
