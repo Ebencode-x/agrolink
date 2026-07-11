@@ -404,6 +404,24 @@ class Message(db.Model):
     sent_at         = db.Column(db.DateTime, default=datetime.utcnow)
     sender          = db.relationship("User", foreign_keys=[sender_id], lazy=True)
 
+class MessageDeletion(db.Model):
+    """'Futa kwangu' — mtumiaji anaficha ujumbe mmoja kutoka mwonekano wake pekee."""
+    __tablename__ = "message_deletions"
+    id         = db.Column(db.Integer, primary_key=True)
+    message_id = db.Column(db.Integer, db.ForeignKey("messages.id"), nullable=False)
+    user_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    deleted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    __table_args__ = (db.UniqueConstraint("message_id", "user_id", name="uq_message_deletion"),)
+
+class ConversationClear(db.Model):
+    """'Futa Mazungumzo' — mtumiaji anaficha ujumbe wote uliotumwa kabla ya wakati fulani."""
+    __tablename__ = "conversation_clears"
+    id              = db.Column(db.Integer, primary_key=True)
+    conversation_id = db.Column(db.Integer, db.ForeignKey("conversations.id"), nullable=False)
+    user_id         = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    cleared_before  = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    __table_args__ = (db.UniqueConstraint("conversation_id", "user_id", name="uq_conversation_clear"),)
+
 # ── Escrow Model ─────────────────────────────────────────────────────────────
 class EscrowStatus(enum.Enum):
     held     = "held"
@@ -3026,6 +3044,16 @@ def get_messages(conv_id):
     ).filter(Message.sender_id != current_user.id).update({"is_read": True})
     db.session.commit()
 
+    clear = ConversationClear.query.filter_by(
+        conversation_id=conv_id, user_id=current_user.id
+    ).first()
+    hidden_ids = {
+        d.message_id for d in
+        MessageDeletion.query.join(Message)
+        .filter(MessageDeletion.user_id == current_user.id,
+                Message.conversation_id == conv_id)
+        .all()
+    }
     msgs = [
         {
             "id":        m.id,
@@ -3036,6 +3064,8 @@ def get_messages(conv_id):
             "sent_at":   m.sent_at.strftime("%Y-%m-%dT%H:%M:%SZ"),  # UTC ISO
         }
         for m in conv.messages
+        if m.id not in hidden_ids
+        and (clear is None or m.sent_at > clear.cleared_before)
     ]
     return jsonify({
         "conversation_id": conv.id,
@@ -3085,14 +3115,54 @@ def reply_message(conv_id):
 @login_required
 @require_active_account
 def delete_message(msg_id):
-    """Futa ujumbe — sender tu, ndani ya dakika 10."""
+    """Futa kwa Wote — sender tu, ndani ya dakika 10 (kama WhatsApp)."""
     msg = Message.query.get_or_404(msg_id)
     if msg.sender_id != current_user.id:
         return jsonify({"error": "Unaweza kufuta ujumbe wako tu."}), 403
     if msg.is_deleted:
         return jsonify({"error": "Umeshafutwa."}), 400
+    if datetime.utcnow() - msg.sent_at > timedelta(minutes=10):
+        return jsonify({"error": "Muda wa kufuta kwa wote (dakika 10) umeisha."}), 400
     msg.is_deleted = True
     msg.body = "Ujumbe huu umefutwa."
+    db.session.commit()
+    return jsonify({"success": True})
+
+@app.route("/api/messages/<int:msg_id>/delete-for-me", methods=["POST"])
+@login_required
+@require_active_account
+def delete_message_for_me(msg_id):
+    """Futa Kwangu — mshiriki yeyote wa mazungumzo anaficha ujumbe kwake pekee."""
+    msg = Message.query.get_or_404(msg_id)
+    conv = msg.conversation
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return jsonify({"error": "Hauruhusiwi."}), 403
+    exists = MessageDeletion.query.filter_by(
+        message_id=msg_id, user_id=current_user.id
+    ).first()
+    if not exists:
+        db.session.add(MessageDeletion(message_id=msg_id, user_id=current_user.id))
+        db.session.commit()
+    return jsonify({"success": True})
+
+@app.route("/api/conversations/<int:conv_id>/clear", methods=["POST"])
+@login_required
+@require_active_account
+def clear_conversation(conv_id):
+    """Futa Mazungumzo — mshiriki anaficha ujumbe wote uliopo sasa, kwake pekee."""
+    conv = Conversation.query.get_or_404(conv_id)
+    if current_user.id not in (conv.buyer_id, conv.seller_id):
+        return jsonify({"error": "Hauruhusiwi."}), 403
+    now = datetime.utcnow()
+    clear = ConversationClear.query.filter_by(
+        conversation_id=conv_id, user_id=current_user.id
+    ).first()
+    if clear:
+        clear.cleared_before = now
+    else:
+        db.session.add(ConversationClear(
+            conversation_id=conv_id, user_id=current_user.id, cleared_before=now
+        ))
     db.session.commit()
     return jsonify({"success": True})
 
