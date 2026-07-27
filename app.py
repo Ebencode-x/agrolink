@@ -3126,8 +3126,9 @@ def delete_message(msg_id):
         return jsonify({"error": "Umeshafutwa."}), 400
     if datetime.utcnow() - msg.sent_at > timedelta(minutes=10):
         return jsonify({"error": "Muda wa kufuta kwa wote (dakika 10) umeisha."}), 400
-    msg.is_deleted = True
-    msg.body = "Ujumbe huu umefutwa."
+    Message.query.filter_by(reply_to_id=msg.id).update({"reply_to_id": None})
+    MessageDeletion.query.filter_by(message_id=msg.id).delete()
+    db.session.delete(msg)
     db.session.commit()
     return jsonify({"success": True})
 
