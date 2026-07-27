@@ -1,5 +1,7 @@
 import os
 import requests
+import io
+from PIL import Image
 from functools import wraps
 from email_service import send_welcome_email, send_partnership_notification
 from datetime import datetime, timedelta
@@ -53,6 +55,7 @@ if app.config["SQLALCHEMY_DATABASE_URI"].startswith("postgresql+psycopg://"):
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {"pool_pre_ping": True, "pool_recycle": 300}
+app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 6MB hard cap (upload route itaangalia 5MB baadaye)
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
@@ -2365,12 +2368,22 @@ def upload_image():
     file_bytes = file.read()
     if len(file_bytes) > 5 * 1024 * 1024:
         return jsonify({"error": "Picha ni kubwa mno. Kikomo ni 5MB."}), 400
-
+    # SECURITY: thibitisha faili ni picha halisi, si faili hatari lililobadilishwa jina
+    try:
+        img = Image.open(io.BytesIO(file_bytes))
+        img.verify()
+        real_format = img.format.lower()
+    except Exception:
+        return jsonify({"error": "Faili hii si picha halali."}), 400
+    format_map = {"jpeg": {"jpg", "jpeg"}, "png": {"png"}, "webp": {"webp"}}
+    if not any(real_format == k and ext in v for k, v in format_map.items()):
+        return jsonify({"error": "Aina ya picha haiendani na kiendelezi cha faili."}), 400
+    safe_content_type = "image/" + real_format
     filename = (
-        f"crops/{current_user.id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.{ext}"
+        f'crops/{current_user.id}_' + datetime.utcnow().strftime('%Y%m%d%H%M%S') + f'.{ext}'
     )
     supabase_client.storage.from_("crop-images").upload(
-        filename, file_bytes, {"content-type": file.content_type}
+        filename, file_bytes, {"content-type": safe_content_type}
     )
     public_url = f"{SUPABASE_URL}/storage/v1/object/public/crop-images/{filename}"
     return jsonify({"url": public_url})
