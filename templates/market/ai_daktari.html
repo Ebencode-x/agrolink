@@ -23,6 +23,11 @@
   .preview-wrap{margin-top:1.25rem;display:none;border-radius:var(--radius-sm);overflow:hidden;border:1px solid var(--border)}
   .preview-wrap img{width:100%;max-height:260px;object-fit:cover;display:block}
   .preview-label{padding:0.6rem 0.75rem;background:var(--bg-surface);font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;border-top:1px solid var(--border)}
+  .upload-btn-row{display:flex;gap:0.5rem;justify-content:center;margin-top:1rem;flex-wrap:wrap;position:relative;z-index:2}
+  .upload-btn{display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1rem;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:var(--bg-surface);color:var(--text-primary);font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit}
+  .upload-btn-primary{border-color:var(--brand-mid);background:var(--brand-mid);color:#fff}
+  .preview-remove{margin-left:auto;width:26px;height:26px;border-radius:50%;border:none;background:rgba(0,0,0,0.08);color:var(--text-muted);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .preview-remove:hover{background:rgba(220,38,38,0.15);color:#dc2626}
 
   .crop-hint-row{display:flex;flex-wrap:wrap;gap:0.5rem;margin:1.25rem 0 1rem}
   .crop-hint{padding:0.3rem 0.75rem;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-subtle);font-size:0.75rem;color:var(--text-secondary);cursor:pointer;transition:all var(--transition)}
@@ -103,18 +108,32 @@
         Pakia Picha ya Zao
       </div>
       <div class="upload-zone" id="upload-zone">
-        <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" onchange="handleFile(event)"/>
         <div class="upload-icon">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         </div>
-        <div class="upload-text">Bonyeza au buruta picha hapa</div>
+        <div class="upload-text">Piga picha au chagua kutoka kwenye picha zako</div>
         <div class="upload-hint">JPG, PNG, WEBP — hadi 5MB</div>
+        <div class="upload-btn-row">
+          <button type="button" class="upload-btn upload-btn-primary" onclick="event.stopPropagation();document.getElementById('camera-input').click()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            Piga Picha
+          </button>
+          <button type="button" class="upload-btn" onclick="event.stopPropagation();document.getElementById('gallery-input').click()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Chagua kutoka Picha
+          </button>
+        </div>
+        <input type="file" id="camera-input" accept="image/jpeg,image/png,image/webp" capture="environment" style="display:none" onchange="handleFile(event)"/>
+        <input type="file" id="gallery-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleFile(event)"/>
       </div>
       <div class="preview-wrap" id="preview-wrap">
         <img id="preview-img" src="" alt="Picha ya zao"/>
         <div class="preview-label">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           <span id="preview-name"></span>
+          <button type="button" class="preview-remove" onclick="removeFile()" aria-label="Futa Picha">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
       </div>
       <div style="font-size:0.78rem;color:var(--text-muted);margin:1.1rem 0 0.4rem">Au andika zao lako (si lazima):</div>
@@ -214,6 +233,14 @@ function handleFile(e){
   document.getElementById('preview-img').src=URL.createObjectURL(file);
   document.getElementById('preview-name').textContent=file.name;
   document.getElementById('preview-wrap').style.display='block';
+}
+function removeFile(){
+  selectedFile=null;
+  document.getElementById('camera-input').value='';
+  document.getElementById('gallery-input').value='';
+  document.getElementById('preview-img').src='';
+  document.getElementById('preview-name').textContent='';
+  document.getElementById('preview-wrap').style.display='none';
 }
 const zone=document.getElementById('upload-zone');
 zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
