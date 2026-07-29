@@ -114,7 +114,7 @@
         <div class="upload-text">Piga picha au chagua kutoka kwenye picha zako</div>
         <div class="upload-hint">JPG, PNG, WEBP — hadi 5MB</div>
         <div class="upload-btn-row">
-          <button type="button" class="upload-btn upload-btn-primary" onclick="event.stopPropagation();document.getElementById('camera-input').click()">
+          <button type="button" id="btn-piga-picha" class="upload-btn upload-btn-primary">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             Piga Picha
           </button>
@@ -123,7 +123,6 @@
             Chagua kutoka Picha
           </button>
         </div>
-        <input type="file" id="camera-input" accept="image/jpeg,image/png,image/webp" capture="environment" style="display:none" onchange="handleFile(event)"/>
         <input type="file" id="gallery-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleFile(event)"/>
       </div>
       <div class="preview-wrap" id="preview-wrap">
@@ -317,5 +316,10 @@ function renderResult(a){
   document.getElementById('r-confidence-bar').style.width=conf+'%';
   showState('result');
 }
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/camera-capture.css') }}">
+<script src="{{ url_for('static', filename='js/camera-capture.js') }}"></script>
+<script>
+  new CameraCapture({ triggerBtnId: 'btn-piga-picha', fileInputId: 'gallery-input' });
 </script>
 {% endblock %}

@@ -123,7 +123,7 @@
               <p style="font-size:0.85rem;color:var(--text-muted)">Piga picha au chagua kutoka kwenye picha zako</p>
               <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.25rem">JPG, PNG, WEBP — Max 5MB</p>
               <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:0.9rem;flex-wrap:wrap">
-                <button type="button" onclick="document.getElementById('camera-input').click()" style="display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1rem;border-radius:var(--radius-sm);border:1px solid var(--brand-mid);background:var(--brand-mid);color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit">
+                <button type="button" id="btn-piga-picha" style="display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1rem;border-radius:var(--radius-sm);border:1px solid var(--brand-mid);background:var(--brand-mid);color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit">
                   <i data-lucide="camera" style="width:14px;height:14px"></i>Piga Picha
                 </button>
                 <button type="button" onclick="document.getElementById('gallery-input').click()" style="display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1rem;border-radius:var(--radius-sm);border:1px solid var(--border-strong);background:var(--bg-surface);color:var(--text-primary);font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit">
@@ -131,7 +131,6 @@
                 </button>
               </div>
             </div>
-            <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none" onchange="previewImage(this)"/>
             <input type="file" id="gallery-input" accept="image/*" style="display:none" onchange="previewImage(this)"/>
             <div id="image-preview-wrap" style="display:none;position:relative;margin-top:0.75rem">
               <img id="image-preview" src="" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;display:block"/>
@@ -336,5 +335,10 @@ document.getElementById('add-form').addEventListener('submit',async e=>{
     document.getElementById('submit-text').textContent='Ongeza Orodha Sokoni';
   }
 });
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/camera-capture.css') }}">
+<script src="{{ url_for('static', filename='js/camera-capture.js') }}"></script>
+<script>
+  new CameraCapture({ triggerBtnId: 'btn-piga-picha', fileInputId: 'gallery-input' });
 </script>
 {% endblock %}
