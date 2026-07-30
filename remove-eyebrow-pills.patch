@@ -1,0 +1,252 @@
+From 5a98da0793d5cac466c74a299d4abdfb6dbfd15b Mon Sep 17 00:00:00 2001
+From: Ebenezer <ebenezer@agrolink.local>
+Date: Thu, 30 Jul 2026 12:32:24 +0000
+Subject: [PATCH] Remove decorative eyebrow/badge pills across public pages
+
+Removed meaningless uppercase eyebrow labels (hero, section, about, auth,
+dashboard, ai_daktari, price_intelligence) and their associated CSS rules
+for a cleaner, more polished look (eBay/Google-style) instead of vibe-coded
+decorative pills.
+
+Files: index.html, about.html, developer.html, auth/login.html,
+dashboard/dashboard.html, market/ai_daktari.html, market/price_intelligence.html,
+base.html (shared .section-eyebrow rule)
+---
+ templates/about.html                     | 3 ---
+ templates/auth/login.html                | 2 --
+ templates/base.html                      | 1 -
+ templates/dashboard/dashboard.html       | 2 --
+ templates/developer.html                 | 5 -----
+ templates/index.html                     | 9 ---------
+ templates/market/ai_daktari.html         | 5 -----
+ templates/market/price_intelligence.html | 5 -----
+ 8 files changed, 32 deletions(-)
+
+diff --git a/templates/about.html b/templates/about.html
+index ec49627..b4b6395 100644
+--- a/templates/about.html
++++ b/templates/about.html
+@@ -7,7 +7,6 @@
+   /* ── HERO ── */
+   .ab-hero{background:var(--brand-dark);padding:6rem clamp(1rem,5vw,3rem) 5rem}
+   .ab-hero-inner{max-width:640px}
+-  .ab-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem}
+   .ab-hero h1{font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
+   .ab-hero p{color:rgba(254,250,224,0.60);font-size:1rem;line-height:1.85;max-width:520px;margin-bottom:2.5rem}
+   .ab-hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
+@@ -74,7 +73,6 @@
+ <section class="ab-hero">
+   <div class="ab-wrap">
+     <div class="ab-hero-inner">
+-      <div class="ab-eyebrow">AgroLink Tanzania</div>
+       <h1>Jukwaa la Kilimo<br/>cha Tanzania</h1>
+       <p>Tunaunganisha wakulima, mawakala, na masoko ya Tanzania — bei za kweli, watu wa kweli, wakati halisi. Bila wasitani, bila udanganyifu.</p>
+       <div class="ab-hero-btns">
+@@ -203,7 +201,6 @@
+ <section class="ab-cta">
+   <div class="ab-wrap">
+     <div class="ab-cta-inner">
+-      <div class="ab-eyebrow">Jiunge Nasi</div>
+       <h2>Anza Leo — Bure Kabisa</h2>
+       <p>Jiunge na wakulima wa Tanzania wanaotumia AgroLink kupata bei bora, masoko mapya, na fursa za biashara.</p>
+       <a href="/register" class="ab-btn-solid">
+diff --git a/templates/auth/login.html b/templates/auth/login.html
+index f24afbf..864a3c7 100644
+--- a/templates/auth/login.html
++++ b/templates/auth/login.html
+@@ -7,7 +7,6 @@
+ 
+ 
+   .auth-visual-content{position:relative;z-index:1}
+-  .auth-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,0.35);border:1px solid rgba(212,163,115,0.40);color:var(--brand-light);padding:0.35rem 0.9rem;border-radius:50px;font-size:0.78rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2rem}
+   .auth-visual-title{font-family:var(--font-display);font-size:clamp(2rem,3.5vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
+   .auth-visual-title .accent{color:var(--brand-green)}
+   .auth-visual-subtitle{font-size:1rem;color:rgba(254,250,224,0.60);line-height:1.7;max-width:420px;margin-bottom:3rem}
+@@ -43,7 +42,6 @@
+ <div class="auth-layout">
+   <div class="auth-visual">
+     <div class="auth-visual-content">
+-      <div class="auth-eyebrow"><i data-lucide="shield-check" style="width:13px;height:13px"></i>Salama & Haraka</div>
+       <h1 class="auth-visual-title">Karibu Tena<br/>kwenye <span class="accent">AgroLink</span><br/>Tanzania</h1>
+       <p class="auth-visual-subtitle">Ingia kwenye akaunti yako upate bei za soko, hali ya hewa, na mazungumzo na wakulima wengine wa Tanzania.</p>
+       <div>
+diff --git a/templates/base.html b/templates/base.html
+index 7d8d27d..7ca4c4e 100644
+--- a/templates/base.html
++++ b/templates/base.html
+@@ -98,7 +98,6 @@
+     .nav-dropdown:hover .nav-dropdown-menu{display:block}
+ 
+     /* Section headers */
+-    .section-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--brand-mid);margin-bottom:0.5rem}
+     .section-title{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:800;line-height:1.2;color:var(--text-primary);margin-bottom:0.75rem}
+     .section-subtitle{font-size:0.97rem;color:var(--text-secondary);max-width:520px;line-height:1.75}
+ 
+diff --git a/templates/dashboard/dashboard.html b/templates/dashboard/dashboard.html
+index 53ae83a..1e1b9f4 100644
+--- a/templates/dashboard/dashboard.html
++++ b/templates/dashboard/dashboard.html
+@@ -5,7 +5,6 @@
+ <style>
+   .dash-wrap{max-width:1200px;margin:0 auto;padding:2.5rem clamp(1rem,5vw,2.5rem) 5rem}
+   .dash-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+-  .dash-eyebrow{font-size:0.72rem;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;color:var(--brand-mid);margin-bottom:0.4rem}
+   .dash-title{font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;color:var(--text-primary);margin-bottom:0.25rem}
+   .dash-subtitle{font-size:0.85rem;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+   .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
+@@ -111,7 +110,6 @@
+   <!-- Header -->
+   <div class="dash-header reveal">
+     <div>
+-      <div class="dash-eyebrow">Dashboard Yako</div>
+       <div class="dash-title">Karibu, {{ current_user.full_name.split()[0] }}</div>
+       <div class="dash-subtitle">
+         <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--brand-mid)"></i>
+diff --git a/templates/developer.html b/templates/developer.html
+index 679b6a4..d3f0629 100644
+--- a/templates/developer.html
++++ b/templates/developer.html
+@@ -15,7 +15,6 @@
+   .live-dot{width:8px;height:8px;background:var(--brand-light);border-radius:50%;animation:pulse-dot 2s ease-in-out infinite}
+   @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
+ 
+-  .about-eyebrow{font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--brand-light);margin-bottom:0.75rem}
+   .about-name{font-family:var(--font-display);font-size:2.5rem;font-weight:800;line-height:1.1;color:var(--text-primary);margin-bottom:0.5rem}
+   .about-role{font-size:0.95rem;color:var(--brand-mid);font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:8px}
+   .about-bio{font-size:0.93rem;color:var(--text-secondary);line-height:1.9;margin-bottom:2rem}
+@@ -43,7 +42,6 @@
+   .stat-card-value{font-family:var(--font-display);font-size:2.2rem;font-weight:800;color:var(--brand-dark);margin-bottom:0.5rem}
+   .stat-card-label{font-size:0.83rem;color:var(--text-secondary)}
+ 
+-  .section-eyebrow{font-size:0.75rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--brand-light);margin-bottom:0.75rem}
+   .section-title{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--text-primary);margin-bottom:0.75rem}
+ 
+   .mission-section{padding:4rem clamp(1rem,5vw,4rem);max-width:1100px;margin:0 auto}
+@@ -123,7 +121,6 @@
+     </div>
+ 
+     <div class="reveal">
+-      <div class="about-eyebrow">Msanidi Mkuu</div>
+       <div class="about-name">Ebenezer Richard<br/>Masanja</div>
+       <div class="about-role">
+         <i data-lucide="graduation-cap" style="width:18px;height:18px"></i>
+@@ -188,7 +185,6 @@
+ <!-- MISSION -->
+ <div class="mission-section">
+   <div style="text-align:center" class="reveal">
+-    <div class="section-eyebrow">Dhamira Yetu</div>
+     <h2 class="section-title">Kwa Nini AgroLink Tanzania?</h2>
+     <p style="color:var(--text-secondary);max-width:600px;margin:0 auto;line-height:1.8">Tanzania ina wakulima zaidi ya milioni 30. Wengi hawana upatikanaji wa bei za soko za kweli, hali ya hewa sahihi, au njia ya kuunganika na wanunuzi. AgroLink inabadilisha hilo.</p>
+   </div>
+@@ -212,7 +208,6 @@
+ <!-- TECH STACK -->
+ <div class="tech-section">
+   <div class="reveal">
+-    <div class="section-eyebrow">Teknolojia Zinazotumika</div>
+     <h2 class="section-title">Stack ya AgroLink</h2>
+     <p style="color:var(--text-secondary);line-height:1.8">Mfumo huu umejengwa kwa teknolojia za kisasa za uzalishaji — zote zilizochaguliwa kwa makusudi ya utendaji, usalama, na urahisi wa matengenezo.</p>
+   </div>
+diff --git a/templates/index.html b/templates/index.html
+index d3271e3..a2632c1 100644
+--- a/templates/index.html
++++ b/templates/index.html
+@@ -24,7 +24,6 @@
+   /* ── Hero ── */
+   .hero{background:var(--nav-bg);padding:4.5rem clamp(1rem,5vw,2.5rem) 3.5rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+   .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+-  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(74,155,111,0.18);border:1px solid rgba(74,155,111,0.30);color:rgba(240,247,242,0.85);padding:0.28rem 0.85rem;border-radius:50px;font-size:0.73rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:1.25rem}
+   .hero-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
+   .hero-title .accent{color:var(--accent)}
+   .hero-subtitle{font-size:0.97rem;color:rgba(240,247,242,0.62);line-height:1.8;margin-bottom:2rem;max-width:430px}
+@@ -150,10 +149,6 @@
+   <div class="hero-inner">
+     <!-- Left: Content -->
+     <div>
+-      <div class="hero-eyebrow">
+-        <i data-lucide="leaf" style="width:13px;height:13px"></i>
+-        Jukwaa la Kwanza la Kilimo — Tanzania
+-      </div>
+       <h1 class="hero-title">
+         Kilimo cha Kisasa<br/>kwa Wakulima wa<br/>
+         <span class="accent">Tanzania</span>
+@@ -245,7 +240,6 @@
+ <section class="section" id="huduma">
+   <div class="section-inner">
+     <div class="section-header section-header-center">
+-      <div class="section-eyebrow">Huduma Zetu</div>
+       <h2 class="section-title">Kila Kitu Unachohitaji kwa Kilimo</h2>
+       <p class="section-subtitle">Kutoka bei za soko hadi hali ya hewa — AgroLink inakupa nguvu ya kufanya maamuzi sahihi.</p>
+     </div>
+@@ -275,7 +269,6 @@
+ <section class="section section-alt" id="jinsi-inavyofanya-kazi">
+   <div class="section-inner">
+     <div class="section-header section-header-center">
+-      <div class="section-eyebrow">Mchakato</div>
+       <h2 class="section-title">Jinsi AgroLink Inavyofanya Kazi</h2>
+       <p class="section-subtitle">Hatua tatu rahisi kuanza kuuza au kununua mazao.</p>
+     </div>
+@@ -306,7 +299,6 @@
+   <div class="section-inner">
+     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.25rem;flex-wrap:wrap;gap:1rem">
+       <div class="section-header" style="margin-bottom:0">
+-        <div class="section-eyebrow">Soko la Mazao</div>
+         <h2 class="section-title" style="margin-bottom:0.35rem">Mazao Mapya Sokoni</h2>
+         <p style="font-size:0.88rem;color:var(--text-muted)">Ingia ili uone mawasiliano ya muuzaji.</p>
+       </div>
+@@ -360,7 +352,6 @@
+ <section class="section section-alt" id="hali-ya-hewa">
+   <div class="section-inner">
+     <div class="section-header section-header-center">
+-      <div class="section-eyebrow">Hali ya Hewa</div>
+       <h2 class="section-title">Angalia Hali ya Hewa Mjini Kwako</h2>
+       <p class="section-subtitle">Ingiza jina la mji wako na upate hali ya hewa ya sasa hivi.</p>
+     </div>
+diff --git a/templates/market/ai_daktari.html b/templates/market/ai_daktari.html
+index 9d456c8..65a2855 100644
+--- a/templates/market/ai_daktari.html
++++ b/templates/market/ai_daktari.html
+@@ -5,7 +5,6 @@
+ <style>
+   /* ── Forest & Harvest — AI Daktari ── */
+   .ai-page{max-width:1100px;margin:0 auto;padding:2.5rem clamp(1rem,4vw,3rem) 5rem}
+-  .ai-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--bg-surface);border:1px solid var(--border-strong);color:var(--brand-mid);padding:0.3rem 0.9rem;border-radius:var(--radius-sm);font-size:0.75rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:1rem}
+   .ai-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text-primary);margin-bottom:0.6rem}
+   .ai-title .accent{color:var(--brand-mid)}
+   .ai-subtitle{font-size:0.95rem;color:var(--text-secondary);max-width:580px;line-height:1.7;margin-bottom:2.5rem}
+@@ -93,10 +92,6 @@
+ {% block content %}
+ <div class="ai-page">
+   <div class="reveal" style="margin-bottom:0">
+-    <div class="ai-eyebrow">
+-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+-      Teknolojia ya AI — Bure Kabisa
+-    </div>
+     <h1 class="ai-title">Daktari wa Zao<br/><span class="accent">Piga Picha, Pata Ushauri</span></h1>
+     <p class="ai-subtitle">Piga picha ya zao lako — AI yetu itachambua magonjwa, wadudu, au upungufu wa lishe na kutoa dawa na matibabu ya kitaalamu kwa sekunde chache.</p>
+   </div>
+diff --git a/templates/market/price_intelligence.html b/templates/market/price_intelligence.html
+index 7892982..2510337 100644
+--- a/templates/market/price_intelligence.html
++++ b/templates/market/price_intelligence.html
+@@ -7,7 +7,6 @@
+   .pi-page{max-width:1200px;margin:0 auto;padding:2.5rem clamp(1rem,4vw,3rem) 5rem}
+ 
+   .pi-header{margin-bottom:2.5rem}
+-  .pi-eyebrow{display:inline-flex;align-items:center;gap:7px;background:var(--bg-surface);border:1px solid var(--border-strong);color:var(--brand-mid);padding:0.3rem 0.9rem;border-radius:var(--radius-sm);font-size:0.75rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:1rem}
+   .pi-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text-primary);margin-bottom:0.6rem}
+   .pi-title .accent{color:var(--brand-mid)}
+   .pi-subtitle{font-size:0.95rem;color:var(--text-secondary);max-width:580px;line-height:1.7}
+@@ -118,10 +117,6 @@
+ 
+   <!-- Header -->
+   <div class="pi-header reveal">
+-    <div class="pi-eyebrow">
+-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+-      Akili ya Soko — Inayotumia AI
+-    </div>
+     <h1 class="pi-title">Tabiri Bei ya Mazao<br/><span class="accent">kwa Mkoa Wako</span></h1>
+     <p class="pi-subtitle">Chagua zao, mkoa, na mwezi — AI yetu itatoa uchambuzi wa bei, mwenendo wa soko, na ushauri wa mauzo kwa wakati huu.</p>
+   </div>
+-- 
+2.43.0
+
