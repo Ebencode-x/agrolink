@@ -2,86 +2,589 @@
 {% block title %}Kuhusu AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
-  .ab-wrap{max-width:1100px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem)}
+  /* ═══════════════════════════════════════
+     AGROLINK ABOUT — PROFESSIONAL REDESIGN
+     Professional Green, Cream, Dark Theme
+  ═══════════════════════════════════════ */
 
-  /* ── HERO ── */
-  .ab-hero{background:var(--brand-dark);padding:6rem clamp(1rem,5vw,3rem) 5rem}
-  .ab-hero-inner{max-width:640px}
-  .ab-hero h1{font-family:var(--font-display);font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
-  .ab-hero p{color:rgba(254,250,224,0.60);font-size:1rem;line-height:1.85;max-width:520px;margin-bottom:2.5rem}
-  .ab-hero-btns{display:flex;gap:0.75rem;flex-wrap:wrap}
-  .ab-btn-solid{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.4rem;background:var(--accent);color:#3d2000;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.85rem;text-decoration:none;transition:opacity .2s}
-  .ab-btn-solid:hover{opacity:.88}
-  .ab-btn-ghost{display:inline-flex;align-items:center;gap:8px;padding:0.7rem 1.4rem;background:transparent;border:1.5px solid rgba(255,255,255,0.18);color:rgba(254,250,224,0.80);border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.85rem;text-decoration:none;transition:border-color .2s}
-  .ab-btn-ghost:hover{border-color:rgba(255,255,255,0.40)}
-
-  /* ── DIVIDER ── */
-  .ab-divider{border:none;border-top:1px solid var(--border-subtle);margin:0}
-
-  /* ── SECTION BASE ── */
-  .ab-section{padding:4.5rem 0}
-
-  /* ── WHAT WE DO — horizontal rows ── */
-  .ab-row{display:flex;align-items:flex-start;gap:2.5rem;padding:2rem 0;border-bottom:1px solid var(--border-subtle)}
-  .ab-row:last-child{border-bottom:none}
-  .ab-row-num{font-family:var(--font-display);font-size:0.72rem;font-weight:700;color:var(--text-muted);letter-spacing:0.08em;min-width:32px;padding-top:3px}
-  .ab-row-body{}
-  .ab-row-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:0.4rem}
-  .ab-row-desc{font-size:0.88rem;color:var(--text-secondary);line-height:1.75;max-width:560px}
-
-  /* ── METRICS — minimal ── */
-  .ab-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden}
-  .ab-metric{padding:1.75rem 1.5rem;border-right:1px solid var(--border-subtle)}
-  .ab-metric:last-child{border-right:none}
-  .ab-metric-val{font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--text-primary);margin-bottom:0.3rem}
-  .ab-metric-label{font-size:0.78rem;color:var(--text-muted);line-height:1.5}
-  @media(max-width:600px){
-    .ab-metrics{grid-template-columns:1fr 1fr}
-    .ab-metric{border-right:none;border-bottom:1px solid var(--border-subtle)}
-    .ab-metric:nth-child(odd){border-right:1px solid var(--border-subtle)}
-    .ab-metric:last-child{border-bottom:none}
+  :root {
+    --ab-dark: #0F2818;
+    --ab-green-900: #1a3d2e;
+    --ab-green-800: #2d5a3d;
+    --ab-green-600: #3d7a52;
+    --ab-green-500: #4a9b6f;
+    --ab-green-400: #6ba98a;
+    --ab-accent: #E8B84B;
+    --ab-cream: #F5F0E8;
+    --ab-cream-light: #fdfbf7;
+    --ab-text-dark: #0F1F15;
+    --ab-text-light: #1a2e1f;
+    --ab-text-muted: #5a7468;
+    --ab-border: #dce8e0;
+    --ab-glass-bg: rgba(255, 250, 245, 0.7);
+    --ab-glass-border: rgba(74, 155, 111, 0.2);
   }
 
-  /* ── TECH STACK ── */
-  .ab-stack{display:flex;flex-direction:column;gap:0;border:1px solid var(--border-subtle);border-radius:var(--radius-md);overflow:hidden}
-  .ab-stack-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border-bottom:1px solid var(--border-subtle);font-size:0.88rem}
-  .ab-stack-row:last-child{border-bottom:none}
-  .ab-stack-name{font-family:var(--font-display);font-weight:700;color:var(--text-primary)}
-  .ab-stack-role{color:var(--text-muted);font-size:0.82rem}
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-  /* ── CTA ── */
-  .ab-cta{background:var(--brand-dark);padding:5rem clamp(1rem,5vw,3rem)}
-  .ab-cta-inner{max-width:520px}
-  .ab-cta h2{font-family:var(--font-display);font-size:clamp(1.5rem,3vw,2rem);font-weight:800;color:var(--text-on-dark);margin-bottom:0.75rem}
-  .ab-cta p{color:rgba(254,250,224,0.55);font-size:0.9rem;line-height:1.8;margin-bottom:2rem}
+  body {
+    background: linear-gradient(135deg, #fdfbf7 0%, #f5f0e8 100%);
+    font-family: var(--font-body);
+    color: var(--ab-text-dark);
+    overflow-x: hidden;
+  }
 
-  /* ── DEVELOPER ── */
-  .ab-dev{display:inline-flex;align-items:center;gap:0.85rem;margin-top:2rem;padding:0.9rem 1.1rem;border:1px solid rgba(255,255,255,0.10);border-radius:var(--radius-sm);text-decoration:none;transition:border-color .2s;background:rgba(255,255,255,0.03)}
-  .ab-dev:hover{border-color:rgba(232,184,75,0.35)}
-  .ab-dev-avatar{width:38px;height:38px;border-radius:8px;background:var(--brand-mid);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:800;font-size:0.78rem;color:var(--text-on-dark);flex-shrink:0;letter-spacing:.03em}
-  .ab-dev-name{font-family:var(--font-display);font-weight:700;font-size:0.85rem;color:var(--text-on-dark)}
-  .ab-dev-role{font-size:0.75rem;color:rgba(254,250,224,0.40);margin-top:1px}
+  /* ─────────────────────────────────────────
+     HERO SECTION — Gradient + Typography
+  ─────────────────────────────────────────── */
+  .ab-hero {
+    background: linear-gradient(135deg, #0F2818 0%, #1a3d2e 50%, #2d5a3d 100%);
+    padding: 8rem clamp(1rem, 5vw, 3rem) 6rem;
+    position: relative;
+    overflow: hidden;
+  }
 
-  .ab-section-label{font-size:0.72rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2rem;display:flex;align-items:center;gap:8px}
-  .ab-section-label::after{content:'';flex:1;height:1px;background:var(--border-subtle)}
+  .ab-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(74, 155, 111, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(232, 184, 75, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .ab-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 5vw, 2.5rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  .ab-hero-inner {
+    max-width: 680px;
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .ab-hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #f5f0e8;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .ab-hero p {
+    color: rgba(245, 240, 232, 0.75);
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    line-height: 1.8;
+    max-width: 580px;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+  }
+
+  .ab-hero-btns {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .ab-btn-solid {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.9rem 2rem;
+    background: linear-gradient(135deg, #E8B84B 0%, #D4A340 100%);
+    color: #0F2818;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    box-shadow: 0 10px 30px rgba(232, 184, 75, 0.2);
+  }
+
+  .ab-btn-solid:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 45px rgba(232, 184, 75, 0.3);
+  }
+
+  .ab-btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.9rem 2rem;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(245, 240, 232, 0.3);
+    color: #f5f0e8;
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    backdrop-filter: blur(10px);
+  }
+
+  .ab-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(232, 184, 75, 0.5);
+    transform: translateY(-3px);
+  }
+
+  /* ─────────────────────────────────────────
+     DIVIDER — Elegant
+  ─────────────────────────────────────────── */
+  .ab-divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #dce8e0 50%, transparent);
+    margin: 4rem 0;
+  }
+
+  .ab-section {
+    padding: 5.5rem 0;
+  }
+
+  /* ─────────────────────────────────────────
+     SECTION LABELS
+  ─────────────────────────────────────────── */
+  .ab-section-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ab-green-600);
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ab-section-label::after {
+    content: '';
+    flex: 1;
+    height: 1.5px;
+    background: linear-gradient(90deg, var(--ab-green-500), transparent);
+  }
+
+  /* ─────────────────────────────────────────
+     METRICS SECTION — Glassmorphism Cards
+  ─────────────────────────────────────────── */
+  .ab-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .ab-metric {
+    background: var(--ab-glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid var(--ab-glass-border);
+    border-radius: 16px;
+    padding: 2.2rem 2rem;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.320, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ab-metric::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 155, 111, 0.3), transparent);
+  }
+
+  .ab-metric:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 250, 245, 0.85);
+    border-color: var(--ab-green-500);
+    box-shadow: 0 20px 50px rgba(74, 155, 111, 0.12);
+  }
+
+  .ab-metric-val {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--ab-green-600), var(--ab-green-500));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+
+  .ab-metric-label {
+    font-size: 0.9rem;
+    color: var(--ab-text-muted);
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .ab-metrics {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+    .ab-metric {
+      padding: 1.8rem 1.5rem;
+    }
+    .ab-metric-val {
+      font-size: 2.2rem;
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     WHAT WE DO SECTION — Feature Cards
+  ─────────────────────────────────────────── */
+  .ab-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .ab-row {
+    background: linear-gradient(135deg, rgba(255, 250, 245, 0.6) 0%, rgba(245, 240, 232, 0.8) 100%);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid var(--ab-border);
+    border-left: 4px solid var(--ab-green-500);
+    border-radius: 16px;
+    padding: 2.5rem;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.320, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ab-row::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(74, 155, 111, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .ab-row:hover {
+    transform: translateX(6px) translateY(-4px);
+    border-left-color: var(--ab-accent);
+    box-shadow: 0 20px 50px rgba(74, 155, 111, 0.1);
+    border-color: rgba(74, 155, 111, 0.3);
+  }
+
+  .ab-row-num {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--ab-green-500), var(--ab-green-400));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    line-height: 1;
+  }
+
+  .ab-row-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ab-text-dark);
+    margin-bottom: 0.8rem;
+    letter-spacing: -0.01em;
+  }
+
+  .ab-row-desc {
+    font-size: 0.95rem;
+    color: var(--ab-text-muted);
+    line-height: 1.75;
+    font-weight: 400;
+  }
+
+  /* ─────────────────────────────────────────
+     TECH STACK SECTION
+  ─────────────────────────────────────────── */
+  .ab-stack-wrapper {
+    background: linear-gradient(135deg, #fdfbf7 0%, #f5f0e8 100%);
+    padding: 4rem 0;
+  }
+
+  .ab-stack {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.8rem;
+  }
+
+  .ab-stack-row {
+    background: var(--ab-glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid var(--ab-glass-border);
+    border-radius: 14px;
+    padding: 1.8rem 2rem;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    position: relative;
+  }
+
+  .ab-stack-row::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 155, 111, 0.3), transparent);
+  }
+
+  .ab-stack-row:hover {
+    transform: translateY(-6px);
+    border-color: var(--ab-green-500);
+    box-shadow: 0 15px 40px rgba(74, 155, 111, 0.12);
+  }
+
+  .ab-stack-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ab-text-dark);
+  }
+
+  .ab-stack-role {
+    color: var(--ab-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  /* ─────────────────────────────────────────
+     CTA SECTION — Dark Gradient
+  ─────────────────────────────────────────── */
+  .ab-cta {
+    background: linear-gradient(135deg, #0F2818 0%, #1a3d2e 50%, #2d5a3d 100%);
+    padding: 6.5rem clamp(1rem, 5vw, 3rem);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ab-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 30% 40%, rgba(74, 155, 111, 0.12) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(232, 184, 75, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .ab-cta-inner {
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .ab-cta h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    color: #f5f0e8;
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .ab-cta p {
+    color: rgba(245, 240, 232, 0.7);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ─────────────────────────────────────────
+     DEVELOPER CARD — Glassmorphism
+  ─────────────────────────────────────────── */
+  .ab-dev {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: 2rem;
+    padding: 1rem 1.4rem;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(245, 240, 232, 0.2);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .ab-dev:hover {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(232, 184, 75, 0.4);
+    transform: translateY(-3px);
+  }
+
+  .ab-dev-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--ab-green-500), var(--ab-green-400));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  .ab-dev-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #f5f0e8;
+  }
+
+  .ab-dev-role {
+    font-size: 0.8rem;
+    color: rgba(245, 240, 232, 0.5);
+    margin-top: 2px;
+  }
+
+  /* ─────────────────────────────────────────
+     ANIMATIONS
+  ─────────────────────────────────────────── */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* ─────────────────────────────────────────
+     RESPONSIVE
+  ─────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .ab-hero {
+      padding: 5rem clamp(1rem, 5vw, 2rem) 3.5rem;
+    }
+
+    .ab-hero h1 {
+      font-size: 2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .ab-hero p {
+      font-size: 0.95rem;
+    }
+
+    .ab-hero-btns {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .ab-btn-solid, .ab-btn-ghost {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .ab-section {
+      padding: 3.5rem 0;
+    }
+
+    .ab-features {
+      grid-template-columns: 1fr;
+    }
+
+    .ab-row {
+      padding: 2rem;
+    }
+
+    .ab-stack {
+      grid-template-columns: 1fr;
+    }
+
+    .ab-cta {
+      padding: 4rem clamp(1rem, 5vw, 2rem);
+    }
+
+    .ab-cta h2 {
+      font-size: 1.8rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ab-hero h1 {
+      font-size: 1.6rem;
+    }
+
+    .ab-metric {
+      padding: 1.6rem 1.2rem;
+    }
+
+    .ab-metric-val {
+      font-size: 2rem;
+    }
+
+    .ab-row-num {
+      font-size: 2.5rem;
+    }
+
+    .ab-row-title {
+      font-size: 1.1rem;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
+<!-- HERO SECTION -->
 <section class="ab-hero">
   <div class="ab-wrap">
     <div class="ab-hero-inner">
-      <h1>Jukwaa la Kilimo<br/>cha Tanzania</h1>
+      <h1>Jukwaa la Kilimo cha Tanzania</h1>
       <p>Tunaunganisha wakulima, mawakala, na masoko ya Tanzania — bei za kweli, watu wa kweli, wakati halisi. Bila wasitani, bila udanganyifu.</p>
       <div class="ab-hero-btns">
         <a href="/register" class="ab-btn-solid">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
           Jiunge Bure
         </a>
         <a href="/listings" class="ab-btn-ghost">
-          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 2-2-2-2"/><path d="M11 13h4"/><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+          <i data-lucide="store" style="width:18px;height:18px"></i>
           Angalia Soko
         </a>
       </div>
@@ -91,29 +594,29 @@
 
 <hr class="ab-divider"/>
 
-<!-- METRICS -->
+<!-- METRICS SECTION -->
 <div class="ab-wrap">
   <div class="ab-section">
     <div class="ab-section-label">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Takwimu
+      <i data-lucide="trending-up" style="width:14px;height:14px"></i>
+      Takwimu za Jukwaa
     </div>
     <div class="ab-metrics">
       <div class="ab-metric">
         <div class="ab-metric-val">25+</div>
-        <div class="ab-metric-label">Masoko Tanzania yanayofuatiliwa</div>
+        <div class="ab-metric-label">Masoko Tanzania yanayofuatiliwa kila siku</div>
       </div>
       <div class="ab-metric">
         <div class="ab-metric-val">100%</div>
-        <div class="ab-metric-label">Bure kabisa kwa wakulima</div>
+        <div class="ab-metric-label">Bure kabisa kwa wakulima — walakini ni biashara</div>
       </div>
       <div class="ab-metric">
         <div class="ab-metric-val">24/7</div>
-        <div class="ab-metric-label">Inapatikana wakati wote</div>
+        <div class="ab-metric-label">Jukwaa linakuwa operesheni mwaka mzima</div>
       </div>
       <div class="ab-metric">
         <div class="ab-metric-val">2026</div>
-        <div class="ab-metric-label">Ilianzishwa Mbeya, Tanzania</div>
+        <div class="ab-metric-label">Ilianzishwa Mbeya, Pweza ya Kusini</div>
       </div>
     </div>
   </div>
@@ -121,39 +624,41 @@
 
 <hr class="ab-divider"/>
 
-<!-- WHAT WE DO -->
+<!-- WHAT WE DO SECTION -->
 <div class="ab-wrap">
   <div class="ab-section">
     <div class="ab-section-label">
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      <i data-lucide="lightbulb" style="width:14px;height:14px"></i>
       Tunafanya Nini
     </div>
-    <div class="ab-row">
-      <div class="ab-row-num">01</div>
-      <div class="ab-row-body">
-        <div class="ab-row-title">Bei za Soko za Kweli</div>
-        <div class="ab-row-desc">Wakulima wanapata bei za soko moja kwa moja — bila wasitani, bila udanganyifu. Bei halisi kutoka masoko 25+ Tanzania kila siku.</div>
+    <div class="ab-features">
+      <div class="ab-row">
+        <div class="ab-row-num">01</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">Bei za Soko za Kweli</div>
+          <div class="ab-row-desc">Wakulima wanapata bei za soko moja kwa moja — bila wasitani, bila udanganyifu. Bei halisi kutoka masoko 25+ Tanzania kila siku.</div>
+        </div>
       </div>
-    </div>
-    <div class="ab-row">
-      <div class="ab-row-num">02</div>
-      <div class="ab-row-body">
-        <div class="ab-row-title">Hali ya Hewa ya Wakati Halisi</div>
-        <div class="ab-row-desc">Taarifa za hewa na utabiri wa siku 5 kwa eneo lako — husaidia mipango ya kupanda na kuvuna kwa wakati sahihi.</div>
+      <div class="ab-row">
+        <div class="ab-row-num">02</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">Hali ya Hewa ya Wakati Halisi</div>
+          <div class="ab-row-desc">Taarifa za hewa na utabiri wa siku 5 kwa eneo lako — husaidia mipango ya kupanda na kuvuna kwa wakati sahihi.</div>
+        </div>
       </div>
-    </div>
-    <div class="ab-row">
-      <div class="ab-row-num">03</div>
-      <div class="ab-row-body">
-        <div class="ab-row-title">Soko la Biashara la B2B</div>
-        <div class="ab-row-desc">Unganika moja kwa moja na wanunuzi, mawakala, na wasambazaji — mazungumzo ya moja kwa moja, makubaliano ya haraka, bila mtu wa kati.</div>
+      <div class="ab-row">
+        <div class="ab-row-num">03</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">Soko la Biashara la B2B</div>
+          <div class="ab-row-desc">Unganika moja kwa moja na wanunuzi, mawakala, na wasambazaji — mazungumzo ya moja kwa moja, makubaliano ya haraka, bila mtu wa kati.</div>
+        </div>
       </div>
-    </div>
-    <div class="ab-row">
-      <div class="ab-row-num">04</div>
-      <div class="ab-row-body">
-        <div class="ab-row-title">Imejengwa kwa Simu ya Mkononi</div>
-        <div class="ab-row-desc">Inafanya kazi vizuri kwenye simu yoyote — hata bila intaneti nzuri. Mkulima yeyote anaweza kutumia bila mafunzo maalum.</div>
+      <div class="ab-row">
+        <div class="ab-row-num">04</div>
+        <div class="ab-row-body">
+          <div class="ab-row-title">Imejengwa kwa Simu ya Mkononi</div>
+          <div class="ab-row-desc">Inafanya kazi vizuri kwenye simu yoyote — hata bila intaneti nzuri. Mkulima yeyote anaweza kutumia bila mafunzo maalum.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -161,34 +666,38 @@
 
 <hr class="ab-divider"/>
 
-<!-- TECH STACK -->
-<div style="background:var(--bg-subtle);">
+<!-- TECH STACK SECTION -->
+<div class="ab-stack-wrapper">
   <div class="ab-wrap">
     <div class="ab-section">
       <div class="ab-section-label">
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        Teknolojia
+        <i data-lucide="code" style="width:14px;height:14px"></i>
+        Teknolojia Tunayotumia
       </div>
       <div class="ab-stack">
         <div class="ab-stack-row">
           <span class="ab-stack-name">Python / Flask</span>
-          <span class="ab-stack-role">Backend na API</span>
+          <span class="ab-stack-role">Backend na API — Msingi wa jukwaa</span>
         </div>
         <div class="ab-stack-row">
           <span class="ab-stack-name">PostgreSQL / Supabase</span>
-          <span class="ab-stack-role">Hifadhidata na uhifadhi wa picha</span>
+          <span class="ab-stack-role">Hifadhidata imara na uhifadhi wa picha</span>
         </div>
         <div class="ab-stack-row">
           <span class="ab-stack-name">HTML / CSS / JavaScript</span>
-          <span class="ab-stack-role">Muonekano wa mtumiaji</span>
+          <span class="ab-stack-role">Muonekano wa mtumiaji — UI/UX Professional</span>
         </div>
         <div class="ab-stack-row">
           <span class="ab-stack-name">Render</span>
-          <span class="ab-stack-role">Huduma ya seva na deployment</span>
+          <span class="ab-stack-role">Huduma ya seva na deployment endelevu</span>
         </div>
         <div class="ab-stack-row">
           <span class="ab-stack-name">GitHub</span>
-          <span class="ab-stack-role">Udhibiti wa msimbo na CI/CD</span>
+          <span class="ab-stack-role">Udhibiti wa msimbo, CI/CD, na GitHub Actions</span>
+        </div>
+        <div class="ab-stack-row">
+          <span class="ab-stack-name">Lucide Icons</span>
+          <span class="ab-stack-role">Ikoni za kisasa na za hali ya juu</span>
         </div>
       </div>
     </div>
@@ -197,14 +706,14 @@
 
 <hr class="ab-divider"/>
 
-<!-- CTA -->
+<!-- CTA SECTION -->
 <section class="ab-cta">
   <div class="ab-wrap">
     <div class="ab-cta-inner">
       <h2>Anza Leo — Bure Kabisa</h2>
-      <p>Jiunge na wakulima wa Tanzania wanaotumia AgroLink kupata bei bora, masoko mapya, na fursa za biashara.</p>
+      <p>Jiunge na wakulima wa Tanzania wanaotumia AgroLink kupata bei bora, masoko mapya, na fursa za biashara bila kuchakana.</p>
       <a href="/register" class="ab-btn-solid">
-        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
         Jiunge Bure Sasa
       </a>
       <a href="/developer" class="ab-dev">
