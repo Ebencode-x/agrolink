@@ -173,6 +173,21 @@
   @media(min-width:641px){
     .sl-price-mobile{display:none}
   }
+
+  /* ── Thumbnail lightbox ── */
+  .sl-thumb.has-image{cursor:pointer}
+  .sl-thumb-zoom{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.55);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity var(--transition)}
+  .sl-thumb.has-image:hover .sl-thumb-zoom{opacity:1}
+  .sl-thumb{position:relative}
+
+  .sl-lightbox-overlay{display:none;position:fixed;inset:0;background:rgba(10,20,12,0.88);z-index:2000;align-items:center;justify-content:center;padding:1.25rem;backdrop-filter:blur(4px)}
+  .sl-lightbox-overlay.open{display:flex}
+  .sl-lightbox-img{max-width:min(92vw,720px);max-height:85vh;object-fit:contain;border-radius:var(--radius-md);box-shadow:var(--shadow-lg)}
+  .sl-lightbox-close{position:absolute;top:1.25rem;right:1.25rem;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--transition)}
+  .sl-lightbox-close:hover{background:rgba(255,255,255,0.22)}
+  @media(max-width:640px){
+    .sl-thumb-zoom{width:20px;height:20px}
+  }
 </style>
 {% endblock %}
 
@@ -250,9 +265,11 @@
         {% endif %}
 
         <!-- Thumbnail -->
-        <div class="sl-thumb">
+        <div class="sl-thumb{% if l.image_url %} has-image{% endif %}"
+             {% if l.image_url %}onclick="openLightbox('{{ l.image_url }}','{{ l.crop_name|e }}');event.stopPropagation()"{% endif %}>
           {% if l.image_url %}
           <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
+          <span class="sl-thumb-zoom"><i data-lucide="zoom-in" style="width:12px;height:12px"></i></span>
           {% else %}
           <div class="sl-thumb-placeholder">
             <i data-lucide="sprout" style="width:28px;height:28px;opacity:0.3;color:var(--brand-light)"></i>
@@ -456,10 +473,37 @@
   </div>
 </div>
 
+<!-- Thumbnail Lightbox -->
+<div id="sl-lightbox-overlay" class="sl-lightbox-overlay" onclick="if(event.target===this)closeLightbox()">
+  <button class="sl-lightbox-close" onclick="closeLightbox()" aria-label="Funga">
+    <i data-lucide="x" style="width:18px;height:18px"></i>
+  </button>
+  <img id="sl-lightbox-img" class="sl-lightbox-img" src="" alt=""/>
+</div>
+
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
+// ── Thumbnail lightbox ──────────────────────────────────────────────────────
+function openLightbox(url, alt){
+  const ov = document.getElementById('sl-lightbox-overlay');
+  const img = document.getElementById('sl-lightbox-img');
+  img.src = url;
+  img.alt = alt || '';
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(){
+  const ov = document.getElementById('sl-lightbox-overlay');
+  ov.classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('sl-lightbox-img').src = '';
+}
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') closeLightbox();
+});
+
 // ── Mobile: show actions inside body ─────────────────────────────────────────
 (function(){
   const isMob = () => window.innerWidth <= 640;
