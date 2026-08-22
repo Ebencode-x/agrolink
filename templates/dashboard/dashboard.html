@@ -4,75 +4,60 @@
 {% block extra_head %}
 <style>
   /* ===== Shell ===== */
-  .dash-wrap{max-width:1180px;margin:0 auto;padding:2.5rem clamp(1rem,5vw,2.5rem) 5rem}
+  .dash-wrap{max-width:1080px;margin:0 auto;padding:2.5rem clamp(1rem,5vw,2.5rem) 5rem}
 
-  .dash-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
+  .dash-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem}
   .dash-title{font-family:var(--font-display);font-size:clamp(1.7rem,3vw,2.3rem);font-weight:800;color:var(--text-primary);line-height:1.15;margin-bottom:0.3rem}
   .dash-subtitle{font-size:0.83rem;color:var(--text-muted);display:flex;align-items:center;gap:0.4rem}
   .dash-subtitle .sep{color:var(--border);font-size:0.7rem}
 
-  .btn-primary-dash{display:inline-flex;align-items:center;gap:8px;background:var(--brand-dark);color:#fff;padding:0.72rem 1.3rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;text-decoration:none;transition:background var(--transition)}
+  .dash-header-actions{display:flex;align-items:center;gap:0.65rem}
+
+  .bell-btn{position:relative;width:42px;height:42px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;color:var(--text-secondary);text-decoration:none;transition:all var(--transition);flex-shrink:0}
+  .bell-btn:hover{border-color:var(--brand-mid);color:var(--brand-mid)}
+  .bell-badge{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--danger);color:#fff;font-size:0.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;border:2px solid var(--bg-page,#F8F9FA)}
+
+  .btn-primary-dash{display:inline-flex;align-items:center;gap:8px;background:var(--brand-dark);color:#fff;padding:0.72rem 1.3rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;text-decoration:none;transition:background var(--transition);white-space:nowrap}
   .btn-primary-dash:hover{background:var(--brand-mid)}
 
-  /* ===== Instrument strip ===== */
-  .instrument{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);margin-bottom:1.75rem;overflow:hidden}
-  .instrument-seg{padding:1.1rem 1.4rem;border-right:1px solid var(--border)}
-  .instrument-seg:last-child{border-right:none}
-  .instrument-label{font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.5rem;display:flex;align-items:center;gap:5px}
-  .instrument-value{font-family:var(--font-display);font-weight:800;font-size:1.55rem;color:var(--text-primary);line-height:1}
-  .instrument-value.small{font-size:1.05rem;font-family:var(--font-body);font-weight:700}
+  /* ===== Snapshot strip — clickable filters, eBay-Overview inspired ===== */
+  .snapshot{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);margin-bottom:1.75rem;overflow:hidden}
+  .snap-seg{padding:1rem 1.3rem;border-right:1px solid var(--border);cursor:pointer;background:none;text-align:left;font-family:inherit;transition:background var(--transition)}
+  .snap-seg:last-child{border-right:none}
+  .snap-seg:hover{background:var(--bg-subtle)}
+  .snap-seg.is-active{background:rgba(27,122,67,0.06)}
+  .snap-label{font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.5rem}
+  .snap-seg.is-active .snap-label{color:var(--brand-mid)}
+  .snap-value{font-family:var(--font-display);font-weight:800;font-size:1.55rem;color:var(--text-primary);line-height:1}
 
-  /* Market pulse — signature element: real data, not decoration */
-  .pulse-wrap{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);padding:1rem 1.4rem;margin-bottom:1.75rem}
-  .pulse-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem}
-  .pulse-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)}
-  .pulse-ratio{font-size:0.78rem;color:var(--text-secondary);font-weight:600;font-variant-numeric:tabular-nums}
-  .pulse-bar{height:6px;border-radius:3px;background:var(--bg-subtle);overflow:hidden;display:flex}
-  .pulse-fill-active{background:var(--brand-mid);height:100%}
-  .pulse-fill-inactive{background:var(--border);height:100%}
-  .pulse-legend{display:flex;gap:1.2rem;margin-top:0.6rem}
-  .pulse-legend-item{display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--text-muted)}
-  .pulse-swatch{width:7px;height:7px;border-radius:1.5px}
-
-  /* ===== Main grid ===== */
-  .dash-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:1.25rem;align-items:start}
-
+  /* ===== Listings panel ===== */
   .dash-panel{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);overflow:hidden}
   .dash-panel-header{padding:1rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-  .dash-panel-title{font-family:var(--font-display);font-weight:700;font-size:0.92rem;color:var(--text-primary)}
-  .dash-panel-count{font-size:0.72rem;color:var(--text-muted);font-variant-numeric:tabular-nums}
+  .dash-panel-title{font-family:var(--font-display);font-weight:700;font-size:0.95rem;color:var(--text-primary)}
   .dash-panel-link{font-size:0.74rem;color:var(--brand-mid);text-decoration:none;font-weight:600}
   .dash-panel-link:hover{text-decoration:underline}
 
-  /* ===== Listings ledger ===== */
-  .ledger-row{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:0.85rem;padding:0.75rem 1.3rem;border-bottom:1px solid var(--border);transition:background var(--transition)}
+  .ledger-row{display:grid;grid-template-columns:44px 1fr auto auto;align-items:center;gap:0.9rem;padding:0.85rem 1.3rem;border-bottom:1px solid var(--border);transition:background var(--transition)}
   .ledger-row:last-child{border-bottom:none}
   .ledger-row:hover{background:var(--bg-subtle)}
-  .ledger-thumb{width:40px;height:40px;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-subtle);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--brand-light)}
+  .ledger-row.is-hidden{display:none}
+  .ledger-thumb{width:44px;height:44px;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-subtle);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--brand-light)}
   .ledger-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .ledger-info{min-width:0}
-  .ledger-name{font-weight:600;font-size:0.87rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ledger-meta{font-size:0.72rem;color:var(--text-muted);margin-top:1px}
-  .ledger-price{font-family:var(--font-display);font-weight:700;font-size:0.94rem;color:var(--text-primary);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .ledger-name{font-weight:600;font-size:0.88rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ledger-meta{font-size:0.72rem;color:var(--text-muted);margin-top:2px;display:flex;align-items:center;gap:6px}
+  .ledger-price{font-family:var(--font-display);font-weight:700;font-size:0.95rem;color:var(--text-primary);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
   .ledger-price-unit{font-size:0.64rem;font-weight:500;color:var(--text-muted);display:block;text-align:right}
-  .ledger-actions{display:flex;align-items:center;gap:0.3rem}
-  .icon-btn{width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);text-decoration:none;transition:all var(--transition)}
-  .icon-btn:hover{border-color:#16a34a;color:#16a34a;background:rgba(22,163,74,0.06)}
+
+  .icon-btn{width:32px;height:32px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);transition:all var(--transition)}
   .icon-btn.danger:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-bg)}
 
   .status-pill{padding:0.16rem 0.55rem;border-radius:3px;font-size:0.63rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em}
   .status-active{background:rgba(27,122,67,0.09);color:var(--brand-mid)}
   .status-inactive{background:var(--danger-bg);color:var(--danger)}
 
-  /* ===== Crops list (secondary panel) ===== */
-  .crop-row{padding:0.8rem 1.3rem;border-bottom:1px solid var(--border)}
-  .crop-row:last-child{border-bottom:none}
-  .crop-name{font-weight:600;font-size:0.85rem;color:var(--text-primary)}
-  .crop-name .en{color:var(--text-muted);font-weight:400;font-size:0.78rem}
-  .crop-meta{font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:3px}
-
   /* ===== Empty states ===== */
-  .empty-state{padding:2.2rem 1.3rem;text-align:center}
+  .empty-state{padding:2.4rem 1.3rem;text-align:center}
   .empty-state p{font-size:0.83rem;color:var(--text-muted);margin-bottom:0.9rem}
   .empty-link{display:inline-flex;align-items:center;gap:6px;color:var(--brand-mid);font-size:0.8rem;font-weight:600;text-decoration:none;border-bottom:1px solid var(--brand-mid);padding-bottom:1px}
 
@@ -83,22 +68,16 @@
   .dash-toolbar a.danger:hover{color:var(--danger);background:var(--danger-bg)}
 
   /* ===== Responsive ===== */
-  @media(max-width:900px){
-    .dash-grid{grid-template-columns:1fr}
-  }
   @media(max-width:640px){
     .dash-wrap{padding:1.25rem 1rem 3rem}
     .dash-header{flex-direction:column;align-items:flex-start;gap:0.85rem}
-    .btn-primary-dash{width:100%;justify-content:center}
-    .instrument{grid-template-columns:1fr 1fr}
-    .instrument-seg:nth-child(2){border-right:none}
-    .instrument-seg:nth-child(3),.instrument-seg:nth-child(4){border-top:1px solid var(--border)}
-    .instrument-seg{padding:0.85rem 1rem}
-    .instrument-value{font-size:1.25rem}
-    .ledger-row{grid-template-columns:36px 1fr auto;row-gap:0.4rem}
-    .ledger-actions{grid-column:1/-1;justify-content:flex-end}
+    .dash-header-actions{width:100%}
+    .btn-primary-dash{flex:1;justify-content:center}
+    .snapshot{grid-template-columns:1fr 1fr 1fr}
+    .snap-seg{padding:0.8rem 0.6rem}
+    .snap-value{font-size:1.2rem}
+    .ledger-row{grid-template-columns:38px 1fr auto;row-gap:0.35rem}
     .ledger-price-unit{display:none}
-    .dash-toolbar{gap:0.2rem}
   }
 </style>{% endblock %}
 
@@ -118,122 +97,81 @@
         {{ current_user.role|title }}
       </div>
     </div>
-    <a href="/dashboard/add" class="btn-primary-dash">
-      <i data-lucide="plus" style="width:16px;height:16px"></i>Ongeza Orodha Mpya
-    </a>
-  </div>
-
-  <!-- Instrument strip -->
-  <div class="instrument">
-    <div class="instrument-seg">
-      <div class="instrument-label">Orodha Zangu</div>
-      <div class="instrument-value">{{ listings|length }}</div>
-    </div>
-    <div class="instrument-seg">
-      <div class="instrument-label">Mazao Yangu</div>
-      <div class="instrument-value">{{ crops|length }}</div>
-    </div>
-    <div class="instrument-seg">
-      <div class="instrument-label">Mkoa</div>
-      <div class="instrument-value small">{{ current_user.region or 'Haujaweka' }}</div>
-    </div>
-    <div class="instrument-seg">
-      <div class="instrument-label">Akaunti</div>
-      <div class="instrument-value small">{{ current_user.role|title }}</div>
-    </div>
-  </div>
-
-  <!-- Market pulse: real ratio of active vs inactive listings, not decoration -->
-  {% set active_count = listings|selectattr('is_available')|list|length %}
-  {% if listings|length > 0 %}
-  <div class="pulse-wrap">
-    <div class="pulse-top">
-      <span class="pulse-title">Hali ya Orodha Zako</span>
-      <span class="pulse-ratio">{{ active_count }} / {{ listings|length }} zinapatikana</span>
-    </div>
-    <div class="pulse-bar">
-      <div class="pulse-fill-active" style="width:{{ (active_count / listings|length * 100)|round(1) }}%"></div>
-      <div class="pulse-fill-inactive" style="width:{{ (100 - (active_count / listings|length * 100))|round(1) }}%"></div>
-    </div>
-    <div class="pulse-legend">
-      <span class="pulse-legend-item"><span class="pulse-swatch" style="background:var(--brand-mid)"></span>Inapatikana</span>
-      <span class="pulse-legend-item"><span class="pulse-swatch" style="background:var(--border)"></span>Imeisha</span>
-    </div>
-  </div>
-  {% endif %}
-
-  <!-- Main grid -->
-  <div class="dash-grid">
-
-    <!-- Orodha Zangu -->
-    <div class="dash-panel">
-      <div class="dash-panel-header">
-        <span class="dash-panel-title">Orodha Zangu</span>
-        {% if listings %}
-        <a href="/listings" class="dash-panel-link">Ona zote →</a>
+    <div class="dash-header-actions">
+      {# Notification bell — scaffold. Wire `unread_notifications` from the backend once
+         a Notification model + route exists (planned: admin broadcast messages). #}
+      <a href="#" class="bell-btn" title="Arifa">
+        <i data-lucide="bell" style="width:19px;height:19px"></i>
+        {% set unread = unread_notifications|default(0) %}
+        {% if unread > 0 %}
+        <span class="bell-badge">{{ unread if unread < 100 else '99+' }}</span>
         {% endif %}
-      </div>
+      </a>
+      <a href="/dashboard/add" class="btn-primary-dash">
+        <i data-lucide="plus" style="width:16px;height:16px"></i>Ongeza Orodha Mpya
+      </a>
+    </div>
+  </div>
 
+  <!-- Snapshot: clickable numeric filters, no bar/line -->
+  {% set active_count = listings|selectattr('is_available')|list|length %}
+  {% set inactive_count = listings|length - active_count %}
+  <div class="snapshot" id="snapshot" role="group" aria-label="Chuja orodha kwa hali">
+    <button type="button" class="snap-seg is-active" data-filter="all">
+      <div class="snap-label">Jumla</div>
+      <div class="snap-value">{{ listings|length }}</div>
+    </button>
+    <button type="button" class="snap-seg" data-filter="active">
+      <div class="snap-label">Inapatikana</div>
+      <div class="snap-value">{{ active_count }}</div>
+    </button>
+    <button type="button" class="snap-seg" data-filter="inactive">
+      <div class="snap-label">Imeisha</div>
+      <div class="snap-value">{{ inactive_count }}</div>
+    </button>
+  </div>
+
+  <!-- Listings -->
+  <div class="dash-panel">
+    <div class="dash-panel-header">
+      <span class="dash-panel-title">Orodha Zangu</span>
       {% if listings %}
-        {% for l in listings[:8] %}
-        <div class="ledger-row" id="listing-row-{{ l.id }}">
-          <div class="ledger-thumb">
-            {% if l.image_url %}
-            <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
-            {% else %}
-            <i data-lucide="wheat" style="width:16px;height:16px"></i>
-            {% endif %}
-          </div>
-          <div class="ledger-info">
-            <div class="ledger-name">{{ l.crop_name }}</div>
-            <div class="ledger-meta">
-              <span class="status-pill {{ 'status-active' if l.is_available else 'status-inactive' }}">{{ 'Inapatikana' if l.is_available else 'Imeisha' }}</span>
-              &nbsp;{{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }} · {{ l.posted_at.strftime('%d %b') }}
-            </div>
-          </div>
-          <div>
-            <div class="ledger-price">TZS {{ "{:,.0f}".format(l.price_tzs) }}</div>
-            <span class="ledger-price-unit">/ {{ l.unit or 'kg' }}</span>
-          </div>
-          <div class="ledger-actions">
-            <a href="https://wa.me/255{{ l.contact|replace('+255','')|replace('0','',1) }}" target="_blank" class="icon-btn" title="WhatsApp">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            </a>
-            <button class="icon-btn danger" onclick="deleteListing({{ l.id }}, this)" title="Futa">
-              <i data-lucide="trash-2" style="width:14px;height:14px"></i>
-            </button>
-          </div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <p>Huna orodha bado. Ongeza zao lako la kwanza ili wanunuzi waweze kukuona.</p>
-          <a href="/dashboard/add" class="empty-link">Ongeza orodha ya kwanza</a>
-        </div>
+      <a href="/listings" class="dash-panel-link">Ona kwenye Soko →</a>
       {% endif %}
     </div>
 
-    <!-- Mazao Yangu -->
-    <div class="dash-panel">
-      <div class="dash-panel-header">
-        <span class="dash-panel-title">Mazao Yangu</span>
-        <span class="dash-panel-count">{{ crops|length }}</span>
+    {% if listings %}
+      {% for l in listings %}
+      <div class="ledger-row" id="listing-row-{{ l.id }}" data-status="{{ 'active' if l.is_available else 'inactive' }}">
+        <div class="ledger-thumb">
+          {% if l.image_url %}
+          <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
+          {% else %}
+          <i data-lucide="wheat" style="width:17px;height:17px"></i>
+          {% endif %}
+        </div>
+        <div class="ledger-info">
+          <div class="ledger-name">{{ l.crop_name }}</div>
+          <div class="ledger-meta">
+            <span class="status-pill {{ 'status-active' if l.is_available else 'status-inactive' }}">{{ 'Inapatikana' if l.is_available else 'Imeisha' }}</span>
+            {{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }} · {{ l.posted_at.strftime('%d %b') }}
+          </div>
+        </div>
+        <div>
+          <div class="ledger-price">TZS {{ "{:,.0f}".format(l.price_tzs) }}</div>
+          <span class="ledger-price-unit">/ {{ l.unit or 'kg' }}</span>
+        </div>
+        <button class="icon-btn danger" onclick="deleteListing({{ l.id }}, this)" title="Futa">
+          <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+        </button>
       </div>
-
-      {% if crops %}
-        {% for c in crops[:8] %}
-        <div class="crop-row">
-          <div class="crop-name">{{ c.name_sw }} <span class="en">({{ c.name_en }})</span></div>
-          <div class="crop-meta">{{ c.category|title }} · {{ c.region }}</div>
-        </div>
-        {% endfor %}
-      {% else %}
-        <div class="empty-state">
-          <p>Mazao yataonekana hapa mara utakapoongeza orodha.</p>
-        </div>
-      {% endif %}
-    </div>
-
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <p>Huna orodha bado. Ongeza zao lako la kwanza ili wanunuzi waweze kukuona.</p>
+        <a href="/dashboard/add" class="empty-link">Ongeza orodha ya kwanza</a>
+      </div>
+    {% endif %}
   </div>
 
   <!-- Toolbar -->
@@ -257,5 +195,18 @@ async function deleteListing(id, btn){
   if(res.ok){ row.remove(); }
   else{ alert(data.error); }
 }
+
+// Snapshot filter — click a segment to show only that status, no page reload
+document.querySelectorAll('.snap-seg').forEach(seg => {
+  seg.addEventListener('click', () => {
+    const filter = seg.dataset.filter;
+    document.querySelectorAll('.snap-seg').forEach(s => s.classList.remove('is-active'));
+    seg.classList.add('is-active');
+    document.querySelectorAll('.ledger-row').forEach(row => {
+      const show = filter === 'all' || row.dataset.status === filter;
+      row.classList.toggle('is-hidden', !show);
+    });
+  });
+});
 </script>
 {% endblock %}
