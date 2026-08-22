@@ -3,102 +3,103 @@
 
 {% block extra_head %}
 <style>
-  .dash-wrap{max-width:1200px;margin:0 auto;padding:2.5rem clamp(1rem,5vw,2.5rem) 5rem}
-  .dash-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
-  .dash-title{font-family:var(--font-display);font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;color:var(--text-primary);margin-bottom:0.25rem}
-  .dash-subtitle{font-size:0.85rem;color:var(--text-muted);display:flex;align-items:center;gap:6px}
-  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem}
-  .stat-card{padding:1.25rem 1.5rem;border-radius:var(--radius-md);display:flex;align-items:center;gap:1rem;background:var(--bg-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);transition:box-shadow var(--transition),transform var(--transition)}
-  .stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
-  .stat-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .stat-info-label{font-size:0.70rem;color:var(--text-muted);margin-bottom:3px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em}
-  .stat-info-value{font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--text-primary)}
-  .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem}
-  .dash-card{border-radius:var(--radius-md);background:var(--bg-card);border:1px solid var(--border);box-shadow:var(--shadow-sm);overflow:hidden}
-  .dash-card-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--bg-subtle)}
-  .dash-card-title{font-family:var(--font-display);font-weight:700;font-size:0.88rem;display:flex;align-items:center;gap:7px;color:var(--text-primary)}
-  .dash-card-count{font-size:0.72rem;color:var(--text-muted);font-weight:600}
-  .dash-card-body{padding:0 1.25rem}
-  .listing-row{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 0;border-bottom:1px solid var(--border);gap:0.5rem;flex-wrap:wrap}
-  .listing-row:last-child{border-bottom:none}
-  .listing-row-info{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
-  .listing-row-name{font-weight:600;font-size:0.875rem;color:var(--text-primary)}
-  .listing-row-meta{font-size:0.72rem;color:var(--text-muted)}
-  .listing-row-actions{display:flex;align-items:center;gap:0.4rem;flex-shrink:0}
-  .listing-row{border-left:3px solid transparent;transition:border-left-color var(--transition),background var(--transition);padding-left:0.75rem;margin-left:-0.75rem;border-radius:0 var(--radius-sm) var(--radius-sm) 0}
-  .listing-row:hover{border-left-color:var(--accent);background:var(--bg-subtle)}
-  .dash-listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem;padding:1rem 0}
-  .dash-listing-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-md);overflow:hidden;transition:border-left-color var(--transition)}
-  .dash-listing-card:hover{border-left-color:var(--accent)}
-  .dash-listing-thumb{position:relative;width:100%;height:110px;background:var(--bg-surface);overflow:hidden}
-  .dash-listing-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .dash-listing-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(6,78,59,0.18));color:var(--brand-mid)}
-  .dash-listing-body{padding:0.8rem 0.85rem}
-  .dash-listing-name{font-weight:600;font-size:0.84rem;color:var(--text-primary);margin-bottom:0.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .dash-listing-price{font-family:var(--font-display);font-weight:800;font-size:1.05rem;color:var(--brand-dark);margin-bottom:0.15rem}
-  .dash-listing-price-unit{font-size:0.65rem;font-weight:500;color:var(--text-muted)}
-  .dash-listing-meta{font-size:0.68rem;color:var(--text-muted);margin-bottom:0.65rem}
-  .dash-listing-actions{display:flex;align-items:center;justify-content:space-between;gap:0.35rem;flex-wrap:wrap}
-  .status-pill{padding:0.18rem 0.6rem;border-radius:50px;font-size:0.67rem;font-weight:700;white-space:nowrap}
-  .status-active{background:rgba(46,107,71,0.10);color:var(--brand-mid);border:1px solid rgba(46,107,71,0.22)}
-  .status-inactive{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(192,57,43,0.22)}
-  .wa-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.22);color:#16a34a;padding:0.28rem 0.65rem;border-radius:var(--radius-sm);font-size:0.70rem;font-weight:600;text-decoration:none;transition:background var(--transition)}
-  .wa-btn:hover{background:rgba(22,163,74,0.16)}
-  .btn-del{display:inline-flex;align-items:center;gap:4px;background:var(--danger-bg);border:1px solid rgba(192,57,43,0.20);color:var(--danger);padding:0.28rem 0.6rem;border-radius:var(--radius-sm);font-size:0.70rem;font-weight:600;cursor:pointer;transition:background var(--transition)}
-  .btn-del:hover{background:rgba(192,57,43,0.14)}
-  .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--text-muted)}
-  .empty-state-icon{opacity:0.25;margin-bottom:0.875rem}
-  .empty-state p{font-size:0.875rem;margin-bottom:1rem}
-  .empty-link{display:inline-flex;align-items:center;gap:6px;background:rgba(46,107,71,0.08);border:1px solid rgba(46,107,71,0.20);color:var(--brand-mid);padding:0.45rem 1.1rem;border-radius:var(--radius-sm);font-size:0.80rem;font-weight:600;text-decoration:none;transition:background var(--transition)}
-  .empty-link:hover{background:rgba(46,107,71,0.14)}
-  .dash-quick-links{display:flex;gap:0.75rem;flex-wrap:wrap;padding-top:1.5rem;border-top:1px solid var(--border)}
-  .dash-quick-links a{display:inline-flex;align-items:center;gap:7px;padding:0.55rem 1.1rem;border-radius:var(--radius-sm);font-size:0.81rem;font-weight:500;text-decoration:none;border:1px solid var(--border);color:var(--text-secondary);background:var(--bg-card);transition:all var(--transition)}
-  .dash-quick-links a:hover{border-color:var(--brand-mid);color:var(--brand-mid);background:rgba(46,107,71,0.04)}
-  .dash-quick-links a.danger{color:var(--danger);border-color:rgba(192,57,43,0.22);background:var(--danger-bg)}
-  .dash-quick-links a.danger:hover{background:rgba(192,57,43,0.12)}
-  .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.40);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;padding:1rem}
-  .modal-overlay.open{display:flex}
-  .modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modal-in 0.22s ease}
-  @keyframes modal-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-  .modal-title{font-family:var(--font-display);font-size:1.15rem;font-weight:800;color:var(--text-primary);display:flex;align-items:center;gap:8px}
-  .modal-close{background:var(--bg-subtle);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);transition:all var(--transition)}
-  .modal-close:hover{background:var(--danger-bg);color:var(--danger);border-color:rgba(192,57,43,0.25)}
-  .modal-form{display:flex;flex-direction:column;gap:1rem}
-  .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .form-label{display:flex;align-items:center;gap:5px;font-size:0.76rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.35rem;text-transform:uppercase;letter-spacing:0.04em}
-  .form-select,.form-input,.form-textarea{width:100%;background:#fff;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:0.68rem 1rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.90rem;outline:none;transition:border-color var(--transition),box-shadow var(--transition);box-sizing:border-box}
-  .form-select:focus,.form-input:focus,.form-textarea:focus{border-color:var(--brand-mid);box-shadow:0 0 0 3px rgba(46,107,71,0.10)}
-  .form-select{cursor:pointer;appearance:none}
-  .form-select option{background:#fff}
-  .form-textarea{resize:vertical;min-height:80px}
-  .form-input::placeholder,.form-textarea::placeholder{color:var(--text-muted)}
-  .btn-submit-modal{width:100%;justify-content:center;padding:0.82rem;font-size:0.92rem;display:flex;align-items:center;gap:8px;background:var(--brand-mid);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;cursor:pointer;transition:background var(--transition)}
-  .btn-submit-modal:hover{background:var(--brand-dark)}
-  .btn-submit-modal:disabled{opacity:0.5;cursor:not-allowed}
-  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .success-msg{background:var(--success-bg);border:1px solid rgba(46,107,71,0.25);border-radius:var(--radius-sm);padding:0.68rem 1rem;font-size:0.84rem;color:var(--success);display:none;align-items:center;gap:8px}
-  .error-msg{background:var(--danger-bg);border:1px solid rgba(192,57,43,0.22);border-radius:var(--radius-sm);padding:0.68rem 1rem;font-size:0.84rem;color:var(--danger);display:none;align-items:center;gap:8px}
-  @media(max-width:768px){
-    .dash-wrap{padding:1.25rem 1rem 3rem}
-    .dash-grid{grid-template-columns:1fr;gap:1rem}
-    .form-row-2{grid-template-columns:1fr}
-    .dash-header{flex-direction:column;align-items:flex-start;gap:0.75rem;padding-bottom:1.25rem;margin-bottom:1.25rem}
-    .btn-primary-dash{width:100%;justify-content:center}
-    .stats-row{grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.25rem}
-    .stat-card{padding:1rem;gap:0.75rem}
-    .stat-icon{width:38px;height:38px}
-    .stat-info-value{font-size:1.1rem}
-    .stat-card:hover{transform:none;box-shadow:var(--shadow-sm)}
-    .listing-row{flex-direction:column;align-items:flex-start;gap:0.5rem;padding:0.75rem 0}
-    .listing-row-actions{width:100%;flex-wrap:wrap;gap:0.35rem}
-    .dash-listings-grid{grid-template-columns:1fr}
-    .dash-quick-links{gap:0.5rem}
-    .dash-quick-links a{padding:0.5rem 0.85rem;font-size:0.77rem}
-    .modal-box{padding:1.25rem 1rem;max-height:95vh}
+  /* ===== Shell ===== */
+  .dash-wrap{max-width:1180px;margin:0 auto;padding:2.5rem clamp(1rem,5vw,2.5rem) 5rem}
+
+  .dash-header{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
+  .dash-title{font-family:var(--font-display);font-size:clamp(1.7rem,3vw,2.3rem);font-weight:800;color:var(--text-primary);line-height:1.15;margin-bottom:0.3rem}
+  .dash-subtitle{font-size:0.83rem;color:var(--text-muted);display:flex;align-items:center;gap:0.4rem}
+  .dash-subtitle .sep{color:var(--border);font-size:0.7rem}
+
+  .btn-primary-dash{display:inline-flex;align-items:center;gap:8px;background:var(--brand-dark);color:#fff;padding:0.72rem 1.3rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;text-decoration:none;transition:background var(--transition)}
+  .btn-primary-dash:hover{background:var(--brand-mid)}
+
+  /* ===== Instrument strip ===== */
+  .instrument{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);margin-bottom:1.75rem;overflow:hidden}
+  .instrument-seg{padding:1.1rem 1.4rem;border-right:1px solid var(--border)}
+  .instrument-seg:last-child{border-right:none}
+  .instrument-label{font-size:0.66rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-muted);margin-bottom:0.5rem;display:flex;align-items:center;gap:5px}
+  .instrument-value{font-family:var(--font-display);font-weight:800;font-size:1.55rem;color:var(--text-primary);line-height:1}
+  .instrument-value.small{font-size:1.05rem;font-family:var(--font-body);font-weight:700}
+
+  /* Market pulse — signature element: real data, not decoration */
+  .pulse-wrap{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);padding:1rem 1.4rem;margin-bottom:1.75rem}
+  .pulse-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem}
+  .pulse-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted)}
+  .pulse-ratio{font-size:0.78rem;color:var(--text-secondary);font-weight:600;font-variant-numeric:tabular-nums}
+  .pulse-bar{height:6px;border-radius:3px;background:var(--bg-subtle);overflow:hidden;display:flex}
+  .pulse-fill-active{background:var(--brand-mid);height:100%}
+  .pulse-fill-inactive{background:var(--border);height:100%}
+  .pulse-legend{display:flex;gap:1.2rem;margin-top:0.6rem}
+  .pulse-legend-item{display:flex;align-items:center;gap:6px;font-size:0.7rem;color:var(--text-muted)}
+  .pulse-swatch{width:7px;height:7px;border-radius:1.5px}
+
+  /* ===== Main grid ===== */
+  .dash-grid{display:grid;grid-template-columns:1.55fr 1fr;gap:1.25rem;align-items:start}
+
+  .dash-panel{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);overflow:hidden}
+  .dash-panel-header{padding:1rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .dash-panel-title{font-family:var(--font-display);font-weight:700;font-size:0.92rem;color:var(--text-primary)}
+  .dash-panel-count{font-size:0.72rem;color:var(--text-muted);font-variant-numeric:tabular-nums}
+  .dash-panel-link{font-size:0.74rem;color:var(--brand-mid);text-decoration:none;font-weight:600}
+  .dash-panel-link:hover{text-decoration:underline}
+
+  /* ===== Listings ledger ===== */
+  .ledger-row{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:0.85rem;padding:0.75rem 1.3rem;border-bottom:1px solid var(--border);transition:background var(--transition)}
+  .ledger-row:last-child{border-bottom:none}
+  .ledger-row:hover{background:var(--bg-subtle)}
+  .ledger-thumb{width:40px;height:40px;border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-subtle);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--brand-light)}
+  .ledger-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .ledger-info{min-width:0}
+  .ledger-name{font-weight:600;font-size:0.87rem;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ledger-meta{font-size:0.72rem;color:var(--text-muted);margin-top:1px}
+  .ledger-price{font-family:var(--font-display);font-weight:700;font-size:0.94rem;color:var(--text-primary);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .ledger-price-unit{font-size:0.64rem;font-weight:500;color:var(--text-muted);display:block;text-align:right}
+  .ledger-actions{display:flex;align-items:center;gap:0.3rem}
+  .icon-btn{width:30px;height:30px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-secondary);text-decoration:none;transition:all var(--transition)}
+  .icon-btn:hover{border-color:#16a34a;color:#16a34a;background:rgba(22,163,74,0.06)}
+  .icon-btn.danger:hover{border-color:var(--danger);color:var(--danger);background:var(--danger-bg)}
+
+  .status-pill{padding:0.16rem 0.55rem;border-radius:3px;font-size:0.63rem;font-weight:700;white-space:nowrap;letter-spacing:0.02em}
+  .status-active{background:rgba(27,122,67,0.09);color:var(--brand-mid)}
+  .status-inactive{background:var(--danger-bg);color:var(--danger)}
+
+  /* ===== Crops list (secondary panel) ===== */
+  .crop-row{padding:0.8rem 1.3rem;border-bottom:1px solid var(--border)}
+  .crop-row:last-child{border-bottom:none}
+  .crop-name{font-weight:600;font-size:0.85rem;color:var(--text-primary)}
+  .crop-name .en{color:var(--text-muted);font-weight:400;font-size:0.78rem}
+  .crop-meta{font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:3px}
+
+  /* ===== Empty states ===== */
+  .empty-state{padding:2.2rem 1.3rem;text-align:center}
+  .empty-state p{font-size:0.83rem;color:var(--text-muted);margin-bottom:0.9rem}
+  .empty-link{display:inline-flex;align-items:center;gap:6px;color:var(--brand-mid);font-size:0.8rem;font-weight:600;text-decoration:none;border-bottom:1px solid var(--brand-mid);padding-bottom:1px}
+
+  /* ===== Toolbar ===== */
+  .dash-toolbar{display:flex;flex-wrap:wrap;margin-top:1.75rem;border-top:1px solid var(--border);padding-top:0.9rem}
+  .dash-toolbar a{display:inline-flex;align-items:center;gap:6px;padding:0.5rem 1rem;font-size:0.79rem;font-weight:500;color:var(--text-secondary);text-decoration:none;border-radius:var(--radius-sm);transition:all var(--transition)}
+  .dash-toolbar a:hover{color:var(--brand-mid);background:var(--bg-subtle)}
+  .dash-toolbar a.danger:hover{color:var(--danger);background:var(--danger-bg)}
+
+  /* ===== Responsive ===== */
+  @media(max-width:900px){
+    .dash-grid{grid-template-columns:1fr}
   }
-  @media(max-width:380px){.stats-row{grid-template-columns:1fr}}
+  @media(max-width:640px){
+    .dash-wrap{padding:1.25rem 1rem 3rem}
+    .dash-header{flex-direction:column;align-items:flex-start;gap:0.85rem}
+    .btn-primary-dash{width:100%;justify-content:center}
+    .instrument{grid-template-columns:1fr 1fr}
+    .instrument-seg:nth-child(2){border-right:none}
+    .instrument-seg:nth-child(3),.instrument-seg:nth-child(4){border-top:1px solid var(--border)}
+    .instrument-seg{padding:0.85rem 1rem}
+    .instrument-value{font-size:1.25rem}
+    .ledger-row{grid-template-columns:36px 1fr auto;row-gap:0.4rem}
+    .ledger-actions{grid-column:1/-1;justify-content:flex-end}
+    .ledger-price-unit{display:none}
+    .dash-toolbar{gap:0.2rem}
+  }
 </style>{% endblock %}
 
 {% block content %}
@@ -112,140 +113,135 @@
     <div>
       <div class="dash-title">Karibu, {{ current_user.full_name.split()[0] }}</div>
       <div class="dash-subtitle">
-        <i data-lucide="map-pin" style="width:14px;height:14px;color:var(--brand-mid)"></i>
-        {{ current_user.region or 'Tanzania' }} ·
-        <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--brand-mid)"></i>
+        {{ current_user.region or 'Tanzania' }}
+        <span class="sep">·</span>
         {{ current_user.role|title }}
       </div>
     </div>
-    <a href="/dashboard/add" class="btn btn-primary">
-      <i data-lucide="plus-circle" style="width:18px;height:18px"></i>Ongeza Orodha Mpya
+    <a href="/dashboard/add" class="btn-primary-dash">
+      <i data-lucide="plus" style="width:16px;height:16px"></i>Ongeza Orodha Mpya
     </a>
   </div>
 
-  <!-- Stats -->
-  <div class="stats-row">
-    {% for icon,label,value,color,bg in [
-      ('store','Orodha Zangu',listings|length,'var(--brand-mid)','rgba(46,107,71,0.10)'),
-      ('sprout','Mazao Yangu',crops|length,'var(--accent-dark)','rgba(232,184,75,0.12)'),
-      ('map-pin','Mkoa',current_user.region or 'Haujaweka','var(--brand-light)','rgba(74,155,111,0.12)'),
-      ('user-check','Akaunti',current_user.role|title,'var(--brand-mid)','rgba(46,107,71,0.10)')
-    ] %}
-    <div class="stat-card">
-      <div class="stat-icon" style="background:{{ bg }}">
-        <i data-lucide="{{ icon }}" style="width:22px;height:22px;color:{{ color }}"></i>
-      </div>
-      <div>
-        <div class="stat-info-label">{{ label }}</div>
-        <div class="stat-info-value">{{ value }}</div>
-      </div>
+  <!-- Instrument strip -->
+  <div class="instrument">
+    <div class="instrument-seg">
+      <div class="instrument-label">Orodha Zangu</div>
+      <div class="instrument-value">{{ listings|length }}</div>
     </div>
-    {% endfor %}
+    <div class="instrument-seg">
+      <div class="instrument-label">Mazao Yangu</div>
+      <div class="instrument-value">{{ crops|length }}</div>
+    </div>
+    <div class="instrument-seg">
+      <div class="instrument-label">Mkoa</div>
+      <div class="instrument-value small">{{ current_user.region or 'Haujaweka' }}</div>
+    </div>
+    <div class="instrument-seg">
+      <div class="instrument-label">Akaunti</div>
+      <div class="instrument-value small">{{ current_user.role|title }}</div>
+    </div>
   </div>
 
-  <!-- Main Grid -->
+  <!-- Market pulse: real ratio of active vs inactive listings, not decoration -->
+  {% set active_count = listings|selectattr('is_available')|list|length %}
+  {% if listings|length > 0 %}
+  <div class="pulse-wrap">
+    <div class="pulse-top">
+      <span class="pulse-title">Hali ya Orodha Zako</span>
+      <span class="pulse-ratio">{{ active_count }} / {{ listings|length }} zinapatikana</span>
+    </div>
+    <div class="pulse-bar">
+      <div class="pulse-fill-active" style="width:{{ (active_count / listings|length * 100)|round(1) }}%"></div>
+      <div class="pulse-fill-inactive" style="width:{{ (100 - (active_count / listings|length * 100))|round(1) }}%"></div>
+    </div>
+    <div class="pulse-legend">
+      <span class="pulse-legend-item"><span class="pulse-swatch" style="background:var(--brand-mid)"></span>Inapatikana</span>
+      <span class="pulse-legend-item"><span class="pulse-swatch" style="background:var(--border)"></span>Imeisha</span>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Main grid -->
   <div class="dash-grid">
 
     <!-- Orodha Zangu -->
-    <div class="dash-card">
-      <div class="dash-card-header">
-        <div class="dash-card-title">
-          <i data-lucide="store" style="width:16px;height:16px;color:var(--brand-mid)"></i>
-          Orodha Zangu za Hivi Karibuni
-        </div>
-        <span style="font-size:0.75rem;color:var(--text-muted)">{{ listings|length }} jumla</span>
-      </div>
-      <div class="dash-card-body">
+    <div class="dash-panel">
+      <div class="dash-panel-header">
+        <span class="dash-panel-title">Orodha Zangu</span>
         {% if listings %}
-          <div class="dash-listings-grid">
-          {% for l in listings[:6] %}
-          <div class="dash-listing-card" id="listing-row-{{ l.id }}">
-            <div class="dash-listing-thumb">
-              {% if l.image_url %}
-              <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
-              {% else %}
-              <div class="dash-listing-thumb-placeholder">
-                <i data-lucide="wheat" style="width:24px;height:24px"></i>
-              </div>
-              {% endif %}
-            </div>
-            <div class="dash-listing-body">
-              <div class="dash-listing-name">{{ l.crop_name }}</div>
-              <div class="dash-listing-price">TZS {{ "{:,.0f}".format(l.price_tzs) }} <span class="dash-listing-price-unit">/ {{ l.unit or 'kg' }}</span></div>
-              <div class="dash-listing-meta">{{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }} · {{ l.posted_at.strftime('%d %b %Y') }}</div>
-              <div class="dash-listing-actions">
-                <span class="status-pill {{ 'status-active' if l.is_available else 'status-inactive' }}">
-                  {{ 'Inapatikana' if l.is_available else 'Imeisha' }}
-                </span>
-                <a href="https://wa.me/255{{ l.contact|replace('+255','')|replace('0','',1) }}" target="_blank" class="wa-btn">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                  WhatsApp
-                </a>
-                <button class="btn-del" onclick="deleteListing({{ l.id }}, this)">
-                  <i data-lucide="trash-2" style="width:12px;height:12px"></i>Futa
-                </button>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-          </div>
-        {% else %}
-          <div style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted)">
-            <i data-lucide="package-open" style="width:40px;height:40px;opacity:0.3;margin-bottom:1rem"></i>
-            <p style="font-size:0.875rem;margin-bottom:1rem">Huna orodha bado.</p>
-            <a href="/dashboard/add" class="empty-link">
-              <i data-lucide="plus" style="width:14px;height:14px"></i>Ongeza ya Kwanza
-            </a>
-          </div>
+        <a href="/listings" class="dash-panel-link">Ona zote →</a>
         {% endif %}
       </div>
+
+      {% if listings %}
+        {% for l in listings[:8] %}
+        <div class="ledger-row" id="listing-row-{{ l.id }}">
+          <div class="ledger-thumb">
+            {% if l.image_url %}
+            <img src="{{ l.image_url }}" alt="{{ l.crop_name }}" loading="lazy"/>
+            {% else %}
+            <i data-lucide="wheat" style="width:16px;height:16px"></i>
+            {% endif %}
+          </div>
+          <div class="ledger-info">
+            <div class="ledger-name">{{ l.crop_name }}</div>
+            <div class="ledger-meta">
+              <span class="status-pill {{ 'status-active' if l.is_available else 'status-inactive' }}">{{ 'Inapatikana' if l.is_available else 'Imeisha' }}</span>
+              &nbsp;{{ "{:,.0f}".format(l.quantity_kg) }} {{ l.unit or 'kg' }} · {{ l.posted_at.strftime('%d %b') }}
+            </div>
+          </div>
+          <div>
+            <div class="ledger-price">TZS {{ "{:,.0f}".format(l.price_tzs) }}</div>
+            <span class="ledger-price-unit">/ {{ l.unit or 'kg' }}</span>
+          </div>
+          <div class="ledger-actions">
+            <a href="https://wa.me/255{{ l.contact|replace('+255','')|replace('0','',1) }}" target="_blank" class="icon-btn" title="WhatsApp">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+            <button class="icon-btn danger" onclick="deleteListing({{ l.id }}, this)" title="Futa">
+              <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>Huna orodha bado. Ongeza zao lako la kwanza ili wanunuzi waweze kukuona.</p>
+          <a href="/dashboard/add" class="empty-link">Ongeza orodha ya kwanza</a>
+        </div>
+      {% endif %}
     </div>
 
     <!-- Mazao Yangu -->
-    <div class="dash-card">
-      <div class="dash-card-header">
-        <div class="dash-card-title">
-          <i data-lucide="sprout" style="width:16px;height:16px;color:var(--brand-mid)"></i>
-          Mazao Yangu
+    <div class="dash-panel">
+      <div class="dash-panel-header">
+        <span class="dash-panel-title">Mazao Yangu</span>
+        <span class="dash-panel-count">{{ crops|length }}</span>
+      </div>
+
+      {% if crops %}
+        {% for c in crops[:8] %}
+        <div class="crop-row">
+          <div class="crop-name">{{ c.name_sw }} <span class="en">({{ c.name_en }})</span></div>
+          <div class="crop-meta">{{ c.category|title }} · {{ c.region }}</div>
         </div>
-        <span style="font-size:0.75rem;color:var(--text-muted)">{{ crops|length }} jumla</span>
-      </div>
-      <div class="dash-card-body">
-        {% if crops %}
-          {% for c in crops[:6] %}
-          <div class="listing-row">
-            <div class="listing-row-info">
-              <div class="listing-row-name">{{ c.name_sw }} <span style="color:var(--text-muted);font-weight:400;font-size:0.85rem">({{ c.name_en }})</span></div>
-              <div class="listing-row-meta">{{ c.category|title }} · {{ c.region }} · {{ c.season or 'Wakati wowote' }}</div>
-            </div>
-            <span class="status-pill status-active">{{ c.category|title }}</span>
-          </div>
-          {% endfor %}
-        {% else %}
-          <div style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted)">
-            <i data-lucide="sprout" style="width:40px;height:40px;opacity:0.3;margin-bottom:1rem"></i>
-            <p style="font-size:0.875rem">Mazao yataonekana hapa ukiongeza orodha.</p>
-          </div>
-        {% endif %}
-      </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <p>Mazao yataonekana hapa mara utakapoongeza orodha.</p>
+        </div>
+      {% endif %}
     </div>
 
   </div>
 
-  <!-- Quick Links -->
-  <div class="dash-quick-links">
-    <a href="/dashboard/add" >
-      <i data-lucide="plus-circle" style="width:15px;height:15px"></i>Ongeza Zao Jipya
-    </a>
-    <a href="/listings">
-      <i data-lucide="store" style="width:15px;height:15px"></i>Angalia Soko Lote
-    </a>
-    <a href="/about">
-      <i data-lucide="info" style="width:15px;height:15px"></i>Kuhusu AgroLink
-    </a>
-    <a href="{{ url_for('logout') }}" class="danger">
-      <i data-lucide="log-out" style="width:15px;height:15px"></i>Toka
-    </a>
+  <!-- Toolbar -->
+  <div class="dash-toolbar">
+    <a href="/dashboard/add"><i data-lucide="plus" style="width:15px;height:15px"></i>Ongeza Zao Jipya</a>
+    <a href="/listings"><i data-lucide="store" style="width:15px;height:15px"></i>Angalia Soko Lote</a>
+    <a href="/about"><i data-lucide="info" style="width:15px;height:15px"></i>Kuhusu AgroLink</a>
+    <a href="{{ url_for('logout') }}" class="danger"><i data-lucide="log-out" style="width:15px;height:15px"></i>Toka</a>
   </div>
 
 </div>
