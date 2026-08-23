@@ -1,13 +1,20 @@
 {% extends "base.html" %}
-{% block title %}KilimoBridge — Soko la Kilimo Tanzania{% endblock %}
+{% block title %}AgroLink Tanzania — Soko la Kilimo{% endblock %}
 
 {% block content %}
 <section class="landing-hero">
+  <picture>
+    <source media="(max-width:768px)" srcset="{{ url_for('static', filename='images/hero-mobile.jpg') }}">
+    <img class="landing-hero__photo" src="{{ url_for('static', filename='images/hero-desktop.jpg') }}" alt="Wakulima wa Tanzania wakifanya kazi shambani" loading="eager"/>
+  </picture>
+  <div class="landing-hero__scrim"></div>
+
   <div class="landing-hero__inner">
+    <!-- Left: Text + CTA + Stats -->
     <div class="landing-hero__text">
       <h1 class="landing-hero__title">
-        Soko la Kilimo<br>
-        <span class="landing-hero__accent">Tanzania</span>
+        <span class="landing-hero__title-line landing-hero__title-line--sm">Soko la Kilimo</span>
+        <span class="landing-hero__title-line landing-hero__accent">TANZANIA</span>
       </h1>
       <p class="landing-hero__sub">
         Unganisha wakulima, wanunuzi, na washauri wa kilimo katika
@@ -21,22 +28,23 @@
           <i data-lucide="log-in"></i> Ingia
         </a>
       </div>
+
+      <div class="landing-stats">
+        <div class="landing-stat">
+          <span class="landing-stat__num" id="stat-users">—</span>
+          <span class="landing-stat__label">Wakulima na Wanunuzi</span>
+        </div>
+        <div class="landing-stat">
+          <span class="landing-stat__num" id="stat-listings">—</span>
+          <span class="landing-stat__label">Mazao Yanayouzwa</span>
+        </div>
+        <div class="landing-stat">
+          <span class="landing-stat__num" id="stat-regions">25</span>
+          <span class="landing-stat__label">Mikoa ya Tanzania</span>
+        </div>
+      </div>
     </div>
 
-    <div class="landing-stats">
-      <div class="landing-stat">
-        <span class="landing-stat__num" id="stat-users">—</span>
-        <span class="landing-stat__label">Wakulima na Wanunuzi</span>
-      </div>
-      <div class="landing-stat">
-        <span class="landing-stat__num" id="stat-listings">—</span>
-        <span class="landing-stat__label">Mazao Yanayouzwa</span>
-      </div>
-      <div class="landing-stat">
-        <span class="landing-stat__num" id="stat-regions">25</span>
-        <span class="landing-stat__label">Mikoa ya Tanzania</span>
-      </div>
-    </div>
   </div>
 </section>
 
@@ -90,6 +98,41 @@
   </div>
 </section>
 
+<!-- Weather widget -- moved below listings preview -->
+<section class="landing-weather-section">
+  <div class="landing-weather-section__inner">
+    <div class="landing-hero__glass" id="hali-ya-hewa">
+      <div class="landing-weather__top">
+        <span><i data-lucide="map-pin" style="width:12px;height:12px"></i> <span id="lw-city">Mbeya, Tanzania</span></span>
+      </div>
+      <div class="landing-weather__temp-row">
+        <span class="landing-weather__temp" id="lw-temp">--°</span>
+        <span class="landing-weather__desc" id="lw-desc">Inapakia...</span>
+      </div>
+      <div class="landing-weather__stats">
+        <div class="landing-weather__stat">
+          <div class="landing-weather__stat-val" id="lw-humidity">--%</div>
+          <div class="landing-weather__stat-lbl">Unyevu</div>
+        </div>
+        <div class="landing-weather__stat">
+          <div class="landing-weather__stat-val" id="lw-wind">--</div>
+          <div class="landing-weather__stat-lbl">Upepo</div>
+        </div>
+        <div class="landing-weather__stat">
+          <div class="landing-weather__stat-val" id="lw-feels">--°</div>
+          <div class="landing-weather__stat-lbl">Nyuzi Joto</div>
+        </div>
+      </div>
+      <div class="landing-weather__search">
+        <input type="text" id="lw-city-input" class="landing-weather__search-input" placeholder="Mji wako..."/>
+        <button class="landing-weather__search-btn" onclick="lwSearch()" title="Tafuta">
+          <i data-lucide="search" style="width:14px;height:14px"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Features section -->
 <section class="landing-features">
   <div class="landing-features__grid">
@@ -119,7 +162,7 @@
 <!-- Final CTA -->
 <section class="landing-final-cta">
   <h2>Anza Leo — Bure Kabisa</h2>
-  <p>Jiunge na wakulima na wanunuzi wanaotumia KilimoBridge Tanzania</p>
+  <p>Jiunge na wakulima na wanunuzi wanaotumia AgroLink Tanzania</p>
   <a href="{{ url_for('register') }}" class="btn-primary btn-lg">
     <i data-lucide="arrow-right"></i> Anza Sasa
   </a>
@@ -128,7 +171,7 @@
 
 {% block scripts %}
 <script>
-  // Pata platform stats kwa ajili ya landing page
+  // Platform stats
   fetch('/health')
     .then(r => r.json())
     .then(data => {
@@ -140,5 +183,29 @@
       }
     })
     .catch(() => {});
+
+  // Landing hero weather widget
+  async function lwLoad(city){
+    try{
+      const res = await fetch('/weather?city=' + encodeURIComponent(city));
+      const data = await res.json();
+      const w = data.weather;
+      if(w.success){
+        document.getElementById('lw-city').textContent = w.city + ', Tanzania';
+        document.getElementById('lw-temp').textContent = Math.round(w.temperature) + '°C';
+        document.getElementById('lw-desc').textContent = w.description;
+        document.getElementById('lw-humidity').textContent = w.humidity + '%';
+        document.getElementById('lw-wind').textContent = w.wind_speed + ' m/s';
+        if(w.feels_like) document.getElementById('lw-feels').textContent = Math.round(w.feels_like) + '°C';
+      }
+    }catch(e){ console.warn('Weather unavailable'); }
+  }
+  function lwSearch(){
+    const city = document.getElementById('lw-city-input').value.trim();
+    if(!city) return;
+    lwLoad(city);
+  }
+  document.getElementById('lw-city-input').addEventListener('keydown', e => { if(e.key === 'Enter') lwSearch(); });
+  document.addEventListener('DOMContentLoaded', () => lwLoad('Mbeya'));
 </script>
 {% endblock %}

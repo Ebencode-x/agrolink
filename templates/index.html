@@ -21,47 +21,45 @@
 
 {% block extra_head %}
 <style>
-  /* ── Hero ── */
-  .hero{background:var(--nav-bg);padding:4.5rem clamp(1rem,5vw,2.5rem) 3.5rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+  /* ── Hero: real photo background, art-directed per breakpoint ── */
+  .hero{position:relative;padding:4.5rem clamp(1rem,5vw,2.5rem) 3.5rem;overflow:hidden;isolation:isolate}
+  .hero-photo{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;object-position:center 35%}
+  .hero-scrim{position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(10,22,15,0.92) 0%,rgba(10,22,15,0.82) 38%,rgba(10,22,15,0.55) 68%,rgba(10,22,15,0.40) 100%)}
   .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-  .hero-eyebrow{display:inline-flex;align-items:center;gap:6px;background:rgba(74,155,111,0.18);border:1px solid rgba(74,155,111,0.30);color:rgba(240,247,242,0.85);padding:0.28rem 0.85rem;border-radius:50px;font-size:0.73rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:1.25rem}
-  .hero-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.15;color:var(--text-on-dark);margin-bottom:1.25rem}
-  .hero-title .accent{color:var(--accent)}
-  .hero-subtitle{font-size:0.97rem;color:rgba(240,247,242,0.62);line-height:1.8;margin-bottom:2rem;max-width:430px}
+
+  /* Poster-stack headline — the signature element */
+  .hero-title-poster{margin-bottom:1.4rem}
+  .pt-line{display:block;font-family:var(--font-display);color:var(--text-on-dark);line-height:0.97}
+  .pt-a{font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:600;letter-spacing:0.005em;color:rgba(240,247,242,0.92)}
+  .pt-b{font-size:clamp(1.05rem,2.1vw,1.4rem);font-weight:400;color:rgba(240,247,242,0.62);margin:0.2em 0 0.05em}
+  .pt-c{font-size:clamp(3.6rem,9.5vw,6.4rem);font-weight:900;color:var(--accent);letter-spacing:-0.015em;transform:rotate(-1.3deg);transform-origin:left center;display:inline-block;margin-top:-0.06em}
+
+  .hero-subtitle{font-size:0.97rem;color:rgba(240,247,242,0.72);line-height:1.8;margin-bottom:2rem;max-width:430px}
   .hero-actions{display:flex;gap:0.875rem;flex-wrap:wrap}
   .hero-btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--text-on-accent);padding:0.75rem 1.6rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:700;font-size:0.9rem;text-decoration:none;border:none;cursor:pointer;transition:background var(--transition)}
   .hero-btn-primary:hover{background:var(--accent-dark);color:var(--text-on-accent)}
   .hero-btn-ghost{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);color:var(--text-on-dark);padding:0.75rem 1.6rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.9rem;text-decoration:none;cursor:pointer;transition:background var(--transition)}
   .hero-btn-ghost:hover{background:rgba(255,255,255,0.15)}
-  .hero-stats{display:flex;gap:3.5rem;margin-top:2.5rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.10)}
-  .stat-value{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--accent)}
-  .stat-label{font-size:0.74rem;color:rgba(240,247,242,0.48);margin-top:2px}
-
-  /* ── Hero image panel ── */
-  .hero-image-panel{position:relative;border-radius:var(--radius-md);overflow:hidden;border:1px solid rgba(255,255,255,0.12);min-height:320px}
-  .hero-image-panel img{width:100%;height:100%;object-fit:cover;display:block}
-  .hero-image-tag{position:absolute;left:0.9rem;bottom:0.9rem;display:inline-flex;align-items:center;gap:6px;background:rgba(20,30,24,0.72);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.16);color:var(--text-on-dark);padding:0.4rem 0.75rem;border-radius:50px;font-size:0.70rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase}
 
   /* ── Hero right panel ── */
   .hero-panel{display:flex;flex-direction:column;gap:1rem}
-  .weather-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-md);padding:1.5rem}
+  .weather-card{background:rgba(10,22,15,0.55);backdrop-filter:blur(2px);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-md);padding:1.5rem}
   .weather-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
-  .weather-loc{display:flex;align-items:center;gap:5px;font-size:0.78rem;color:rgba(240,247,242,0.55)}
-  .weather-live{font-size:0.70rem;color:var(--brand-light);font-weight:700;letter-spacing:0.05em;text-transform:uppercase}
+  .weather-loc{display:flex;align-items:center;gap:5px;font-size:0.78rem;color:rgba(240,247,242,0.65)}
   .weather-temp-row{display:flex;align-items:flex-end;gap:0.75rem;margin-bottom:1rem}
   .weather-temp{font-family:var(--font-display);font-size:2.8rem;font-weight:800;color:var(--text-on-dark);line-height:1}
-  .weather-desc{font-size:0.85rem;color:rgba(240,247,242,0.55);padding-bottom:0.2rem;text-transform:capitalize}
+  .weather-desc{font-size:0.85rem;color:rgba(240,247,242,0.60);padding-bottom:0.2rem;text-transform:capitalize}
   .weather-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem}
-  .weather-stat{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);padding:0.6rem 0.4rem;text-align:center}
+  .weather-stat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);border-radius:var(--radius-sm);padding:0.6rem 0.4rem;text-align:center}
   .weather-stat-val{font-family:var(--font-display);font-weight:700;font-size:0.85rem;color:var(--text-on-dark)}
-  .weather-stat-lbl{font-size:0.60rem;color:rgba(240,247,242,0.40);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px}
-  .prices-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-md);padding:1.25rem}
+  .weather-stat-lbl{font-size:0.60rem;color:rgba(240,247,242,0.45);text-transform:uppercase;letter-spacing:0.05em;margin-top:2px}
+  .prices-card{background:rgba(10,22,15,0.55);backdrop-filter:blur(2px);border:1px solid rgba(255,255,255,0.14);border-radius:var(--radius-md);padding:1.25rem}
   .prices-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.875rem}
   .prices-title{font-family:var(--font-display);font-weight:700;font-size:0.85rem;color:var(--text-on-dark);display:flex;align-items:center;gap:7px}
-  .prices-unit{font-size:0.70rem;color:rgba(240,247,242,0.38);font-weight:600;letter-spacing:0.04em}
-  .price-row{display:flex;align-items:center;justify-content:space-between;padding:0.45rem 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:0.84rem}
+  .prices-unit{font-size:0.70rem;color:rgba(240,247,242,0.42);font-weight:600;letter-spacing:0.04em}
+  .price-row{display:flex;align-items:center;justify-content:space-between;padding:0.45rem 0;border-bottom:1px solid rgba(255,255,255,0.08);font-size:0.84rem}
   .price-row:last-child{border-bottom:none}
-  .price-name{display:flex;align-items:center;gap:7px;color:rgba(240,247,242,0.70)}
+  .price-name{display:flex;align-items:center;gap:7px;color:rgba(240,247,242,0.75)}
   .price-val{font-family:var(--font-display);font-weight:700;color:var(--accent);font-size:0.88rem}
 
   /* ── Section shared ── */
@@ -72,9 +70,7 @@
 
   /* ── Features ── */
   .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.25rem}
-  .feature-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-md);padding:1.6rem;transition:border-left-color var(--transition);position:relative}
-  .feature-card:hover{border-left-color:var(--accent)}
-  .feature-tag{position:absolute;top:1.25rem;right:1.25rem;font-size:0.65rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--text-muted);background:var(--bg-subtle);padding:2px 8px;border-radius:50px;border:1px solid var(--border)}
+  .feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:1.6rem;position:relative}
   .feature-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
   .feature-icon-primary{background:rgba(46,107,71,0.10);color:var(--brand-mid);border:1px solid rgba(46,107,71,0.20)}
   .feature-icon-accent{background:rgba(232,184,75,0.12);color:var(--accent-dark);border:1px solid rgba(232,184,75,0.28)}
@@ -84,8 +80,7 @@
 
   /* ── Listings ── */
   .listings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
-  .listing-card{background:var(--bg-card);border:1px solid var(--border);border-left:3px solid transparent;border-radius:var(--radius-md);overflow:hidden;transition:border-left-color var(--transition)}
-  .listing-card:hover{border-left-color:var(--accent)}
+  .listing-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
   .listing-thumb{position:relative;width:100%;height:140px;background:var(--bg-surface);overflow:hidden}
   .listing-thumb img{width:100%;height:100%;object-fit:cover;display:block}
   .listing-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(16,185,129,0.06),rgba(6,78,59,0.18));color:var(--brand-mid)}
@@ -124,21 +119,19 @@
 
   /* ── Mobile ── */
   @media(max-width:768px){
+    .hero{padding:3.5rem 1rem 2.75rem}
+    .hero-photo{object-position:center 30%}
+    .hero-scrim{background:linear-gradient(180deg,rgba(10,22,15,0.55) 0%,rgba(10,22,15,0.86) 55%,rgba(10,22,15,0.94) 100%)}
     .hero-inner{grid-template-columns:1fr;gap:2rem}
     .hero-panel{order:-1}
-    .hero-title{font-size:1.85rem}
-    .hero-stats{gap:1.5rem;flex-wrap:wrap}
-    .stat-value{font-size:1.5rem}
+    .pt-c{font-size:clamp(2.8rem,13vw,3.6rem);transform:rotate(-0.8deg)}
     .weather-temp{font-size:2.2rem}
     .features-grid{grid-template-columns:1fr}
     .listings-grid{grid-template-columns:1fr}
-    .stats-grid{grid-template-columns:1fr 1fr}
     .hero-actions{flex-direction:column}
     .hero-btn-primary,.hero-btn-ghost{justify-content:center}
   }
   @media(max-width:480px){
-    .hero-title{font-size:1.6rem}
-    .stats-grid{grid-template-columns:1fr}
     .weather-input-row{flex-direction:column}
   }
 </style>{% endblock %}
@@ -147,12 +140,19 @@
 
 <!-- HERO -->
 <section class="hero">
+  <picture>
+    <source media="(max-width:768px)" srcset="{{ url_for('static', filename='images/hero-mobile.jpg') }}">
+    <img class="hero-photo" src="{{ url_for('static', filename='images/hero-desktop.jpg') }}" alt="Wakulima wa Tanzania wakifanya kazi shambani" loading="eager"/>
+  </picture>
+  <div class="hero-scrim"></div>
+
   <div class="hero-inner">
     <!-- Left: Content -->
     <div>
-      <h1 class="hero-title">
-        Kilimo cha Kisasa<br/>kwa Wakulima wa<br/>
-        <span class="accent">Tanzania</span>
+      <h1 class="hero-title-poster">
+        <span class="pt-line pt-a">Kilimo cha Kisasa</span>
+        <span class="pt-line pt-b">kwa Wakulima wa</span>
+        <span class="pt-line pt-c">TANZANIA</span>
       </h1>
       <p class="hero-subtitle">AgroLink Tanzania inaunganisha wakulima, mawakala, na masoko kwa teknolojia ya hali ya juu. Bei za soko, hali ya hewa, na mashauri ya kilimo — mahali pamoja.</p>
       <div class="hero-actions">
@@ -171,12 +171,8 @@
       <div class="weather-card">
         <div class="weather-top">
           <div class="weather-loc">
-            <i data-lucide="map-pin" style="width:12px;height:12px;color:var(--brand-green)"></i>
+            <i data-lucide="map-pin" style="width:12px;height:12px;color:var(--brand-light)"></i>
             <span id="weather-city-name">Mbeya, Tanzania</span>
-          </div>
-          <div class="weather-live">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--brand-light)"></div>
-            Live
           </div>
         </div>
         <div class="weather-temp-row">
@@ -185,17 +181,17 @@
         </div>
         <div class="weather-stats">
           <div class="weather-stat">
-            <i data-lucide="droplets" style="width:14px;height:14px;color:var(--brand-mid)"></i>
+            <i data-lucide="droplets" style="width:14px;height:14px;color:var(--brand-light)"></i>
             <div class="weather-stat-val" id="weather-humidity">--%</div>
             <div class="weather-stat-lbl">Unyevu</div>
           </div>
           <div class="weather-stat">
-            <i data-lucide="wind" style="width:14px;height:14px;color:var(--brand-mid)"></i>
+            <i data-lucide="wind" style="width:14px;height:14px;color:var(--brand-light)"></i>
             <div class="weather-stat-val" id="weather-wind">--</div>
             <div class="weather-stat-lbl">Upepo</div>
           </div>
           <div class="weather-stat">
-            <i data-lucide="thermometer" style="width:14px;height:14px;color:var(--brand-mid)"></i>
+            <i data-lucide="thermometer" style="width:14px;height:14px;color:var(--brand-light)"></i>
             <div class="weather-stat-val" id="weather-feels">--°</div>
             <div class="weather-stat-lbl">Nyuzi Joto</div>
           </div>
@@ -205,17 +201,14 @@
       <!-- Prices Card -->
       <div class="prices-card">
         <div class="prices-header">
-          <div class="prices-title">
-            <div style="width:6px;height:6px;border-radius:50%;background:var(--brand-light)"></div>
-            Bei za Soko Leo
-          </div>
+          <div class="prices-title">Bei za Soko Leo</div>
           <span class="prices-unit">TZS/kg</span>
         </div>
         {% if listings %}
           {% for l in listings[:4] %}
           <div class="price-row">
             <div class="price-name">
-              <i data-lucide="sprout" style="width:13px;height:13px;color:var(--brand-mid)"></i>
+              <i data-lucide="sprout" style="width:13px;height:13px;color:var(--brand-light)"></i>
               {{ l.crop_name }}
             </div>
             <div class="price-val">{{ "{:,.0f}".format(l.price_tzs) }}</div>
@@ -225,7 +218,7 @@
           {% for name,price in [('Mahindi','850'),('Mpunga','1,200'),('Viazi','600'),('Kahawa','4,500')] %}
           <div class="price-row">
             <div class="price-name">
-              <i data-lucide="sprout" style="width:13px;height:13px;color:var(--brand-mid)"></i>
+              <i data-lucide="sprout" style="width:13px;height:13px;color:var(--brand-light)"></i>
               {{ name }}
             </div>
             <div class="price-val">{{ price }}</div>
@@ -254,7 +247,6 @@
         ('smartphone','feature-icon-muted','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.','Mobile')
       ] %}
       <div class="feature-card">
-        <div class="feature-tag">{{ tag }}</div>
         <div class="feature-icon {{ color_class }}">
           <i data-lucide="{{ icon }}" style="width:22px;height:22px"></i>
         </div>
