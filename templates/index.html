@@ -172,7 +172,7 @@
         <div class="weather-top">
           <div class="weather-loc">
             <i data-lucide="map-pin" style="width:12px;height:12px;color:var(--brand-light)"></i>
-            <span id="weather-city-name">Mbeya, Tanzania</span>
+            <span id="weather-city-name">{{ (current_user.region or 'Mbeya') }}, Tanzania</span>
           </div>
         </div>
         <div class="weather-temp-row">
@@ -379,9 +379,10 @@
 
 {% block extra_scripts %}
 <script>
+const heroDefaultCity = "{{ (current_user.region or 'Mbeya')|e }}";
 async function loadHeroWeather(){
   try{
-    const res=await fetch('/weather?city=Mbeya');
+    const res=await fetch('/weather?city='+encodeURIComponent(heroDefaultCity));
     const data=await res.json();
     const w=data.weather;
     if(w.success){
