@@ -4,6 +4,7 @@ import io
 from PIL import Image
 from functools import wraps
 from email_service import send_welcome_email, send_partnership_notification
+import sentinai_handler
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_migrate import Migrate
@@ -43,6 +44,7 @@ import enum
 load_dotenv()
 
 app = Flask(__name__)
+sentinai_handler.install(app)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", "sqlite:///agrolink.db"
