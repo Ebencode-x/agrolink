@@ -960,13 +960,15 @@ def register_initiate():
 
     # ── Futa OTP za zamani za namba hii ──────────────────────────────────────
     PhoneOTP.query.filter_by(phone=phone, verified=False).delete()
+    PhoneOTP.query.filter(PhoneOTP.expires_at < datetime.utcnow()).delete()
     db.session.flush()
 
     # ── Tengeneza OTP ─────────────────────────────────────────────────────────
     otp_code = f"{_secrets.randbelow(900000) + 100000}"
     form_payload = json.dumps({
         "full_name": full_name, "phone": phone, "email": email,
-        "region": region, "role": role, "password": password,
+        "region": region, "role": role,
+        "password_hash": bcrypt.generate_password_hash(password).decode("utf-8"),
     })
     otp_record = PhoneOTP(
         phone=phone,
@@ -1044,10 +1046,14 @@ def register_verify():
         can_advise=False,
         can_b2b=False,
     )
-    user.set_password(form["password"])
+    if form.get("password_hash"):
+        user.password_hash = form["password_hash"]
+    else:
+        # rekodi za zamani za kabla ya marekebisho, zinaisha ndani ya dakika 10
+        user.set_password(form["password"])
     db.session.add(user)
 
-    record.verified = True
+    db.session.delete(record)
     db.session.commit()
 
     trust_engine(user.id)
