@@ -269,6 +269,7 @@ document.getElementById('register-form').addEventListener('submit',async e=>{
     clearTimeout(timeout);
     const data=await res.json();
     if(res.ok){
+      if(data.redirect){window.location.href=data.redirect;return}
       setLoading(false);
       showOtpScreen(phone);
     } else {
