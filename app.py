@@ -120,6 +120,15 @@ OTP_MOCK = (
 )
 OTP_SMS_CONFIGURED = bool(os.environ.get("AT_USERNAME") and os.environ.get("AT_API_KEY"))
 
+
+def get_payload():
+    """Tumia JSON object kama ipo, vinginevyo form. Mwili usio sahihi hauleti 500."""
+    data = request.get_json(silent=True)
+    if isinstance(data, dict):
+        return data
+    return request.form
+
+
 def send_otp_sms(phone: str, otp_code: str) -> bool:
     """Tuma OTP kwa SMS. OTP_MOCK=true → log tu (development/staging)."""
     if OTP_MOCK:
@@ -891,7 +900,7 @@ def weather_page():
 @limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
-        data = request.get_json() or request.form
+        data = get_payload()
         phone = sanitize(data.get("phone", ""), max_length=20)
         password = data.get(
             "password", ""
@@ -922,7 +931,7 @@ def login():
 def register_initiate():
     """Hatua ya 1: Validate form data, tuma OTP, subiri uthibitisho."""
     import json, secrets as _secrets
-    data = request.get_json() or request.form
+    data = get_payload()
 
     # ── Sanitize ─────────────────────────────────────────────────────────────
     full_name = sanitize(data.get("full_name", ""), max_length=120)
@@ -1032,7 +1041,7 @@ def register_initiate():
 def register_verify():
     """Hatua ya 2: Thibitisha OTP na unda akaunti."""
     import json
-    data = request.get_json() or request.form
+    data = get_payload()
     phone    = sanitize(data.get("phone", ""), max_length=20)
     otp_code = sanitize(data.get("otp_code", ""), max_length=6)
 
@@ -1137,7 +1146,7 @@ def forgot_password():
     Kwa sasa, tumia security questions au admin reset badala ya self-service.
     """
     if request.method == "POST":
-        data = request.get_json() or request.form
+        data = get_payload()
         phone = sanitize(data.get("phone", ""), max_length=20)
         new_password = data.get("new_password", "")
         confirm = data.get("confirm_password", "")
@@ -1191,7 +1200,7 @@ def forgot_password():
 @require_active_account
 def change_password():
     if request.method == "POST":
-        data = request.get_json() or request.form
+        data = get_payload()
         old_password = data.get("old_password", "")
         new_password = data.get("new_password", "")
         confirm = data.get("confirm_password", "")
@@ -1236,7 +1245,7 @@ def dashboard():
 @require_active_account
 def add_product():
     if request.method == "POST":
-        data = request.get_json() or request.form
+        data = get_payload()
 
         crop_name = sanitize(data.get("crop_name", ""), max_length=100)
         region = sanitize(
@@ -1390,7 +1399,7 @@ def rate_seller(listing_id):
     if listing.seller_id == current_user.id:
         return jsonify({"error": "Huwezi kujipa rating."}), 400
 
-    data = request.get_json() or request.form
+    data = get_payload()
     comment = sanitize(data.get("comment", ""), max_length=300)
 
     try:
@@ -1434,7 +1443,7 @@ def report_listing(listing_id):
     if listing.seller_id == current_user.id:
         return jsonify({"error": "Huwezi ku-report orodha yako mwenyewe."}), 400
 
-    data = request.get_json() or request.form
+    data = get_payload()
     reason = sanitize(data.get("reason", ""), max_length=200)
 
     if not reason:
