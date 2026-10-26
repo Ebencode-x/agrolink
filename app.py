@@ -105,6 +105,14 @@ ALLOWED_ORIGINS = os.environ.get(
 CORS(app, origins=ALLOWED_ORIGINS, supports_credentials=True)
 
 # ── Rate Limiter ──────────────────────────────────────────────────────────────
+# Render: mteja, Cloudflare, Render ya ndani. IP halisi ni ya tatu kutoka kulia.
+# X-Forwarded-For inayoandikwa na mteja inabaki kushoto na haitumiki.
+from werkzeug.middleware.proxy_fix import ProxyFix
+TRUSTED_PROXY_HOPS = int(os.environ.get("TRUSTED_PROXY_HOPS", "3"))
+app.wsgi_app = ProxyFix(
+    app.wsgi_app, x_for=TRUSTED_PROXY_HOPS, x_proto=0, x_host=0, x_port=0, x_prefix=0
+)
+
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -3831,7 +3839,7 @@ def payment_callback():
       - Idempotent — callback ile ile haiwezi kuprocesiwa mara mbili
       - Kila jaribio (likifaulu au la) linarekodiwa kwa audit (IP + matokeo)
     """
-    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+    client_ip = request.remote_addr
 
     # ── 1. Shared-secret verification ──────────────────────────────────────
     expected_secret = os.getenv("PAYMENT_CALLBACK_SECRET", "")
