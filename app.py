@@ -113,7 +113,12 @@ limiter = Limiter(
 )
 
 # ── OTP SMS Helper ────────────────────────────────────────────────────────────
-OTP_MOCK = os.environ.get("OTP_MOCK", "true").lower() == "true"
+# Mock ni kwa maendeleo ya ndani tu: lazima iwekwe wazi na haifanyi kazi kwenye Render.
+OTP_MOCK = (
+    os.environ.get("OTP_MOCK", "false").lower() == "true"
+    and not os.environ.get("RENDER")
+)
+OTP_SMS_CONFIGURED = bool(os.environ.get("AT_USERNAME") and os.environ.get("AT_API_KEY"))
 
 def send_otp_sms(phone: str, otp_code: str) -> bool:
     """Tuma OTP kwa SMS. OTP_MOCK=true → log tu (development/staging)."""
@@ -957,6 +962,39 @@ def register_initiate():
     # ── Validate role ─────────────────────────────────────────────────────────
     if role not in ("farmer", "agent", "buyer", "member"):
         role = "farmer"
+
+    # -- Hakuna mtoa huduma wa SMS: fungua akaunti bila OTP, simu haijathibitishwa --
+    if not OTP_MOCK and not OTP_SMS_CONFIGURED:
+        user = User(
+            full_name=full_name,
+            phone=phone,
+            email=email or None,
+            region=region,
+            role=role,
+            accepted_terms=True,
+            terms_accepted_at=datetime.utcnow(),
+            is_verified=False,
+            phone_verified=False,
+            trust_level="gray",
+            trust_points=0,
+            flag_count=0,
+            transaction_count=0,
+            avg_rating=0.0,
+            can_post_listing=False,
+            can_advise=False,
+            can_b2b=False,
+        )
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        trust_engine(user.id)
+        if email:
+            try:
+                send_welcome_email(email, full_name, role)
+            except Exception as exc:
+                app.logger.warning("welcome email failed: %s", type(exc).__name__)
+        login_user(user)
+        return jsonify({"message": "Akaunti imefunguliwa.", "redirect": "/dashboard"}), 201
 
     # ── Futa OTP za zamani za namba hii ──────────────────────────────────────
     PhoneOTP.query.filter_by(phone=phone, verified=False).delete()
