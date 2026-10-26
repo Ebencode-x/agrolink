@@ -835,9 +835,8 @@ def require_phone_verified(f):
     def decorated(*args, **kwargs):
         if not getattr(current_user, "phone_verified", False):
             return jsonify({
-                "error": "Thibitisha namba yako ya simu kwanza.",
+                "error": "Uthibitisho wa namba ya simu bado haupatikani. Huduma hii itafunguliwa hivi karibuni.",
                 "code": "PHONE_NOT_VERIFIED",
-                "redirect": "/verify-phone"
             }), 403
         return f(*args, **kwargs)
     return decorated
