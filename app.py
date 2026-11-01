@@ -2687,6 +2687,14 @@ def health():
     })
 
 
+@app.route("/admin/sentinai-test", methods=["POST"])
+@login_required
+@require_admin
+def admin_sentinai_test():
+    """Raise a harmless error so an admin can check the SentinAI wiring end to end."""
+    raise RuntimeError("SentinAI wiring test")
+
+
 @app.errorhandler(404)
 def not_found(e):
     return render_template("404.html"), 404
