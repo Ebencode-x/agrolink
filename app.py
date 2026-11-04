@@ -52,6 +52,17 @@ if os.environ.get("SENTINAI_INGEST_URL") and os.environ.get("SENTINAI_INGEST_KEY
     )
     sentinai.attach(app.logger)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key-change-in-production")
+IS_PRODUCTION = bool(os.environ.get("RENDER"))
+if IS_PRODUCTION and app.config["SECRET_KEY"] == "dev-key-change-in-production":
+    raise RuntimeError("SECRET_KEY lazima iwekwe kwenye production")
+
+# Cookie za session na remember: HttpOnly, SameSite Lax, Secure kwenye production
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+app.config["SESSION_COOKIE_SECURE"] = IS_PRODUCTION
+app.config["REMEMBER_COOKIE_HTTPONLY"] = True
+app.config["REMEMBER_COOKIE_SAMESITE"] = "Lax"
+app.config["REMEMBER_COOKIE_SECURE"] = IS_PRODUCTION
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", "sqlite:///agrolink.db"
 )
