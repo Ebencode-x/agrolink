@@ -4,7 +4,7 @@ import io
 from PIL import Image
 from functools import wraps
 from email_service import send_welcome_email, send_partnership_notification
-import sentinai_handler
+import sentinai
 from datetime import datetime, timedelta
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, abort
 from flask_migrate import Migrate
@@ -44,7 +44,13 @@ import enum
 load_dotenv()
 
 app = Flask(__name__)
-sentinai_handler.install(app)
+if os.environ.get("SENTINAI_INGEST_URL") and os.environ.get("SENTINAI_INGEST_KEY"):
+    sentinai.init(
+        environment="production" if os.environ.get("RENDER")
+        else (os.environ.get("FLASK_ENV") or "development"),
+        release=os.environ.get("RENDER_GIT_COMMIT"),
+    )
+    sentinai.attach(app.logger)
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-key-change-in-production")
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get(
     "DATABASE_URL", "sqlite:///agrolink.db"
