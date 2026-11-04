@@ -9,7 +9,7 @@ SQLAlchemy==2.0.49
 psycopg2-binary==2.9.11
 python-dotenv==1.0.1
 requests==2.32.3
-gunicorn==22.0.0
+gunicorn==26.2.0
 supabase==2.15.1
 alembic==1.18.4
 bleach==6.1.0
