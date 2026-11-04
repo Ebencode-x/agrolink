@@ -156,7 +156,7 @@ def send_otp_sms(phone: str, otp_code: str) -> bool:
         )
         sms = africastalking.SMS
         msg = f"AgroLink Tanzania: Nambari yako ya uthibitisho ni {otp_code}. Inaisha baada ya dakika 10. Usishirikishe mtu yeyote."
-        response = sms.send(msg, [f"+255{phone.lstrip('0')}"])
+        sms.send(msg, [f"+255{phone.lstrip('0')}"])
         return True
     except Exception as e:
         app.logger.error(f"[OTP SMS ERROR] {e}")
@@ -1810,7 +1810,6 @@ VALID_MONTHS = [
 def get_cached_prediction(cache_key):
     cached = PricePredictionCache.query.filter_by(cache_key=cache_key).first()
     if cached:
-        age = datetime.utcnow() - cached.created_at
         if False:  # cache disabled
             import json as json_lib
 
@@ -1845,7 +1844,6 @@ def save_prediction_cache(cache_key, crop_sw, region, month, ai_response_text):
 def fetch_wfp_price(crop_sw, region):
     """Tumia bei halisi kutoka listings za AgroLink database."""
     try:
-        from sqlalchemy import func
         region_lower = region.lower()
         # Tafuta listings za hivi karibuni za zao hili
         listings = MarketListing.query.filter(
@@ -1875,7 +1873,6 @@ def fetch_wfp_price(crop_sw, region):
         for l in pool:
             price = l.price_tzs
             unit = (l.unit or "kg").lower()
-            qty = l.quantity_kg or 1
             # Normalize to per kg
             if unit == "tani":
                 price = price / 1000
@@ -2173,6 +2170,11 @@ def mshauri():
     return render_template("mshauri.html")
 
 # ── LISTING ADVICE BOT ───────────────────────────────────────────────────────
+
+MONTH_NAMES_SW = [
+    "Januari", "Februari", "Machi", "Aprili", "Mei", "Juni",
+    "Julai", "Agosti", "Septemba", "Oktoba", "Novemba", "Desemba",
+]
 
 CROP_KNOWLEDGE = {
     "mahindi": {
@@ -3446,9 +3448,9 @@ def order_advance(order_id):
         return jsonify({"error": "Hatua hii inafanyika tu baada ya malipo kuthibitishwa"}), 403
     required_role = transition["role"]
     if required_role == "buyer" and current_user.id != order.buyer_id:
-        return jsonify({"error": f"Hatua hii inafanywa na mnunuzi tu"}), 403
+        return jsonify({"error": "Hatua hii inafanywa na mnunuzi tu"}), 403
     if required_role == "seller" and current_user.id != order.seller_id:
-        return jsonify({"error": f"Hatua hii inafanywa na muuzaji tu"}), 403
+        return jsonify({"error": "Hatua hii inafanywa na muuzaji tu"}), 403
     order.status = transition["next"]
     db.session.commit()
     return jsonify({"success": True, "status": order.status.value,
@@ -4172,14 +4174,14 @@ def service_worker():
 ADMIN_NOTIFY_EMAIL = os.environ.get("ADMIN_NOTIFY_EMAIL", "er.masanja01@gmail.com")
 
 @app.route("/ubia", methods=["GET", "POST"])
+@limiter.limit("3 per hour", methods=["POST"])
 def ubia():
     if request.method == "POST":
         # Honeypot: field hii haionekani kwa binadamu, bots wanaijaza
         if request.form.get("website_url"):
             return redirect(url_for("ubia_thanks"))
 
-        # Rate limit rahisi: max maombi 3 kwa saa kwa IP moja
-        ip = request.remote_addr
+        # Kikomo cha maombi 3 kwa saa kwa IP kiko kwenye limiter juu ya route hii
         hour_ago = datetime.utcnow() - timedelta(hours=1)
         recent_count = Partnership.query.filter(
             Partnership.created_at >= hour_ago
