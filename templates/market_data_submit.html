@@ -50,6 +50,7 @@
       </div>
 
       <form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="sb-field">
           <label>Zao</label>
           <select name="crop_name" required>

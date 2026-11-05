@@ -65,6 +65,7 @@
     </div>
     <div style="display:flex;gap:10px;">
       <form method="post" action="/admin/market-data/run-hdx-import" onsubmit="return confirm('Kuendesha HDX import sasa? Hii itachukua sekunde 10-30.')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button type="submit" style="height:34px;padding:0 16px;background:var(--brand-mid);color:#fff;border:none;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;">Run HDX Import</button>
       </form>
       <a class="adm-back" href="/admin">Rudi Admin</a>
@@ -87,6 +88,7 @@
       <div class="adm-card-head"><h2>Ongeza Bei Moja kwa Moja</h2></div>
       <div class="adm-card-body">
         <form method="post" action="/admin/market-data/add">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="adm-field">
             <label>Zao</label>
             <select name="crop_name" required>
@@ -138,6 +140,7 @@
       <div class="adm-card-head"><h2>Ingiza Kwa CSV</h2></div>
       <div class="adm-card-body">
         <form method="post" action="/admin/market-data/import-csv" enctype="multipart/form-data">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="adm-csv-zone">
             <label for="csv_file">Chagua faili la CSV kupakia</label>
             <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
@@ -185,9 +188,11 @@
             </td>
             <td style="display:flex;gap:6px;">
               <form method="post" action="/admin/market-data/approve/{{ p.id }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button class="adm-btn" style="height:30px;padding:0 12px;background:var(--brand-mid);color:#fff;font-size:.75rem;" type="submit">Idhinisha</button>
               </form>
               <form method="post" action="/admin/market-data/reject/{{ p.id }}">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button class="adm-btn adm-btn-danger" type="submit">Kataa</button>
               </form>
             </td>
@@ -235,6 +240,7 @@
             <td>
               <form method="post" action="/admin/market-data/delete/{{ p.id }}"
                     onsubmit="return confirm('Futa rekodi hii?')">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button class="adm-btn adm-btn-danger" type="submit">Futa</button>
               </form>
             </td>

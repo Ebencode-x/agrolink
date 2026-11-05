@@ -78,6 +78,7 @@
     </div>
     <div class="ub-card-body">
       <form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="ub-honeypot" aria-hidden="true">
           <label>Website</label>
           <input type="text" name="website_url" tabindex="-1" autocomplete="off">
