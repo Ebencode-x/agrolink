@@ -18,3 +18,14 @@ def client():
     with m.app.app_context():
         m.db.create_all()
     return m.app.test_client()
+
+
+import pytest as _pytest
+
+
+@_pytest.fixture(autouse=True)
+def _csrf_off_by_default():
+    import app as appmod
+    appmod.app.config["WTF_CSRF_ENABLED"] = False
+    yield
+    appmod.app.config["WTF_CSRF_ENABLED"] = True

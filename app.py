@@ -921,6 +921,19 @@ def weather_page():
 # ── AUTH ──────────────────────────────────────────────────────────────────────
 
 
+from flask_wtf.csrf import CSRFProtect, CSRFError
+
+app.config["WTF_CSRF_TIME_LIMIT"] = None  # token ishi na session
+csrf = CSRFProtect(app)
+
+
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    if request.is_json or request.headers.get("X-CSRFToken"):
+        return jsonify(error="Ombi halikukubaliwa. Pakia ukurasa upya kisha jaribu tena."), 400
+    return "Ombi halikukubaliwa. Rudi nyuma, pakia ukurasa upya kisha jaribu tena.", 400
+
+
 @app.route("/login", methods=["GET", "POST"])
 @limiter.limit("5 per minute")
 def login():
@@ -3856,6 +3869,7 @@ def payment_initiate(order_id):
 
 
 @app.route("/payments/callback", methods=["POST"])
+@csrf.exempt
 def payment_callback():
     """
     Payment provider callback — inaitwa na AzamPay/Selcom baada ya mnunuzi kulipa.
