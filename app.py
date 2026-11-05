@@ -154,20 +154,34 @@ def get_payload():
     return request.form
 
 
+def _normalize_tz_phone(phone: str) -> str:
+    """Rudisha namba ya Tanzania kwa muundo +255XXXXXXXXX kutoka 07.., 255.. au +255.."""
+    digits = "".join(ch for ch in str(phone) if ch.isdigit())
+    if digits.startswith("255"):
+        digits = digits[3:]
+    return "+255" + digits.lstrip("0")
+
+
 def send_otp_sms(phone: str, otp_code: str) -> bool:
-    """Tuma OTP kwa SMS. OTP_MOCK=true → log tu (development/staging)."""
+    """Tuma OTP kwa SMS. OTP_MOCK=true: log tu (development/staging).
+    Inarudisha True tu kama Africa's Talking imekubali ujumbe kwa mpokeaji."""
     if OTP_MOCK:
         app.logger.info(f"[OTP MOCK] Phone={phone} OTP={otp_code}")
         return True
+    username = os.environ.get("AT_USERNAME", "")
+    api_key = os.environ.get("AT_API_KEY", "")
+    if not username or not api_key:
+        app.logger.error("[OTP SMS ERROR] AT_USERNAME au AT_API_KEY haijawekwa")
+        return False
     try:
         import africastalking
-        africastalking.initialize(
-            os.environ.get("AT_USERNAME", ""),
-            os.environ.get("AT_API_KEY", ""),
-        )
-        sms = africastalking.SMS
+        africastalking.initialize(username, api_key)
         msg = f"AgroLink Tanzania: Nambari yako ya uthibitisho ni {otp_code}. Inaisha baada ya dakika 10. Usishirikishe mtu yeyote."
-        sms.send(msg, [f"+255{phone.lstrip('0')}"])
+        resp = africastalking.SMS.send(msg, [_normalize_tz_phone(phone)])
+        recipients = (resp or {}).get("SMSMessageData", {}).get("Recipients", [])
+        if not recipients or recipients[0].get("status") != "Success":
+            app.logger.error(f"[OTP SMS ERROR] SMS haikukubaliwa: {recipients or resp}")
+            return False
         return True
     except Exception as e:
         app.logger.error(f"[OTP SMS ERROR] {e}")
