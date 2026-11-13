@@ -8,7 +8,7 @@ Flask-Limiter==3.7.0
 SQLAlchemy==2.0.49
 psycopg2-binary==2.9.13
 python-dotenv==1.2.4
-requests==2.32.3
+requests==2.34.2
 gunicorn==26.2.0
 supabase==2.34.1
 alembic==1.18.4
