@@ -10,7 +10,7 @@ psycopg2-binary==2.9.13
 python-dotenv==1.2.4
 requests==2.32.3
 gunicorn==26.2.0
-supabase==2.33.0
+supabase==2.34.1
 alembic==1.18.4
 bleach==6.4.0
 python-dateutil==2.9.0.post0
