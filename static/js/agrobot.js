@@ -558,7 +558,7 @@ function build(){
 let _H=[];
 function addMsg(text,who,save=true){
   const box=document.getElementById("abot-messages");
-  const d=document.createElement("div");d.className=`abot-msg ${who}`;d.innerHTML=text;
+  const d=document.createElement("div");d.className=`abot-msg ${who}`;if(who==="user"){d.textContent=text;}else{d.innerHTML=text;}
   box.appendChild(d);box.scrollTop=box.scrollHeight;
   if(save){_H.push({who,text});saveH(_H);}
   return d;
@@ -597,9 +597,13 @@ window.abotClear=function(){
 };
 
 // ── SEND ──────────────────────────────────────────────────────────────────
+let _busy=false;
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function formatAI(s){return esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>");}
 window.abotSend=function(preset){
   const inp=document.getElementById("abot-input");
   const msg=preset||inp.value.trim();
+  if(_busy)return;
   if(!msg)return;
   inp.value="";
   addMsg(msg,"user");
@@ -620,7 +624,17 @@ window.abotSend=function(preset){
   const box=document.getElementById("abot-messages");
   const t=document.createElement("div");t.className="abot-typing";t.innerHTML="<span></span><span></span><span></span>";
   box.appendChild(t);box.scrollTop=box.scrollHeight;
-  setTimeout(()=>{t.remove();addMsg(getReplyWithContext(msg),"bot");},500+Math.random()*350);
+  const history=_H.slice(0,-1).slice(-6).map(m=>({role:m.who==="user"?"user":"bot",text:m.text}));
+  const finish=(html)=>{t.remove();_busy=false;addMsg(html,"bot");};
+  const fallback=()=>finish(getReplyWithContext(msg));
+  if(!isLoggedIn()){setTimeout(fallback,500+Math.random()*350);return;}
+  _busy=true;
+  const ctl=new AbortController();
+  const timer=setTimeout(()=>ctl.abort(),25000);
+  fetch("/api/agrobot",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:msg,history:history}),signal:ctl.signal})
+    .then(r=>r.ok?r.json():null)
+    .then(j=>{clearTimeout(timer);if(j&&j.reply){finish(formatAI(j.reply));}else{fallback();}})
+    .catch(()=>{clearTimeout(timer);fallback();});
 };
 
 if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",build);}else{build();}
