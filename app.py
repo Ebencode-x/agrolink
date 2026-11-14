@@ -79,7 +79,8 @@ app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024  # 6MB hard cap (upload route
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_VISION_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
+GEMINI_VISION_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 WFP_API_URL = "https://api.vam.wfp.org/api/1/vam-data-bridges/1.0.0"
 WFP_COMMODITY_MAP = {
     "mahindi":  {"id": 1,   "name": "Maize"},
@@ -1583,7 +1584,11 @@ Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
             {"text": prompt},
             {"inline_data": {"mime_type": mime_type, "data": img_b64}}
         ]}],
-        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 1024},
+        "generationConfig": {
+            "temperature": 0.2,
+            "maxOutputTokens": 2048,
+            "responseMimeType": "application/json",
+        },
     }
 
     # ── Retry logic: max 3 attempts, exponential backoff ─────────────────────
@@ -1592,8 +1597,9 @@ Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
     for attempt in range(1, 4):
         try:
             resp = requests.post(
-                f"{GEMINI_VISION_URL}?key={GEMINI_API_KEY}",
-                json=payload, timeout=45,
+                GEMINI_VISION_URL,
+                headers={"x-goog-api-key": GEMINI_API_KEY},
+                json=payload, timeout=30,
             )
             # Log non-200 responses for debugging
             if not resp.ok:
