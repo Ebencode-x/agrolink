@@ -612,7 +612,7 @@ window.abotSend=function(preset){
       setTimeout(()=>{
         const box=document.getElementById("abot-messages");
         const gate=document.createElement("div");gate.className="abot-gate";
-        gate.innerHTML=`Ili kupata ushauri kamili wa kilimo, tafadhali <strong>ingia</strong> au <strong>jisajili bure</strong> — inachukua sekunde 30 tu!<div class="abot-gate-btns"><a href="/login" class="abot-gbtn p">Ingia Sasa</a><a href="/signup" class="abot-gbtn s">Jisajili Bure</a></div>`;
+        gate.innerHTML=`Ili kupata ushauri kamili wa kilimo, tafadhali <strong>ingia</strong> au <strong>jisajili bure</strong>. Inachukua sekunde 30 tu!<div class="abot-gate-btns"><a href="/login" class="abot-gbtn p">Ingia Sasa</a><a href="/signup" class="abot-gbtn s">Jisajili Bure</a></div>`;
         box.appendChild(gate);box.scrollTop=box.scrollHeight;
       },600);
       return;

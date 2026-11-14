@@ -1,4 +1,4 @@
-const CACHE_NAME = 'agrolink-v5';
+const CACHE_NAME = 'agrolink-v6';
 const OFFLINE_URL = '/offline';
 
 const PRECACHE_URLS = [
