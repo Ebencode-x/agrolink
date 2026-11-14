@@ -300,7 +300,7 @@ r:"Mfumo upo imara! AgroBot v4.0 imeupokea ujumbe wako. Nina KB ya mazao 30+ na 
 r:"Mimi ni AgroBot, bot ya keyword-based iliyojengwa maalum kwa kilimo cha Tanzania! Sijaundwa kwa ChatGPT lakini nimetengezwa na timu ya AgroLink. Ninajifunza kila wakati!"},
 ];
 
-const DEFAULT="<strong>Mada hii iko nje ya eneo langu.</strong><br><br>Mimi ni AgroBot, msaidizi wa kilimo peke yake. Ninaweza kukusaidia na mambo kama:<br>• Magonjwa ya mazao na dawa zake<br>• Bei za soko Tanzania 2025/2026<br>• Kilimo cha mazao: mahindi, nyanya, kahawa, korosho...<br>• Mbolea, mbegu bora, umwagiliaji<br>• Masoko, export, mikopo ya kilimo<br><br>Kwa maswali ya <em>mitambo, magari, vifaa vya ujenzi</em> na mambo mengine, tafadhali wasiliana na mtaalamu husika.<br><br><a href='/mshauri' style='color:#6ee7b7;font-weight:700'>→ Angalia mada zote ninazoweza kukusaidia nazo</a>";
+const DEFAULT="<strong>Mada hii iko nje ya eneo langu.</strong><br><br>Mimi ni AgroBot, msaidizi wa kilimo peke yake. Ninaweza kukusaidia na mambo kama:<br>• Magonjwa ya mazao na dawa zake<br>• Bei za soko Tanzania 2025/2026<br>• Kilimo cha mazao: mahindi, nyanya, kahawa, korosho...<br>• Mbolea, mbegu bora, umwagiliaji<br>• Masoko, export, mikopo ya kilimo<br><br>Kwa maswali ya <em>mitambo, magari, vifaa vya ujenzi</em> na mambo mengine, tafadhali wasiliana na mtaalamu husika.<br><br><a href='/mshauri' style='color:#1B7A43;font-weight:700'>→ Angalia mada zote ninazoweza kukusaidia nazo</a>";
 
 // ══════════════════════════════════════════════════════════════════════════════
 // SMART ENGINE v3, Enhanced Scoring + Fuzzy + Multilingual
@@ -452,61 +452,59 @@ function getTimeGreeting(){
 // ── CSS ───────────────────────────────────────────────────────────────────
 const CSS=`
 #agrobot-bubble{position:fixed;bottom:24px;right:24px;z-index:9999;cursor:pointer}@media(max-width:768px){#agrobot-bubble{bottom:80px!important;right:16px!important}}
-#agrobot-bubble-inner{width:58px;height:58px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 0 rgba(16,185,129,0.7),0 4px 20px rgba(16,185,129,0.4);animation:abotPulse 2.5s ease-in-out infinite}
-#agrobot-bubble-inner svg{width:27px;height:27px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#abot-label{position:absolute;bottom:64px;right:0;background:rgba(6,30,20,0.95);border:1px solid rgba(16,185,129,0.5);color:#6ee7b7;font-size:0.7rem;font-weight:700;padding:4px 12px;border-radius:20px;white-space:nowrap;font-family:sans-serif;letter-spacing:0.05em;box-shadow:0 0 12px rgba(16,185,129,0.3);animation:abotLabelPulse 3s ease-in-out infinite}
-@keyframes abotPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.5),0 4px 20px rgba(16,185,129,0.4)}60%{box-shadow:0 0 0 16px rgba(16,185,129,0),0 4px 20px rgba(16,185,129,0.4)}}
-@keyframes abotLabelPulse{0%,100%{opacity:1;transform:translateY(0)}50%{opacity:0.6;transform:translateY(-2px)}}
-#agrobot-panel{position:fixed;top:0;right:-440px;width:min(420px,100vw);height:100vh;z-index:10000;background:linear-gradient(160deg,#071a0f 0%,#050f08 100%);border-left:1px solid rgba(16,185,129,0.2);box-shadow:-12px 0 50px rgba(0,0,0,0.7);display:flex;flex-direction:column;transition:right 0.38s cubic-bezier(0.4,0,0.2,1);font-family:'DM Sans',system-ui,sans-serif}
+#agrobot-bubble-inner{width:58px;height:58px;background:#1B7A43;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:opacity 0.2s}
+#agrobot-bubble-inner:hover{opacity:0.9}
+#agrobot-bubble-inner svg{width:27px;height:27px;stroke:#FFFFFF;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#agrobot-panel{position:fixed;top:0;right:-440px;width:min(420px,100vw);height:100vh;z-index:10000;background:#FFFFFF;color:#1A1A1A;border-left:1px solid #E5E7EB;box-shadow:-4px 0 24px rgba(0,0,0,0.12);display:flex;flex-direction:column;transition:right 0.38s cubic-bezier(0.4,0,0.2,1);font-family:'DM Sans',system-ui,sans-serif}
 #agrobot-panel.open{right:0}
-#abot-header{padding:0.85rem 1rem;background:linear-gradient(90deg,rgba(16,185,129,0.12),transparent);border-bottom:1px solid rgba(16,185,129,0.15);display:flex;align-items:center;gap:9px;flex-shrink:0}
-#abot-avatar{width:40px;height:40px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 18px rgba(16,185,129,0.4)}
-#abot-avatar svg{width:21px;height:21px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#abot-header{padding:0.85rem 1rem;background:#F8F9FA;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:9px;flex-shrink:0}
+#abot-avatar{width:40px;height:40px;background:#1B7A43;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#abot-avatar svg{width:21px;height:21px;stroke:#FFFFFF;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #abot-title{flex:1;min-width:0}
-#abot-name{font-weight:800;font-size:0.9rem;color:#fff;text-shadow:0 0 14px rgba(16,185,129,0.4)}
-#abot-status{font-size:0.68rem;color:#6ee7b7;display:flex;align-items:center;gap:5px;margin-top:1px}
-.abot-dot{width:6px;height:6px;background:#10b981;border-radius:50%;box-shadow:0 0 6px #10b981;animation:abotPulse 1.5s ease-in-out infinite;flex-shrink:0}
-.abot-hbtn{width:29px;height:29px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0}
-.abot-hbtn:hover{background:rgba(255,255,255,0.12)}
-.abot-hbtn svg{width:13px;height:13px;stroke:#9ca3af;fill:none;stroke-width:2.5;stroke-linecap:round}
-#abot-close-btn:hover{background:rgba(244,63,94,0.2);border-color:rgba(244,63,94,0.3)}
-#abot-close-btn:hover svg{stroke:#fda4af}
-#abot-know-more{margin:0.6rem 0.9rem 0;background:linear-gradient(90deg,rgba(16,185,129,0.12),rgba(245,158,11,0.08));border:1px solid rgba(16,185,129,0.25);border-radius:10px;padding:0.6rem 0.85rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:all 0.22s;text-decoration:none;flex-shrink:0}
-#abot-know-more:hover{background:linear-gradient(90deg,rgba(16,185,129,0.22),rgba(245,158,11,0.14));border-color:rgba(16,185,129,0.45);transform:translateY(-1px)}
+#abot-name{font-weight:800;font-size:0.9rem;color:#1A1A1A}
+#abot-status{font-size:0.7rem;color:#1B7A43;display:flex;align-items:center;gap:5px;margin-top:1px}
+.abot-dot{width:6px;height:6px;background:#16A34A;border-radius:50%;flex-shrink:0}
+.abot-hbtn{width:29px;height:29px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+.abot-hbtn:hover{background:#E5E7EB}
+.abot-hbtn svg{width:13px;height:13px;stroke:#1A1A1A;fill:none;stroke-width:2.5;stroke-linecap:round}
+#abot-close-btn:hover{background:#E5E7EB}
+#abot-know-more{margin:0.6rem 0.9rem 0;background:#F8F9FA;border:1px solid #E5E7EB;border-radius:10px;padding:0.6rem 0.85rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:border-color 0.2s;text-decoration:none;flex-shrink:0}
+#abot-know-more:hover{border-color:#1B7A43}
 #abot-know-more-left{display:flex;align-items:center;gap:8px}
-#abot-know-more-left svg{width:15px;height:15px;stroke:#f59e0b;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
-#abot-know-more-text{font-size:0.75rem;font-weight:700;color:#d1fae5;letter-spacing:0.02em}
-#abot-know-more-sub{font-size:0.65rem;color:#6ee7b7;margin-top:1px}
-#abot-know-more-arrow{width:20px;height:20px;background:rgba(16,185,129,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-#abot-know-more-arrow svg{width:11px;height:11px;stroke:#10b981;fill:none;stroke-width:2.5;stroke-linecap:round}
+#abot-know-more-left svg{width:15px;height:15px;stroke:#D97706;fill:none;stroke-width:2;stroke-linecap:round;flex-shrink:0}
+#abot-know-more-text{font-size:0.78rem;font-weight:700;color:#1A1A1A}
+#abot-know-more-sub{font-size:0.68rem;color:#1A1A1A;opacity:0.65;margin-top:1px}
+#abot-know-more-arrow{width:20px;height:20px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#abot-know-more-arrow svg{width:11px;height:11px;stroke:#1B7A43;fill:none;stroke-width:2.5;stroke-linecap:round}
 #abot-messages{flex:1;overflow-y:auto;padding:0.85rem;display:flex;flex-direction:column;gap:0.7rem;scroll-behavior:smooth}
 #abot-messages::-webkit-scrollbar{width:3px}
-#abot-messages::-webkit-scrollbar-thumb{background:rgba(16,185,129,0.25);border-radius:2px}
-.abot-msg{max-width:90%;font-size:0.84rem;line-height:1.65;padding:0.6rem 0.85rem;border-radius:14px;animation:abotMsgIn 0.22s ease;word-break:break-word}
-@keyframes abotMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.abot-msg.bot{background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.18);color:#d1fae5;align-self:flex-start;border-bottom-left-radius:3px}
-.abot-msg.user{background:linear-gradient(135deg,rgba(16,185,129,0.22),rgba(5,150,105,0.18));border:1px solid rgba(16,185,129,0.28);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
-.abot-typing{display:flex;gap:5px;align-items:center;padding:0.6rem 0.85rem;background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.12);border-radius:14px;border-bottom-left-radius:3px;align-self:flex-start}
-.abot-typing span{width:7px;height:7px;background:#10b981;border-radius:50%;animation:abotDot 1.1s ease-in-out infinite}
+#abot-messages::-webkit-scrollbar-thumb{background:#E5E7EB;border-radius:2px}
+.abot-msg{max-width:90%;font-size:0.86rem;line-height:1.65;padding:0.6rem 0.85rem;border-radius:14px;animation:abotMsgIn 0.2s ease;word-break:break-word}
+@keyframes abotMsgIn{from{opacity:0}to{opacity:1}}
+.abot-msg.bot{background:#F8F9FA;border:1px solid #E5E7EB;color:#1A1A1A;align-self:flex-start;border-bottom-left-radius:3px}
+.abot-msg.user{background:#1B7A43;border:1px solid #1B7A43;color:#FFFFFF;align-self:flex-end;border-bottom-right-radius:3px}
+.abot-typing{display:flex;gap:5px;align-items:center;padding:0.6rem 0.85rem;background:#F8F9FA;border:1px solid #E5E7EB;border-radius:14px;border-bottom-left-radius:3px;align-self:flex-start}
+.abot-typing span{width:7px;height:7px;background:#1B7A43;border-radius:50%;animation:abotDot 1.1s ease-in-out infinite}
 .abot-typing span:nth-child(2){animation-delay:0.18s}
 .abot-typing span:nth-child(3){animation-delay:0.36s}
-@keyframes abotDot{0%,80%,100%{transform:scale(0.55);opacity:0.35}40%{transform:scale(1);opacity:1}}
-#abot-chips{padding:0.45rem 0.85rem 0.55rem;display:flex;flex-wrap:wrap;gap:0.38rem;flex-shrink:0;border-top:1px solid rgba(16,185,129,0.08)}
-.abot-chip{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);color:#6ee7b7;font-size:0.68rem;padding:0.26rem 0.65rem;border-radius:20px;cursor:pointer;transition:all 0.18s;font-family:inherit;white-space:nowrap}
-.abot-chip:hover{background:rgba(16,185,129,0.2);border-color:rgba(16,185,129,0.45);color:#a7f3d0}
-#abot-input-row{padding:0.75rem 0.85rem;border-top:1px solid rgba(16,185,129,0.12);display:flex;gap:0.5rem;align-items:center;flex-shrink:0;background:rgba(0,0,0,0.25)}
-#abot-input{flex:1;background:rgba(255,255,255,0.055);border:1px solid rgba(16,185,129,0.22);border-radius:24px;padding:0.6rem 1rem;color:#fff;font-size:0.84rem;font-family:inherit;outline:none;transition:border-color 0.2s}
-#abot-input:focus{border-color:rgba(16,185,129,0.5);background:rgba(16,185,129,0.06)}
-#abot-input::placeholder{color:rgba(255,255,255,0.28)}
-#abot-send{width:36px;height:36px;background:linear-gradient(135deg,#10b981,#059669);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;flex-shrink:0;box-shadow:0 2px 10px rgba(16,185,129,0.3)}
-#abot-send:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(16,185,129,0.5)}
-#abot-send svg{width:14px;height:14px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.abot-gate{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:14px;padding:1rem;margin:0.3rem 0;text-align:center;color:#d1fae5;font-size:0.83rem;line-height:1.6;align-self:stretch}
+@keyframes abotDot{0%,80%,100%{opacity:0.3}40%{opacity:1}}
+#abot-chips{padding:0 0.85rem;display:flex;flex-direction:column;flex-shrink:0;max-height:30vh;overflow-y:auto;border-top:1px solid #E5E7EB}
+.abot-chip{background:transparent;border:none;border-bottom:1px solid #E5E7EB;border-radius:0;color:#1B7A43;font-size:0.82rem;font-weight:500;padding:0.6rem 0;text-align:left;cursor:pointer;transition:background 0.18s;font-family:inherit;width:100%}
+.abot-chip:last-child{border-bottom:none}
+.abot-chip:hover{background:#F8F9FA}
+#abot-input-row{padding:0.75rem 0.85rem;border-top:1px solid #E5E7EB;display:flex;gap:0.5rem;align-items:center;flex-shrink:0;background:#F8F9FA}
+#abot-input{flex:1;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:24px;padding:0.6rem 1rem;color:#1A1A1A;font-size:0.86rem;font-family:inherit;outline:none;transition:border-color 0.2s}
+#abot-input:focus{border-color:#1B7A43}
+#abot-input::placeholder{color:#1A1A1A;opacity:0.45}
+#abot-send{width:36px;height:36px;background:#1B7A43;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:opacity 0.2s;flex-shrink:0}
+#abot-send:hover{opacity:0.9}
+#abot-send svg{width:14px;height:14px;stroke:#FFFFFF;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.abot-gate{background:#F8F9FA;border:1px solid #E5E7EB;border-radius:14px;padding:1rem;margin:0.3rem 0;text-align:center;color:#1A1A1A;font-size:0.85rem;line-height:1.6;align-self:stretch}
 .abot-gate-btns{display:flex;gap:0.55rem;justify-content:center;margin-top:0.75rem;flex-wrap:wrap}
-.abot-gbtn{padding:0.42rem 1.1rem;border-radius:20px;font-size:0.78rem;font-weight:600;cursor:pointer;text-decoration:none;transition:all 0.2s;font-family:inherit}
-.abot-gbtn.p{background:linear-gradient(135deg,#10b981,#059669);color:white;border:none;box-shadow:0 2px 10px rgba(16,185,129,0.3)}
-.abot-gbtn.s{background:transparent;color:#6ee7b7;border:1px solid rgba(16,185,129,0.35)}
-.abot-gbtn:hover{transform:translateY(-1px)}
+.abot-gbtn{padding:0.45rem 1.1rem;border-radius:20px;font-size:0.8rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity 0.2s;font-family:inherit}
+.abot-gbtn.p{background:#1B7A43;color:#FFFFFF;border:1px solid #1B7A43}
+.abot-gbtn.s{background:transparent;color:#1B7A43;border:1px solid #1B7A43}
+.abot-gbtn:hover{opacity:0.9}
 @media(max-width:480px){#agrobot-panel{width:100vw;border-left:none}}
 `;
 
@@ -517,7 +515,7 @@ function build(){
   const s=document.createElement("style");s.textContent=CSS;document.head.appendChild(s);
 
   const bub=document.createElement("div");bub.id="agrobot-bubble";
-  bub.innerHTML=`<div id="abot-label">Niulize</div><div id="agrobot-bubble-inner"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="3"/><circle cx="9" cy="10.5" r="1.2" fill="white" stroke="none"/><circle cx="12" cy="10.5" r="1.2" fill="white" stroke="none"/><circle cx="15" cy="10.5" r="1.2" fill="white" stroke="none"/><path d="M8 17l-2 3M16 17l2 3" stroke-width="1.5"/></svg></div>`;
+  bub.innerHTML=`<div id="agrobot-bubble-inner"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="3"/><circle cx="9" cy="10.5" r="1.2" fill="white" stroke="none"/><circle cx="12" cy="10.5" r="1.2" fill="white" stroke="none"/><circle cx="15" cy="10.5" r="1.2" fill="white" stroke="none"/><path d="M8 17l-2 3M16 17l2 3" stroke-width="1.5"/></svg></div>`;
   document.body.appendChild(bub);
 
   const pan=document.createElement("div");pan.id="agrobot-panel";
