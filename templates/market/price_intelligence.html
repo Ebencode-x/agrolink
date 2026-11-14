@@ -291,6 +291,8 @@
           <div class="confidence-bar-wrap">
             <div class="confidence-bar" id="r-confidence-bar"></div>
           </div>
+          <p id="r-source" style="margin:0.7rem 0 0;font-size:0.82rem;line-height:1.5;color:var(--text-muted,#5F6368)"></p>
+          <p style="margin:0.35rem 0 0;font-size:0.82rem;line-height:1.5;color:var(--text-muted,#5F6368)">Makadirio tu, si ahadi ya bei. Thibitisha bei sokoni kabla ya kuuza.</p>
         </div>
 
       </div><!-- /pi-result -->
@@ -316,13 +318,6 @@ const CROPS = [
   {sw:"mtama",   en:"Sorghum",     label:"Mtama",    icon:"align-justify"},
 ];
 
-const REGIONS = [
-  "Dar es Salaam","Mwanza","Arusha","Dodoma","Mbeya","Morogoro","Tanga",
-  "Iringa","Kilimanjaro","Tabora","Kigoma","Singida","Kagera","Geita",
-  "Shinyanga","Rukwa","Ruvuma","Lindi","Mtwara","Songwe","Simiyu",
-  "Katavi","Njombe","Pwani","Manyara"
-];
-
 // ── Build crop grid ──
 const grid = document.getElementById('crop-grid');
 const regionSel = document.getElementById('region-select');
@@ -340,12 +335,17 @@ CROPS.forEach(c => {
   grid.appendChild(btn);
 });
 
-// ── Build region dropdown ──
-REGIONS.forEach(r => {
-  const opt = document.createElement('option');
-  opt.value = r; opt.textContent = r;
-  regionSel.appendChild(opt);
-});
+// ── Build region dropdown (server list is the single source) ──
+fetch('/api/price-prediction/crops')
+  .then(res => (res.ok ? res.json() : Promise.reject(new Error('regions'))))
+  .then(data => {
+    (data.regions || []).forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r; opt.textContent = r;
+      regionSel.appendChild(opt);
+    });
+  })
+  .catch(() => {});
 
 // Pre-select current month
 const months = ["Januari","Februari","Machi","Aprili","Mei","Juni",
@@ -399,13 +399,14 @@ function renderResult(p) {
   document.getElementById('r-season').textContent = p.season_context || '—';
   document.getElementById('r-advice').textContent = p.market_advice  || '—';
 
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   // Factors
   const factorsEl = document.getElementById('r-factors');
   factorsEl.innerHTML = '';
   (p.key_factors||[]).forEach(f => {
     factorsEl.innerHTML += `<span class="factor-chip">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      ${f}</span>`;
+      ${esc(f)}</span>`;
   });
 
   // Markets
@@ -414,7 +415,7 @@ function renderResult(p) {
   (p.best_markets||[]).forEach(m => {
     marketsEl.innerHTML += `<span class="market-chip">
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/></svg>
-      ${m}</span>`;
+      ${esc(m)}</span>`;
   });
 
   // Confidence
@@ -422,6 +423,8 @@ function renderResult(p) {
   const conf = confMap[p.confidence] || confMap.medium;
   document.getElementById('r-confidence-bar').style.width = conf.pct;
   document.getElementById('r-confidence-label').textContent = conf.label;
+  const srcEl = document.getElementById('r-source');
+  if (srcEl) srcEl.textContent = p.data_source || '';
 
   showState('result');
 }
