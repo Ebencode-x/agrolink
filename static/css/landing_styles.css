@@ -22,7 +22,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(100deg, rgba(10,22,15,0.90) 0%, rgba(10,22,15,0.70) 42%, rgba(10,22,15,0.38) 75%, rgba(10,22,15,0.22) 100%);
+  background: rgba(26,26,26,0.62);
 }
 .landing-hero__inner {
   max-width: 800px;
@@ -97,41 +97,6 @@
 .landing-stat__num { font-family: var(--font-display); font-size: 1.9rem; font-weight: 800; color: var(--accent); }
 .landing-stat__label { font-size: .75rem; color: rgba(240,247,242,0.6); text-transform: uppercase; letter-spacing: .05em; }
 
-/* ── Weather widget: light glassmorphism — text glows, photo stays visible ── */
-.landing-hero__glass {
-  background: rgba(255,255,255,0.10);
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
-  border: 1px solid rgba(255,255,255,0.28);
-  border-radius: var(--radius-md);
-  padding: 1.5rem 1.6rem;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.25);
-}
-.landing-weather__top {
-  display: flex; align-items: center; gap: 5px;
-  font-size: .78rem; color: rgba(255,255,255,0.8); margin-bottom: .9rem;
-}
-.landing-weather__temp-row { display: flex; align-items: flex-end; gap: .6rem; margin-bottom: 1rem; }
-.landing-weather__temp { font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; text-shadow: 0 2px 12px rgba(0,0,0,0.3); }
-.landing-weather__desc { font-size: .85rem; color: rgba(255,255,255,0.78); text-transform: capitalize; padding-bottom: .18rem; }
-.landing-weather__stats { display: flex; border-top: 1px solid rgba(255,255,255,0.22); padding-top: .85rem; }
-.landing-weather__stat { flex: 1; text-align: center; border-right: 1px solid rgba(255,255,255,0.16); }
-.landing-weather__stat:last-child { border-right: none; }
-.landing-weather__stat-val { font-family: var(--font-display); font-weight: 700; font-size: .85rem; color: #fff; }
-.landing-weather__stat-lbl { font-size: .58rem; color: rgba(255,255,255,0.58); text-transform: uppercase; letter-spacing: .05em; margin-top: 2px; }
-.landing-weather__search { display: flex; gap: .5rem; margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.20); }
-.landing-weather__search-input {
-  flex: 1; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.28); border-radius: var(--radius-sm);
-  padding: .55rem .8rem; color: #fff; font-family: var(--font-body); font-size: .82rem; outline: none;
-}
-.landing-weather__search-input::placeholder { color: rgba(255,255,255,0.55); }
-.landing-weather__search-input:focus { border-color: rgba(255,255,255,0.5); }
-.landing-weather__search-btn {
-  background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.32); border-radius: var(--radius-sm);
-  padding: .55rem .75rem; color: #fff; cursor: pointer; display: flex; align-items: center; transition: background var(--transition);
-}
-.landing-weather__search-btn:hover { background: rgba(255,255,255,0.26); }
-
 /* Preview */
 .landing-preview { max-width: 1100px; margin: 60px auto; padding: 0 24px; }
 .landing-preview__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
@@ -178,14 +143,12 @@
 .landing-final-cta {
   text-align: center;
   padding: 80px 24px;
-  background:
-    radial-gradient(120% 100% at 15% 0%, rgba(46,107,71,0.55) 0%, transparent 55%),
-    radial-gradient(120% 100% at 85% 100%, rgba(232,184,74,0.18) 0%, transparent 60%),
-    linear-gradient(160deg, #14261B 0%, #1C3D2A 45%, #16301F 100%);
+  background: #1B7A43;
   color: var(--text-on-dark);
 }
 .landing-final-cta h2 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; margin: 0 0 12px; color: var(--text-on-dark); }
 .landing-final-cta p { opacity: .82; margin: 0 0 32px; font-size: 1rem; }
+.landing-final-cta .btn-primary { background: #FFFFFF; color: #1B7A43; border-color: #FFFFFF; }
 
 /* Trust badges */
 .trust-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; letter-spacing: .03em; }
@@ -198,22 +161,11 @@
 @media (max-width: 768px) {
   .landing-hero__photo { object-position: center 30%; }
   .landing-hero__scrim {
-    background: linear-gradient(180deg,
-      rgba(10,22,15,0.42) 0%,
-      rgba(10,22,15,0.68) 45%,
-      rgba(10,22,15,0.85) 75%,
-      rgba(10,22,15,0) 100%);
+    background: rgba(26,26,26,0.62);
   }
   .landing-hero__accent { font-size: clamp(2.6rem, 13vw, 3.4rem); transform: rotate(-0.8deg); }
   .landing-hero__inner { grid-template-columns: 1fr; gap: 2rem; }
 
-  /* Glass nyepesi zaidi kwenye simu */
-  .landing-hero__glass {
-    background: rgba(255,255,255,0.06);
-    backdrop-filter: blur(10px) saturate(140%);
-    -webkit-backdrop-filter: blur(10px) saturate(140%);
-    border: 1px solid rgba(255,255,255,0.20);
-  }
 }
 @media (max-width: 600px) {
   .landing-hero { padding: 48px 0 40px; }

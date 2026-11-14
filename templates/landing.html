@@ -31,14 +31,6 @@
 
       <div class="landing-stats">
         <div class="landing-stat">
-          <span class="landing-stat__num" id="stat-users">—</span>
-          <span class="landing-stat__label">Wakulima na Wanunuzi</span>
-        </div>
-        <div class="landing-stat">
-          <span class="landing-stat__num" id="stat-listings">—</span>
-          <span class="landing-stat__label">Mazao Yanayouzwa</span>
-        </div>
-        <div class="landing-stat">
           <span class="landing-stat__num" id="stat-regions">25</span>
           <span class="landing-stat__label">Mikoa ya Tanzania</span>
         </div>
@@ -135,18 +127,4 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  // Platform stats
-  fetch('/health')
-    .then(r => r.json())
-    .then(data => {
-      if (data.stats) {
-        document.getElementById('stat-users').textContent =
-          (data.stats.total_users || 0).toLocaleString();
-        document.getElementById('stat-listings').textContent =
-          (data.stats.active_listings || 0).toLocaleString();
-      }
-    })
-    .catch(() => {});
-</script>
 {% endblock %}
