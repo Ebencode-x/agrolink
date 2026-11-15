@@ -1569,6 +1569,7 @@ def analyze_crop():
 
 Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
 {{
+  "is_crop": true,
   "crop_detected": "jina la zao lililoonekana (Kiswahili)",
   "severity": "healthy|mild|moderate|severe",
   "diagnosis": "maelezo ya tatizo au hali ya zao kwa Kiswahili (sentensi 2-3)",
@@ -1577,8 +1578,10 @@ Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
   "available_meds_tz": ["dawa 1 inayopatikana TZ", "dawa 2", "dawa 3"],
   "prevention": "jinsi ya kuzuia tatizo hili (Kiswahili)",
   "season_advice": "ushauri kulingana na msimu wa kilimo Tanzania (Kiswahili)",
-  "confidence_pct": 85
-}}"""
+  "confidence_pct": "namba kamili 0 hadi 100, uhakika wako kwa picha hii"
+}}
+
+Kanuni: "is_crop" ni true tu kama picha inaonyesha mmea au zao halisi. Kama sio mmea (kifaa, kitu, mtu, mnyama, mandhari bila mmea), weka "is_crop": false, andika kwenye "diagnosis" sentensi moja fupi inayosema picha sio zao, na weka sehemu nyingine zote null. Usibuni dalili wala dawa. Kama ni zao, "severity" na "confidence_pct" lazima zitokane na picha."""
     payload = {
         "contents": [{"parts": [
             {"text": prompt},
@@ -1618,10 +1621,41 @@ Jibu kwa JSON hii tu (bila markdown, bila maelezo mengine):
             )
             raw_text = re.sub(r"```json|```", "", raw_text).strip()
             analysis = json_lib.loads(raw_text)
-            for field in ["crop_detected","severity","diagnosis","prevention","season_advice"]:
-                if field in analysis:
-                    analysis[field] = str(analysis[field])[:600]
-            return jsonify({"success": True, "analysis": analysis})
+            if not isinstance(analysis, dict) or not isinstance(analysis.get("is_crop"), bool):
+                print("[Gemini Vision] is_crop missing or not boolean")
+                return jsonify({"error": "AI ilirudi na jibu lisilo sahihi. Jaribu tena."}), 500
+
+            def _txt(v, n=600):
+                return v.strip()[:n] if isinstance(v, str) and v.strip() else None
+
+            def _items(v, n=6):
+                if not isinstance(v, list):
+                    return []
+                return [i.strip()[:300] for i in v if isinstance(i, str) and i.strip()][:n]
+
+            if not analysis["is_crop"]:
+                return jsonify({"success": True, "analysis": {
+                    "is_crop": False,
+                    "diagnosis": _txt(analysis.get("diagnosis"), 300),
+                }})
+
+            sev = analysis.get("severity")
+            pct = analysis.get("confidence_pct")
+            if isinstance(pct, bool) or not isinstance(pct, (int, float)) or not 0 <= pct <= 100:
+                pct = None
+            clean = {
+                "is_crop": True,
+                "crop_detected": _txt(analysis.get("crop_detected"), 100),
+                "severity": sev if sev in ("healthy", "mild", "moderate", "severe") else None,
+                "diagnosis": _txt(analysis.get("diagnosis")),
+                "symptoms": _items(analysis.get("symptoms")),
+                "treatment": _items(analysis.get("treatment")),
+                "available_meds_tz": _items(analysis.get("available_meds_tz")),
+                "prevention": _txt(analysis.get("prevention")),
+                "season_advice": _txt(analysis.get("season_advice")),
+                "confidence_pct": int(round(pct)) if pct is not None else None,
+            }
+            return jsonify({"success": True, "analysis": clean})
         except json_lib.JSONDecodeError as e:
             print(f"[Gemini Vision] JSON parse error (attempt {attempt}): {e}")
             return jsonify({"error": "AI ilirudi na jibu lisilo sahihi. Jaribu tena."}), 500
