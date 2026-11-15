@@ -118,7 +118,7 @@
   <!-- Header -->
   <div class="pi-header reveal">
     <h1 class="pi-title">Tabiri Bei ya Mazao<br/><span class="accent">kwa Mkoa Wako</span></h1>
-    <p class="pi-subtitle">Chagua zao, mkoa, na mwezi — AI yetu itatoa uchambuzi wa bei, mwenendo wa soko, na ushauri wa mauzo kwa wakati huu.</p>
+    <p class="pi-subtitle">Chagua zao, mkoa na mwezi. AI yetu itatoa uchambuzi wa bei, mwenendo wa soko na ushauri wa mauzo kwa wakati huu.</p>
   </div>
 
   <!-- Main Grid -->
@@ -183,8 +183,7 @@
       <!-- Disclaimer -->
       <div class="pi-disclaimer">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <p>Bei zinazoonyeshwa zinatokana na data ya <strong>Wizara ya Kilimo Tanzania</strong> (2025/2026) na modeli ya AI inayozingatia msimu, mkoa, na mwelekeo wa soko. Ni bei za jumla (wholesale) — bei za rejareja zinaweza kuwa juu zaidi kwa asilimia 20-40.</p>
-        <p style="margin-top:0.4rem;opacity:0.8">Tunafanya kazi kuunganisha API ya real-time na Wizara ya Kilimo na NFRA. Data ya moja kwa moja itapatikana Q3 2026.</p>
+        <p>Bei hizi ni makadirio ya AI yanayotegemea bei za jumla (wholesale) zilizorekodiwa sokoni, data ya WFP kupitia HDX, pamoja na msimu na mkoa. Bei za rejareja zinaweza kuwa tofauti. Tarehe ya data ya mwisho na kiwango cha uhakika vinaonyeshwa kwenye matokeo.</p>
       </div>
     </div>
 
@@ -196,7 +195,7 @@
         <div class="pi-empty-icon">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
         </div>
-        <p>Chagua zao, mkoa, na mwezi — kisha bonyeza "Omba Tabiri" kupata uchambuzi wa AI.</p>
+        <p>Chagua zao, mkoa na mwezi, kisha bonyeza "Omba Tabiri" kupata uchambuzi wa AI.</p>
       </div>
 
       <!-- Loading -->
@@ -386,13 +385,27 @@ function renderResult(p) {
     falling: {cls:'trend-falling', icon:'↓', label:'Inashuka'},
     stable:  {cls:'trend-stable',  icon:'→', label:'Imara'},
   };
-  const t = trendMap[p.trend] || trendMap.stable;
-  badge.className = 'trend-badge '+t.cls;
-  badge.textContent = t.icon+' '+t.label+(p.trend_pct ? ' '+Math.abs(p.trend_pct)+'%' : '');
+  const t = p.trend ? trendMap[p.trend] : null;
+  if (t) {
+    badge.className = 'trend-badge '+t.cls;
+    badge.textContent = t.icon+' '+t.label+(p.trend_pct ? ' '+Math.abs(p.trend_pct)+'%' : '');
+    badge.style.display = '';
+  } else {
+    badge.className = 'trend-badge';
+    badge.textContent = '';
+    badge.style.display = 'none';
+  }
 
   // Prices
   document.getElementById('r-low').textContent  = fmt(p.predicted_price_low);
-  document.getElementById('r-mid').textContent  = fmt(p.predicted_price_mid);
+  const midEl = document.getElementById('r-mid');
+  const midCol = midEl.closest('.price-col');
+  if (p.predicted_price_mid == null) {
+    if (midCol) midCol.style.display = 'none';
+  } else {
+    if (midCol) midCol.style.display = '';
+    midEl.textContent = fmt(p.predicted_price_mid);
+  }
   document.getElementById('r-high').textContent = fmt(p.predicted_price_high);
 
   // Season + advice
@@ -420,7 +433,7 @@ function renderResult(p) {
 
   // Confidence
   const confMap = {high:{pct:'90%',label:'Juu (90%)'},medium:{pct:'60%',label:'Wastani (60%)'},low:{pct:'35%',label:'Chini (35%)'}};
-  const conf = confMap[p.confidence] || confMap.medium;
+  const conf = confMap[p.confidence] || confMap.low;
   document.getElementById('r-confidence-bar').style.width = conf.pct;
   document.getElementById('r-confidence-label').textContent = conf.label;
   const srcEl = document.getElementById('r-source');

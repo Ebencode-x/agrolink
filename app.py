@@ -2152,6 +2152,10 @@ def validate_ai_forecast(raw, static, evidence, low_bound, high_bound):
             "evidence_latest": evidence["latest"],
         }
     )
+    if not evidence["points"]:
+        result["predicted_price_mid"] = None
+        result["trend"] = None
+        result["trend_pct"] = None
     return result
 
 
