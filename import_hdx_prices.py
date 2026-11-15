@@ -17,7 +17,7 @@ import io
 import json
 import sys
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app import app, db, MarketPrice, TANZANIA_REGIONS  # type: ignore
 
@@ -58,8 +58,6 @@ CROP_MAP = {
     "groundnuts (shelled)": "Karanga",
     "wheat": "Ngano",
     "sorghum": "Mtama",
-    "millet": "Ulezi",
-    "millet (bulrush)": "Ulezi",
     "millet (finger)": "Ulezi",
     "cassava": "Muhogo",
 }
@@ -126,7 +124,7 @@ def get_usd_to_tzs_rate():
 
 def run_import():
     print("=== HDX/WFP Tanzania Market Price Import ===")
-    print(f"Wakati: {datetime.utcnow().isoformat()}")
+    print(f"Wakati: {datetime.now(timezone.utc).replace(tzinfo=None).isoformat()}")
 
     csv_url = get_csv_url()
     print(f"CSV URL: {csv_url}")
@@ -152,7 +150,7 @@ def run_import():
     skipped_crop = 0
     skipped_duplicate = 0
 
-    cutoff_date = datetime.utcnow() - timedelta(days=IMPORT_DAYS)
+    cutoff_date = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=IMPORT_DAYS)
 
     with app.app_context():
         existing = {
