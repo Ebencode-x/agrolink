@@ -1839,6 +1839,8 @@ TANZANIA_CROPS = {
     "alizeti": {"en": "Sunflower", "category": "oilseed", "unit": "kg"},
     "maharage": {"en": "Beans", "category": "pulse", "unit": "kg"},
     "mtama": {"en": "Sorghum", "category": "cereal", "unit": "kg"},
+    "ngano": {"en": "Wheat", "category": "cereal", "unit": "kg"},
+    "ulezi": {"en": "Finger millet", "category": "cereal", "unit": "kg"},
 }
 
 TANZANIA_REGIONS = [
@@ -2330,6 +2332,9 @@ def build_static_prediction(crop_sw, region, month):
         "alizeti":  {"low": 1800, "high": 3200, "mid": 2500},
         "maharage": {"low": 2500, "high": 4000, "mid": 3000},
         "mtama":    {"low": 500,  "high": 1100, "mid": 750},
+        # Ngano na Ulezi: asilimia 10, kati na asilimia 90 za WFP kupitia HDX (Okt 2025 hadi Sep 2026, jumla)
+        "ngano":    {"low": 1468, "high": 2632, "mid": 1900},
+        "ulezi":    {"low": 1625, "high": 3000, "mid": 2400},
     }
     SEASON = {
         "Januari": 1.10,
