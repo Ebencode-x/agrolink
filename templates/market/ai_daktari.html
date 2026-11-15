@@ -291,23 +291,78 @@ async function analyzeImage(){
   }
 }
 function renderResult(a){
-  const sevMap={severe:{cls:'badge-danger',label:'Hatari — Haraka'},moderate:{cls:'badge-warning',label:'Ya Wastani'},mild:{cls:'badge-healthy',label:'Ndogo'},healthy:{cls:'badge-healthy',label:'Zao Zuri'}};
-  const s=sevMap[a.severity||'moderate']||sevMap.moderate;
-  const badge=document.getElementById('r-severity-badge');
-  badge.className='result-badge '+s.cls;badge.textContent=s.label;
-  document.getElementById('r-crop-detected').textContent=a.crop_detected||'Zao';
-  document.getElementById('r-diagnosis').textContent=a.diagnosis||'—';
-  document.getElementById('r-prevention').textContent=a.prevention||'—';
-  document.getElementById('r-season-advice').textContent=a.season_advice||'—';
-  const sympEl=document.getElementById('r-symptoms');sympEl.innerHTML='';
-  (a.symptoms||[]).forEach(s=>sympEl.innerHTML+=`<span class="tag tag-blue">${s}</span>`);
-  const treatEl=document.getElementById('r-treatment');treatEl.innerHTML='';
-  (a.treatment||[]).forEach(t=>treatEl.innerHTML+=`<div class="dawa-item"><div class="dawa-dot"></div><span>${t}</span></div>`);
-  const medsEl=document.getElementById('r-available-meds');medsEl.innerHTML='';
-  (a.available_meds_tz||[]).forEach(m=>medsEl.innerHTML+=`<span class="tag tag-amber">${m}</span>`);
-  const conf=Math.min(Math.max(a.confidence_pct||70,10),99);
-  document.getElementById('r-confidence-label').textContent=conf+'% — '+(conf>=80?'Uhakika wa Juu':conf>=60?'Wastani':'Chini — Picha bora itasaidia');
-  document.getElementById('r-confidence-bar').style.width=conf+'%';
+  const $=id=>document.getElementById(id);
+  const card=id=>$(id).closest('.r-card');
+  const show=(el,on)=>{el.style.display=on?'':'none';};
+  const clear=el=>{while(el.firstChild)el.removeChild(el.firstChild);};
+  const text=v=>(typeof v==='string'&&v.trim())?v.trim():null;
+  const list=v=>Array.isArray(v)?v.filter(x=>typeof x==='string'&&x.trim()):[];
+
+  const badge=$('r-severity-badge');
+  const diagTitle=card('r-diagnosis').querySelector('.r-card-title');
+  const allBodies=['r-treatment','r-prevention','r-season-advice','r-confidence-label','r-available-meds'];
+
+  if(a.is_crop!==true){
+    $('r-crop-detected').textContent='Picha hii haionyeshi zao';
+    show(badge,false);
+    show(diagTitle,false);
+    const d=text(a.diagnosis);
+    $('r-diagnosis').textContent=d||'AI haikuona zao kwenye picha hii. Piga picha ya jani, tunda au mmea wenyewe, karibu na kwa mwanga mzuri.';
+    clear($('r-symptoms'));
+    allBodies.forEach(id=>show(card(id),false));
+    showState('result');
+    return;
+  }
+
+  show(diagTitle,true);
+  const sevMap={severe:{cls:'badge-danger',label:'Hatari, Haraka'},moderate:{cls:'badge-warning',label:'Ya Wastani'},mild:{cls:'badge-healthy',label:'Ndogo'},healthy:{cls:'badge-healthy',label:'Zao Zuri'}};
+  const s=sevMap[a.severity];
+  if(s){badge.className='result-badge '+s.cls;badge.textContent=s.label;show(badge,true);}
+  else{show(badge,false);}
+
+  $('r-crop-detected').textContent=text(a.crop_detected)||'';
+
+  const diag=text(a.diagnosis);
+  $('r-diagnosis').textContent=diag||'';
+  show($('r-diagnosis'),!!diag);
+
+  const sympEl=$('r-symptoms');clear(sympEl);
+  list(a.symptoms).forEach(x=>{
+    const sp=document.createElement('span');sp.className='tag tag-blue';sp.textContent=x;sympEl.appendChild(sp);
+  });
+
+  const treat=list(a.treatment);
+  const treatEl=$('r-treatment');clear(treatEl);
+  treat.forEach(x=>{
+    const row=document.createElement('div');row.className='dawa-item';
+    const dot=document.createElement('div');dot.className='dawa-dot';
+    const sp=document.createElement('span');sp.textContent=x;
+    row.appendChild(dot);row.appendChild(sp);treatEl.appendChild(row);
+  });
+  show(card('r-treatment'),treat.length>0);
+
+  const prev=text(a.prevention);
+  $('r-prevention').textContent=prev||'';
+  show(card('r-prevention'),!!prev);
+
+  const season=text(a.season_advice);
+  $('r-season-advice').textContent=season||'';
+  show(card('r-season-advice'),!!season);
+
+  const meds=list(a.available_meds_tz);
+  const medsEl=$('r-available-meds');clear(medsEl);
+  meds.forEach(x=>{
+    const sp=document.createElement('span');sp.className='tag tag-amber';sp.textContent=x;medsEl.appendChild(sp);
+  });
+  show(card('r-available-meds'),meds.length>0);
+
+  const hasConf=typeof a.confidence_pct==='number'&&a.confidence_pct>=0&&a.confidence_pct<=100;
+  show(card('r-confidence-label'),hasConf);
+  if(hasConf){
+    const conf=Math.round(a.confidence_pct);
+    $('r-confidence-label').textContent=conf+'%: '+(conf>=80?'Uhakika wa Juu':conf>=60?'Wastani':'Chini, picha bora itasaidia');
+    $('r-confidence-bar').style.width=conf+'%';
+  }
   showState('result');
 }
 </script>
