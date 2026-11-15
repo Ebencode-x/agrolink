@@ -903,7 +903,7 @@ def index():
             .limit(6)
             .all()
         )
-        return render_template("landing.html", preview_listings=preview)
+        return render_template("landing.html", preview_listings=preview, region_count=len(TANZANIA_REGIONS))
     crops = Crop.query.order_by(Crop.created_at.desc()).limit(6).all()
     listings = (
         MarketListing.query.filter_by(is_available=True)
