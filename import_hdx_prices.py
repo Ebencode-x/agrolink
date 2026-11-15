@@ -15,13 +15,20 @@ Workflow:
 import csv
 import io
 import json
+import sys
 import urllib.request
 from datetime import datetime, timedelta
 
-from app import app, db, MarketPrice  # type: ignore
+from app import app, db, MarketPrice, TANZANIA_REGIONS  # type: ignore
 
 HDX_PACKAGE_API = "https://data.humdata.org/api/3/action/package_show?id=wfp-food-prices-for-united-republic-of-tanzania"
 EXCHANGE_RATE_API = "https://api.exchangerate-api.com/v4/latest/USD"
+
+IMPORT_DAYS = 200
+DRY_RUN = "--dry-run" in sys.argv
+for _a in sys.argv[1:]:
+    if _a.startswith("--days="):
+        IMPORT_DAYS = int(_a.split("=", 1)[1])
 
 CROP_MAP = {
     "maize": "Mahindi",
@@ -82,6 +89,12 @@ REGION_MAP = {
 }
 
 
+# Orodha moja ya mikoa: majina ya TANZANIA_REGIONS yanashinda ramani ya zamani ya juu.
+for _r in TANZANIA_REGIONS:
+    REGION_MAP[_r.lower()] = _r
+    REGION_MAP[_r.lower().replace(" ", "-")] = _r
+
+
 def get_csv_url():
     req = urllib.request.Request(HDX_PACKAGE_API, headers={"User-Agent": "AgroLink-Tanzania/1.0"})
     with urllib.request.urlopen(req, timeout=30) as res:
@@ -139,9 +152,17 @@ def run_import():
     skipped_crop = 0
     skipped_duplicate = 0
 
-    cutoff_date = datetime.utcnow() - timedelta(days=200)
+    cutoff_date = datetime.utcnow() - timedelta(days=IMPORT_DAYS)
 
     with app.app_context():
+        existing = {
+            (c, r, d.date() if isinstance(d, datetime) else d)
+            for c, r, d in MarketPrice.query.filter_by(source="hdx_wfp")
+            .with_entities(MarketPrice.crop_name, MarketPrice.region, MarketPrice.recorded_at)
+            .all()
+            if d is not None
+        }
+        print(f"Rekodi zilizopo (hdx_wfp): {len(existing)}")
         for i, row in enumerate(reader):
             if i == 0 and row.get("date", "").startswith("#"):
                 continue
@@ -195,13 +216,11 @@ def run_import():
             else:
                 continue
 
-            exists = MarketPrice.query.filter_by(
-                crop_name=crop_name, region=region,
-                recorded_at=recorded_at, source="hdx_wfp"
-            ).first()
-            if exists:
+            key = (crop_name, region, recorded_at.date())
+            if key in existing:
                 skipped_duplicate += 1
                 continue
+            existing.add(key)
 
             entry = MarketPrice(
                 crop_name=crop_name,
@@ -218,7 +237,11 @@ def run_import():
             db.session.add(entry)
             inserted += 1
 
-        db.session.commit()
+        if DRY_RUN:
+            db.session.rollback()
+            print("DRY RUN: hakuna kilichoandikwa")
+        else:
+            db.session.commit()
 
     print(f"Imeingizwa: {inserted}")
     print(f"Imerukwa (zao halifahamiki): {skipped_crop}")
