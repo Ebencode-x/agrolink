@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Soko la Mazao — AgroLink Tanzania{% endblock %}
+{% block title %}Soko la Mazao | AgroLink Tanzania{% endblock %}
 {% block meta_description %}Tafuta na nunua mazao, mifugo na pembejeo Tanzania. Orodha za wakulima wa Tanzania kwenye AgroLink.{% endblock %}
-{% block og_title %}Soko la Mazao — AgroLink Tanzania{% endblock %}
+{% block og_title %}Soko la Mazao | AgroLink Tanzania{% endblock %}
 {% block og_description %}Tafuta mazao, mifugo na pembejeo kwa bei nzuri kutoka kwa wakulima wa Tanzania.{% endblock %}
 {% block jsonld %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "Orodha ya Mazao — AgroLink Tanzania",
+  "name": "Orodha ya Mazao | AgroLink Tanzania",
   "description": "Mazao, mifugo na pembejeo kutoka kwa wakulima wa Tanzania",
   "url": "https://agrolink-tanzania.onrender.com/listings",
   "itemListElement": [
@@ -19,7 +19,7 @@
       "item": {
         "@type": "Product",
         "name": "{{ listing.title | e }}",
-        "description": "{{ listing.crop_name | e }} — {{ listing.region | e }}",
+        "description": "{{ listing.crop_name | e }}, {{ listing.region | e }}",
         "offers": {
           "@type": "Offer",
           "price": "{{ listing.price_tzs }}",
@@ -36,7 +36,7 @@
 
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — Listings eBay style ── */
+  /* ── Forest & Harvest - Listings eBay style ── */
   *{box-sizing:border-box}
 
   .sl-wrap{max-width:1200px;margin:0 auto;padding:0 1rem 4rem}
@@ -80,7 +80,7 @@
   .sl-row{display:grid;grid-template-columns:120px 1fr auto;gap:0;background:var(--bg-card);border-bottom:1px solid var(--border);transition:background var(--transition);position:relative;text-decoration:none;color:inherit}
   .sl-row:first-child{border-top:1px solid var(--border)}
   .sl-row:hover{background:var(--bg-surface)}
-  .sl-row.is-sponsored{border-left:3px solid var(--accent)}
+  .sl-row.is-sponsored{outline:1px solid var(--accent);outline-offset:-1px}
 
   /* Sponsored label */
   .sl-sponsored-tag{position:absolute;top:10px;left:124px;display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:var(--text-on-accent);font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:50px;letter-spacing:0.04em;z-index:2}
@@ -323,7 +323,7 @@
             </div>
             <div class="sl-rating" id="rating-{{ l.id }}">
               <div class="sl-stars" id="stars-{{ l.id }}">
-                <span class="sl-star-e">☆</span><span class="sl-star-e">☆</span><span class="sl-star-e">☆</span><span class="sl-star-e">☆</span><span class="sl-star-e">☆</span>
+                <svg class="sl-star-e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="sl-star-e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="sl-star-e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="sl-star-e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg class="sl-star-e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
               <span id="rcount-{{ l.id }}" style="font-size:0.7rem;color:var(--text-muted)"></span>
             </div>
@@ -453,11 +453,11 @@
     <h3>Tathmini Muuzaji</h3>
     <p id="rate-modal-name"></p>
     <div class="star-picker" id="star-picker" style="display:flex;gap:8px;margin-bottom:1rem;justify-content:center">
-      <span onclick="selectStar(1)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
-      <span onclick="selectStar(2)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
-      <span onclick="selectStar(3)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
-      <span onclick="selectStar(4)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
-      <span onclick="selectStar(5)" style="font-size:2rem;cursor:pointer;color:var(--border-strong)">☆</span>
+      <span onclick="selectStar(1)" style="cursor:pointer;line-height:0;color:var(--border-strong)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span onclick="selectStar(2)" style="cursor:pointer;line-height:0;color:var(--border-strong)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span onclick="selectStar(3)" style="cursor:pointer;line-height:0;color:var(--border-strong)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span onclick="selectStar(4)" style="cursor:pointer;line-height:0;color:var(--border-strong)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span onclick="selectStar(5)" style="cursor:pointer;line-height:0;color:var(--border-strong)"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
     </div>
     <textarea id="rate-comment" rows="3" placeholder="Maoni yako (si lazima)..." style="width:100%;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;color:var(--text-primary);font-family:var(--font-body);font-size:0.85rem;resize:none;outline:none;box-sizing:border-box"></textarea>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem">
@@ -571,7 +571,7 @@ async function loadRating(id){
     const countEl = document.getElementById('rcount-'+id);
     if(!starsEl) return;
     let html='';
-    for(let i=1;i<=5;i++) html += i<=Math.round(d.avg) ? '<span class="sl-star-f">★</span>' : '<span class="sl-star-e">☆</span>';
+    for(let i=1;i<=5;i++) html += i<=Math.round(d.avg) ? '<svg class="sl-star-f" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>' : '<svg class="sl-star-e" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
     starsEl.innerHTML = html;
     if(d.count > 0) countEl.textContent = d.avg.toFixed(1)+' ('+d.count+')';
   }catch(e){}
@@ -623,14 +623,14 @@ function openRateModal(id,name){
   _currentListingId=id; _selectedStars=0;
   document.getElementById('rate-modal-name').textContent='Mpe '+name+' nyota';
   document.getElementById('rate-comment').value='';
-  document.getElementById('star-picker').querySelectorAll('span').forEach(s=>{ s.textContent='☆'; s.style.color='var(--border-strong)'; });
+  document.getElementById('star-picker').querySelectorAll('span').forEach(s=>{ s.firstElementChild.setAttribute('fill','none'); s.style.color='var(--border-strong)'; });
   document.getElementById('rate-modal-overlay').style.display='flex';
 }
 function closeRateModal(){ document.getElementById('rate-modal-overlay').style.display='none'; }
 function selectStar(n){
   _selectedStars=n;
   document.getElementById('star-picker').querySelectorAll('span').forEach((s,i)=>{
-    s.textContent=i<n?'★':'☆';
+    s.firstElementChild.setAttribute('fill',i<n?'currentColor':'none');
     s.style.color=i<n?'var(--accent)':'var(--border-strong)';
   });
 }
@@ -674,7 +674,7 @@ async function deleteListing(id,btn){
 
 // ── Sponsor ───────────────────────────────────────────────────────────────────
 async function sponsorListing(id,btn){
-  if(!confirm('Shinikiza orodha hii juu kwa siku 7? (Mock — bila malipo ya kweli sasa)')) return;
+  if(!confirm('Shinikiza orodha hii juu kwa siku 7? (Mock: bila malipo ya kweli sasa)')) return;
   btn.disabled=true; btn.textContent='Inaendelea...';
   try{
     const res=await fetch('/api/listings/'+id+'/sponsor',{method:'POST'});
@@ -709,7 +709,7 @@ async function sponsorListing(id,btn){
   let _lid=null;
   window.openWasiliana=function(id,crop,seller){
     _lid=id;
-    document.getElementById('wasiliana-title').textContent=crop+' — '+seller;
+    document.getElementById('wasiliana-title').textContent=crop+' - '+seller;
     document.getElementById('wasiliana-sub').textContent='Tuma ujumbe kwa '+seller+' kuhusu bidhaa hii.';
     document.getElementById('wasiliana-msg').value='';
     document.getElementById('wasiliana-error').style.display='none';

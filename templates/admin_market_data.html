@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Usimamizi wa Bei — Admin{% endblock %}
+{% block title %}Usimamizi wa Bei | Admin{% endblock %}
 {% block content %}
 <style>
 *{box-sizing:border-box;}
@@ -181,7 +181,7 @@
             <td class="adm-num">{{ "{:,.0f}".format(p.price_tzs) }}</td>
             <td>{{ p.unit }}</td>
             <td>{{ p.region }}</td>
-            <td>{{ p.market or "—" }}</td>
+            <td>{{ p.market or "-" }}</td>
             <td>{{ p.recorded_at.strftime("%d %b %Y") }}</td>
             <td style="font-size:.75rem;color:var(--gray-400);">
               {% if p.submitted_by_id %}#{{ p.submitted_by_id }}{% else %}Admin{% endif %}
@@ -234,7 +234,7 @@
             <td class="adm-num">{{ "{:,.0f}".format(p.price_tzs) }}</td>
             <td>{{ p.unit }}</td>
             <td>{{ p.region }}</td>
-            <td>{{ p.market or "—" }}</td>
+            <td>{{ p.market or "-" }}</td>
             <td><span class="adm-tag">{{ p.source }}</span></td>
             <td>{{ p.recorded_at.strftime("%d %b %Y") }}</td>
             <td>

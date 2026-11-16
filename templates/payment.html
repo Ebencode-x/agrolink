@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Lipa — {{ listing.title }} | AgroLink{% endblock %}
+{% block title %}Lipa: {{ listing.title }} | AgroLink{% endblock %}
 
 {% block content %}
 <style>
@@ -405,7 +405,7 @@
 
       if (data.success) {
         showStatus("success", "check-circle",
-          "Ombi limetumwa! Angalia simu yako — utapata ujumbe wa kuthibitisha malipo. " +
+          "Ombi limetumwa! Angalia simu yako. Utapata ujumbe wa kuthibitisha malipo. " +
           "Ref: " + (data.reference || "")
         );
         btnText.textContent = "Ombi Limetumwa";

@@ -20,3 +20,4 @@ Thumbs.db
 .coverage
 patch_*.py
 archive/
+*.bak

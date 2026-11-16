@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Ujumbe — AgroLink Tanzania{% endblock %}
+{% block title %}Ujumbe | AgroLink Tanzania{% endblock %}
 {% block content %}
 <style>
   .inbox-wrap{max-width:680px;margin:0 auto;padding:1.25rem clamp(0.75rem,4vw,1.5rem) 4rem}
@@ -9,7 +9,7 @@
   .conv-list{display:flex;flex-direction:column;gap:0.5rem}
   .conv-card{display:flex;align-items:center;gap:0.9rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:0.9rem 1rem;text-decoration:none;transition:border-color var(--transition),box-shadow var(--transition);cursor:pointer}
   .conv-card:hover{border-color:var(--brand-mid);box-shadow:0 2px 8px rgba(38,61,47,0.08)}
-  .conv-card.unread{border-left:3px solid var(--accent)}
+  .conv-card.unread{outline:1px solid var(--accent);outline-offset:-1px}
   .conv-avatar{width:42px;height:42px;border-radius:50%;background:var(--brand-mid);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0}
   .conv-body{flex:1;min-width:0}
   .conv-top{display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:0.2rem}

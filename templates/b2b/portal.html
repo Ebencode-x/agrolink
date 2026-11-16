@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Lango la Biashara (B2B) — AgroLink Tanzania{% endblock %}
+{% block title %}Lango la Biashara (B2B) | AgroLink Tanzania{% endblock %}
 
 {% block content %}
 <div class="page-wrapper">
@@ -16,21 +16,21 @@
           Nunua kwa Wingi, Biashara ya Kweli
         </h1>
         <p style="color:#a8c4b0;margin-top:.5rem;font-size:.95rem;">
-          Hotels, migahawa, supermarkets na jumla — pata mazao moja kwa moja kutoka kwa wakulima.
+          Hotels, migahawa, supermarkets na jumla: pata mazao moja kwa moja kutoka kwa wakulima.
         </p>
       </div>
       <!-- Stats cards -->
       <div style="display:flex;gap:1rem;flex-wrap:wrap;" id="b2b-stats">
         <div class="b2b-stat-card">
-          <span class="b2b-stat-num" id="stat-inquiries">—</span>
+          <span class="b2b-stat-num" id="stat-inquiries">-</span>
           <span class="b2b-stat-label">Maombi Yangu</span>
         </div>
         <div class="b2b-stat-card">
-          <span class="b2b-stat-num" id="stat-active">—</span>
+          <span class="b2b-stat-num" id="stat-active">-</span>
           <span class="b2b-stat-label">Mazungumzo</span>
         </div>
         <div class="b2b-stat-card" style="position:relative;">
-          <span class="b2b-stat-num" id="stat-unread">—</span>
+          <span class="b2b-stat-num" id="stat-unread">-</span>
           <span class="b2b-stat-label">Ujumbe Mpya</span>
         </div>
       </div>
@@ -342,7 +342,7 @@ async function submitInquiry() {
     });
     const d = await r.json();
     if (d.success) {
-      showModalMsg(`✓ ${d.message}`, 'success');
+      showModalMsg(`${d.message}`, 'success');
       btn.style.display = 'none';
       loadStats();
       setTimeout(closeModal, 2500);

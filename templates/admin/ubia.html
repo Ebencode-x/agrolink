@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Ushirikiano — AgroLink Admin{% endblock %}
+{% block title %}Ushirikiano | AgroLink Admin{% endblock %}
 {% block content %}
 <div class="page-wrapper" style="background:var(--bg-subtle);min-height:100vh;padding:2rem clamp(1rem,4vw,2rem);">
 
@@ -53,7 +53,7 @@
       input.addEventListener('input', function () {
         clearTimeout(timer);
         var len = input.value.trim().length;
-        // Usisubiri search kwa herufi 1 tu — inasumbua wakati wa kuandika haraka
+        // Usisubiri search kwa herufi 1 tu, inasumbua wakati wa kuandika haraka
         if (len === 1) { return; }
         timer = setTimeout(function () { form.submit(); }, 700);
       });
@@ -155,7 +155,7 @@
       </div>
 
       {% if p.admin_notes %}
-      <div style="border-left:3px solid var(--accent);padding:0.6rem 0.9rem;font-size:0.8rem;color:var(--text-muted);margin-bottom:14px;font-style:italic;">
+      <div style="border:1px solid var(--accent);padding:0.6rem 0.9rem;font-size:0.8rem;color:var(--text-muted);margin-bottom:14px;font-style:italic;">
         Kumbukumbu: {{ p.admin_notes }}
       </div>
       {% endif %}
@@ -205,7 +205,7 @@
     <span id="ubia-bulk-count" style="font-family:var(--font-display);font-weight:700;font-size:0.85rem;">0 zimechaguliwa</span>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
       <select id="ubia-bulk-status" style="height:34px;border-radius:6px;border:none;padding:0 10px;font-size:0.8rem;">
-        <option value="">— Badilisha status —</option>
+        <option value="">Badilisha status</option>
         <option value="pending">Inasubiri</option>
         <option value="reviewing">Inapitiwa</option>
         <option value="contacted">Imewasiliana</option>

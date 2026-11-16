@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Masharti na Vigezo — AgroLink{% endblock %}
+{% block title %}Masharti na Vigezo | AgroLink{% endblock %}
 
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — Terms ── */
+  /* ── Forest & Harvest - Terms ── */
   .terms-hero{text-align:center;padding:3rem 1rem 2rem;background:var(--bg-page)}
   .terms-badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border-strong);color:var(--brand-mid);padding:0.4rem 1.1rem;border-radius:var(--radius-sm);font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.2rem}
   .terms-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);font-weight:800;color:var(--text-primary);margin-bottom:0.6rem}
@@ -40,14 +40,14 @@
   /* Lists */
   .terms-list{list-style:none;padding:0;margin:0.5rem 0;display:flex;flex-direction:column;gap:0.5rem}
   .terms-list li{color:var(--text-secondary);font-size:0.91rem;line-height:1.55;padding-left:1.4rem;position:relative}
-  .terms-list li::before{content:"✓";position:absolute;left:0;color:var(--success);font-weight:700}
-  .terms-list.danger li::before{content:"✕";color:var(--danger)}
+  .terms-list li::before{content:"";position:absolute;left:0;top:0.6em;width:6px;height:6px;border-radius:50%;background:var(--success)}
+  .terms-list.danger li::before{background:var(--danger)}
 
   /* Warning box */
   .terms-warning{display:flex;align-items:flex-start;gap:0.8rem;background:var(--danger-bg);border:1px solid rgba(192,57,43,0.25);border-radius:var(--radius-sm);padding:0.9rem 1.1rem;margin-top:1rem;font-size:0.87rem;color:var(--danger);line-height:1.5}
 
   /* Suspension box */
-  .suspension-box{display:flex;gap:1rem;background:var(--danger-bg);border:1px solid rgba(192,57,43,0.2);border-left:4px solid var(--danger);border-radius:var(--radius-sm);padding:1.2rem;margin-top:1rem}
+  .suspension-box{display:flex;gap:1rem;background:var(--danger-bg);border:1px solid var(--danger);border-radius:var(--radius-sm);padding:1.2rem;margin-top:1rem}
   .suspension-icon{color:var(--danger);flex-shrink:0}
   .suspension-text h4{font-size:0.95rem;font-weight:700;color:var(--danger);margin-bottom:0.4rem}
   .suspension-text p{font-size:0.87rem;color:var(--text-secondary);margin:0;line-height:1.6}
@@ -129,7 +129,7 @@
       <div class="section-body">
         <h2><i data-lucide="handshake" style="width:18px;height:18px"></i>Makubaliano ya Jumla</h2>
         <p>Kwa kutumia AgroLink Tanzania ("Jukwaa"), unakubali kufuata masharti haya yote bila masharti yoyote. Ikiwa hukubali masharti haya, tafadhali usitumie jukwaa hili.</p>
-        <p>AgroLink ni jukwaa la soko la kidijitali linalowaunganisha wakulima wa Tanzania na wanunuzi. Sisi ni wasuluhishi tu — hatuwajibiki moja kwa moja kwa miamala inayofanyika nje ya jukwaa.</p>
+        <p>AgroLink ni jukwaa la soko la kidijitali linalowaunganisha wakulima wa Tanzania na wanunuzi. Sisi ni wasuluhishi tu, hatuwajibiki moja kwa moja kwa miamala inayofanyika nje ya jukwaa.</p>
       </div>
     </div>
 
@@ -142,8 +142,8 @@
         <p>Ili kutumia huduma zetu, unahitaji kujiandikisha. Unakubali kwamba:</p>
         <ul class="terms-list">
           <li>Taarifa zote unazotoa wakati wa usajili ni za kweli, sahihi, na za kisasa.</li>
-          <li>Namba yako ya simu na email ni yako binafsi — huwezi kusajili kwa namba ya mtu mwingine.</li>
-          <li>Unahusika moja kwa moja na usalama wa nywila yako — usishirikishe mtu yeyote.</li>
+          <li>Namba yako ya simu na email ni yako binafsi, huwezi kusajili kwa namba ya mtu mwingine.</li>
+          <li>Unahusika moja kwa moja na usalama wa nywila yako, usishirikishe mtu yeyote.</li>
           <li>Lazima uwe na umri wa miaka 18 au zaidi kufungua akaunti.</li>
           <li>Akaunti moja tu inaruhusiwa kwa mtu mmoja. Akaunti mbili kwa mtu mmoja ni ukiukaji.</li>
         </ul>
@@ -160,8 +160,8 @@
         <ul class="terms-list">
           <li>Taarifa zote za zao (kiwango, bei, ubora, picha) ni za kweli na sio za kupotosha.</li>
           <li>Mazao yaliyoorodheshwa yapo kweli na uko tayari kuuza.</li>
-          <li>Bei iliyowekwa ni ya haki na ya soko — bei za kuchochea au kudanganya zitafutwa.</li>
-          <li>Picha zinazotumika ni za mazao yako halisi — si picha za watu wengine au za mtandaoni.</li>
+          <li>Bei iliyowekwa ni ya haki na ya soko, bei za kuchochea au kudanganya zitafutwa.</li>
+          <li>Picha zinazotumika ni za mazao yako halisi, si picha za watu wengine au za mtandaoni.</li>
           <li>Wasiliana na wanunuzi kwa uaminifu na kwa wakati.</li>
         </ul>
         <div class="terms-warning">
@@ -180,12 +180,12 @@
         <p>Yafuatayo ni marufuku kabisa katika jukwaa la AgroLink:</p>
         <ul class="terms-list danger">
           <li>Kutoa taarifa za uongo au za kupotosha kuhusu bidhaa, bei, au utambulisho wako.</li>
-          <li>Kutumia jukwaa kwa udanganyifu wa aina yoyote — kujifanya mtu mwingine, kutoa malipo ya uongo, nk.</li>
+          <li>Kutumia jukwaa kwa udanganyifu wa aina yoyote, kujifanya mtu mwingine, kutoa malipo ya uongo, nk.</li>
           <li>Kujaribu kuingia kwa akaunti ya mtu mwingine bila ruhusa.</li>
           <li>Kushambulia mfumo wa kiufundi (hacking, SQL injection, DDoS, nk).</li>
           <li>Kutuma ujumbe wa spam au kutangaza bidhaa ambazo hazilingani na sheria za Tanzania.</li>
           <li>Kutumia lugha ya matusi, vitisho, au unyanyasaji kwa watumiaji wengine.</li>
-          <li>Kufungua akaunti mpya baada ya kusimamishwa — hii ni ukiukaji mkubwa.</li>
+          <li>Kufungua akaunti mpya baada ya kusimamishwa, hii ni ukiukaji mkubwa.</li>
         </ul>
       </div>
     </div>
@@ -207,7 +207,7 @@
           <div class="suspension-icon"><i data-lucide="user-x" style="width:32px;height:32px"></i></div>
           <div class="suspension-text">
             <h4>Athari za Kusimamishwa</h4>
-            <p>Akaunti yako itasimamishwa mara moja. <strong>Namba yako ya simu na email vitawekwa kwenye orodha ya kuzuiwa (blacklist)</strong> — hata ukijaribu kufungua akaunti mpya kwa namba au email ile ile, utazuiwa kufanya hivyo. Taarifa zako zitahifadhiwa kwa miaka mitatu (3) kwa madhumuni ya uchunguzi.</p>
+            <p>Akaunti yako itasimamishwa mara moja. <strong>Namba yako ya simu na email vitawekwa kwenye orodha ya kuzuiwa (blacklist)</strong>, hata ukijaribu kufungua akaunti mpya kwa namba au email ile ile, utazuiwa kufanya hivyo. Taarifa zako zitahifadhiwa kwa miaka mitatu (3) kwa madhumuni ya uchunguzi.</p>
           </div>
         </div>
       </div>
@@ -267,7 +267,7 @@
 
   <div class="terms-actions">
     <a href="{{ url_for('register') }}" class="btn-accept">
-      <i data-lucide="user-plus" style="width:18px;height:18px"></i>Nimekubali — Nijiandikishe
+      <i data-lucide="user-plus" style="width:18px;height:18px"></i>Nimekubali, Nijiandikishe
     </a>
     <a href="{{ url_for('index') }}" class="btn-back">
       <i data-lucide="arrow-left" style="width:18px;height:18px"></i>Rudi Nyumbani

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Mazungumzo — AgroLink Tanzania{% endblock %}
+{% block title %}Mazungumzo | AgroLink Tanzania{% endblock %}
 {% block content %}
 <style>
   /* ── Layout ── */
@@ -23,7 +23,7 @@
   .msg-bubble.theirs{align-self:flex-start;align-items:flex-start}
 
   /* Reply preview inside bubble */
-  .msg-reply-preview{padding:0.35rem 0.6rem;border-radius:8px;font-size:0.75rem;margin-bottom:0.2rem;border-left:3px solid;max-width:100%}
+  .msg-reply-preview{padding:0.35rem 0.6rem;border-radius:8px;font-size:0.75rem;margin-bottom:0.2rem;border:1px solid;max-width:100%}
   .mine .msg-reply-preview{background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.6);color:rgba(255,255,255,0.9)}
   .theirs .msg-reply-preview{background:rgba(0,0,0,0.06);border-color:var(--brand-mid);color:var(--text-muted)}
   .msg-reply-sender{font-weight:700;font-size:0.72rem;margin-bottom:1px}
@@ -43,14 +43,14 @@
   .theirs .msg-deleted{background:rgba(46,107,71,0.07)!important;color:var(--text-muted)}
   @keyframes msgDeletedFade{from{opacity:0;transform:scale(0.97)}to{opacity:1;transform:scale(1)}}
 
-  /* Meta — time + ticks */
+  /* Meta - time + ticks */
   .msg-meta{display:flex;align-items:center;gap:3px;font-size:0.65rem;color:var(--text-muted);padding:0 4px}
   .tick{font-size:0.7rem;line-height:1}
   .tick.read{color:var(--brand-mid)}
 
   /* Composer */
   .thread-composer{padding:0.6rem clamp(0.75rem,4vw,1.25rem);background:var(--surface);border-top:1px solid var(--border);flex-shrink:0;z-index:10}
-  .reply-bar{display:none;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;background:var(--bg-subtle, var(--bg));border-radius:8px;margin-bottom:0.4rem;border-left:3px solid var(--brand-mid)}
+  .reply-bar{display:none;align-items:center;gap:0.5rem;padding:0.4rem 0.75rem;background:var(--bg-subtle, var(--bg));border-radius:8px;margin-bottom:0.4rem;border:1px solid var(--brand-mid)}
   .reply-bar.visible{display:flex}
   .reply-bar-text{flex:1;min-width:0}
   .reply-bar-name{font-size:0.72rem;font-weight:700;color:var(--brand-mid)}
@@ -257,7 +257,7 @@
       {% if is_buyer %}
       <button onclick="escrowRelease()" id="escrow-release-btn"
         style="width:100%;padding:0.5rem;background:#1B4332;color:#fff;border:none;border-radius:8px;font-size:0.82rem;font-weight:700;cursor:pointer;margin-bottom:0.4rem">
-        <i data-lucide="check-circle" style="width:13px;height:13px"></i> Nimepokea Bidhaa — Toa Malipo
+        <i data-lucide="check-circle" style="width:13px;height:13px"></i> Nimepokea Bidhaa, Toa Malipo
       </button>
       {% endif %}
       {% if is_seller %}
@@ -353,7 +353,7 @@ function renderOrderActions(order){
   const area = document.getElementById('order-action-area');
   area.innerHTML = '';
   if(order.status === 'completed' || order.status === 'cancelled'){
-    const msg = order.status === 'completed' ? '✅ Agizo limekamilika!' : '❌ Agizo limefutwa.';
+    const msg = order.status === 'completed' ? 'Agizo limekamilika!' : 'Agizo limefutwa.';
     area.innerHTML = `<div style="text-align:center;font-size:0.85rem;font-weight:700;color:${STEP_COLORS[order.status]};padding:0.5rem 0">${msg}</div>`;
     return;
   }
@@ -606,11 +606,11 @@ function renderMessages(msgs){
     let ticks = '';
     if(m.is_mine && !m.is_deleted){
       ticks = m.is_read
-        ? `<span class="tick read">✓✓</span>`
-        : `<span class="tick">✓</span>`;
+        ? `<span class="tick read"><svg width="20" height="14" viewBox="0 0 30 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/><polyline points="28 6 17 17 14 14"/></svg></span>`
+        : `<span class="tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>`;
     }
 
-    // Deleted bubble — minimal, muted
+    // Deleted bubble - minimal, muted
     if(m.is_deleted){
       return `<div class="msg-bubble ${cls}" data-id="${m.id}" data-body="" data-mine="${m.is_mine}" data-deleted="true">
         <div class="msg-text msg-deleted">
@@ -801,7 +801,7 @@ async function sendMessage(){
   const tempEl = document.createElement('div');
   tempEl.className = 'msg-bubble mine';
   tempEl.id = tempId;
-  tempEl.innerHTML = `<div class="msg-text">${escHtml(body)}</div><div class="msg-meta">Inatuma... <span class="tick">✓</span></div>`;
+  tempEl.innerHTML = `<div class="msg-text">${escHtml(body)}</div><div class="msg-meta">Inatuma... <span class="tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span></div>`;
   list.appendChild(tempEl);
   scrollToBottom();
   _userScrolled = false;

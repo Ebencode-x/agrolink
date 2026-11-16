@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}AgroLink Tanzania — Jukwaa la Kilimo la Kisasa{% endblock %}
+{% block title %}AgroLink Tanzania | Jukwaa la Kilimo la Kisasa{% endblock %}
 {% block jsonld %}
 <script type="application/ld+json">
 {
@@ -27,7 +27,7 @@
   .hero-scrim{position:absolute;inset:0;z-index:-1;background:linear-gradient(100deg,rgba(10,22,15,0.92) 0%,rgba(10,22,15,0.82) 38%,rgba(10,22,15,0.55) 68%,rgba(10,22,15,0.40) 100%)}
   .hero-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
 
-  /* Poster-stack headline — the signature element */
+  /* Poster-stack headline - the signature element */
   .hero-title-poster{margin-bottom:1.4rem}
   .pt-line{display:block;font-family:var(--font-display);color:var(--text-on-dark);line-height:0.97}
   .pt-a{font-size:clamp(1.5rem,3.2vw,2.1rem);font-weight:600;letter-spacing:0.005em;color:rgba(240,247,242,0.92)}
@@ -154,7 +154,7 @@
         <span class="pt-line pt-b">kwa Wakulima wa</span>
         <span class="pt-line pt-c">TANZANIA</span>
       </h1>
-      <p class="hero-subtitle">AgroLink Tanzania inaunganisha wakulima, mawakala, na masoko kwa teknolojia ya hali ya juu. Bei za soko, hali ya hewa, na mashauri ya kilimo — mahali pamoja.</p>
+      <p class="hero-subtitle">AgroLink Tanzania inaunganisha wakulima, mawakala, na masoko kwa teknolojia ya hali ya juu. Bei za soko, hali ya hewa, na mashauri ya kilimo. Yote mahali pamoja.</p>
       <div class="hero-actions">
         <a href="{{ url_for('login') }}" class="hero-btn-primary">
           <i data-lucide="store" style="width:17px;height:17px"></i>Ingia Sokoni
@@ -235,16 +235,16 @@
   <div class="section-inner">
     <div class="section-header section-header-center">
       <h2 class="section-title">Kila Kitu Unachohitaji kwa Kilimo</h2>
-      <p class="section-subtitle">Kutoka bei za soko hadi hali ya hewa — AgroLink inakupa nguvu ya kufanya maamuzi sahihi.</p>
+      <p class="section-subtitle">Kutoka bei za soko hadi hali ya hewa. AgroLink inakupa nguvu ya kufanya maamuzi sahihi.</p>
     </div>
     <div class="features-grid">
       {% for icon,color_class,title,desc,tag in [
-        ('trending-up','feature-icon-primary','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania — Kariakoo, Arusha, Mbeya na zaidi.','Bei • Live'),
-        ('radar','feature-icon-accent','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo — zinazosaidia kupanga kilimo chako.','Hewa • API'),
+        ('trending-up','feature-icon-primary','Bei za Soko la Moja kwa Moja','Pata bei halisi za mazao yako kutoka masoko makuu Tanzania: Kariakoo, Arusha, Mbeya na zaidi.','Bei Live'),
+        ('radar','feature-icon-accent','Hali ya Hewa kwa Wakulima','Taarifa za hali ya hewa kwa wakati halisi na utabiri wa siku 5 zijazo, zinazosaidia kupanga kilimo chako.','Hewa API'),
         ('network','feature-icon-muted','Mtandao wa Wakulima','Unganika na wakulima wengine, mawakala wa kilimo, na wanunuzi kutoka kila pembe ya Tanzania.','Mtandao'),
-        ('shield-check','feature-icon-primary','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco — data yako inalindwa na usimbaji wa hali ya juu.','Cisco • SSL'),
+        ('shield-check','feature-icon-primary','Usalama wa Data','Mfumo wetu umejengwa kwa viwango vya Cisco. Data yako inalindwa na usimbaji wa hali ya juu.','Cisco SSL'),
         ('wheat','feature-icon-accent','Mashauri ya Kilimo','Pata vidokezo vya kitaalamu kuhusu msimu wa kupanda, mbolea, na udhibiti wa wadudu.','Kilimo'),
-        ('smartphone','feature-icon-muted','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone — imeundwa kwa wakulima wa Tanzania.','Mobile')
+        ('smartphone','feature-icon-muted','Inapatikana Simu','Tumia AgroLink kwenye simu yako ya kawaida au smartphone. Imeundwa kwa wakulima wa Tanzania.','Mobile')
       ] %}
       <div class="feature-card">
         <div class="feature-icon {{ color_class }}">
@@ -350,7 +350,7 @@
     </div>
     <div class="weather-widget">
       <div class="weather-input-row">
-        <input type="text" id="city-input" class="weather-search-input" placeholder="Mji wako — Dodoma, Arusha, Dar es Salaam..."/>
+        <input type="text" id="city-input" class="weather-search-input" placeholder="Mji wako: Dodoma, Arusha, Dar es Salaam..."/>
         <button class="weather-search-btn" onclick="fetchWeather()">
           <i data-lucide="search" style="width:15px;height:15px"></i>Tafuta
         </button>
