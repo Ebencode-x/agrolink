@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Bei ya Soko — AgroLink Tanzania{% endblock %}
+{% block title %}Bei ya Soko | AgroLink Tanzania{% endblock %}
 
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — Price Intelligence ── */
+  /* ── Forest & Harvest - Price Intelligence ── */
   .pi-page{max-width:1200px;margin:0 auto;padding:2.5rem clamp(1rem,4vw,3rem) 5rem}
 
   .pi-header{margin-bottom:2.5rem}
@@ -151,7 +151,7 @@
         </div>
         <div class="select-wrap">
           <select class="pi-select" id="region-select">
-            <option value="">— Chagua mkoa —</option>
+            <option value="">Chagua mkoa</option>
           </select>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
@@ -165,7 +165,7 @@
         </div>
         <div class="select-wrap">
           <select class="pi-select" id="month-select">
-            <option value="">— Chagua mwezi —</option>
+            <option value="">Chagua mwezi</option>
             <option>Januari</option><option>Februari</option><option>Machi</option>
             <option>Aprili</option><option>Mei</option><option>Juni</option>
             <option>Julai</option><option>Agosti</option><option>Septemba</option>
@@ -409,8 +409,8 @@ function renderResult(p) {
   document.getElementById('r-high').textContent = fmt(p.predicted_price_high);
 
   // Season + advice
-  document.getElementById('r-season').textContent = p.season_context || '—';
-  document.getElementById('r-advice').textContent = p.market_advice  || '—';
+  document.getElementById('r-season').textContent = p.season_context || '-';
+  document.getElementById('r-advice').textContent = p.market_advice  || '-';
 
   const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   // Factors

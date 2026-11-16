@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Daktari wa Zao — AgroLink Tanzania{% endblock %}
+{% block title %}Daktari wa Zao | AgroLink Tanzania{% endblock %}
 
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — AI Daktari ── */
+  /* ── Forest & Harvest - AI Daktari ── */
   .ai-page{max-width:1100px;margin:0 auto;padding:2.5rem clamp(1rem,4vw,3rem) 5rem}
   .ai-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.15;color:var(--text-primary);margin-bottom:0.6rem}
   .ai-title .accent{color:var(--brand-mid)}
@@ -93,7 +93,7 @@
 <div class="ai-page">
   <div class="reveal" style="margin-bottom:0">
     <h1 class="ai-title">Daktari wa Zao<br/><span class="accent">Piga Picha, Pata Ushauri</span></h1>
-    <p class="ai-subtitle">Piga picha ya zao lako — AI yetu itachambua magonjwa, wadudu, au upungufu wa lishe na kutoa dawa na matibabu ya kitaalamu kwa sekunde chache.</p>
+    <p class="ai-subtitle">Piga picha ya zao lako. AI yetu itachambua magonjwa, wadudu, au upungufu wa lishe na kutoa dawa na matibabu ya kitaalamu kwa sekunde chache.</p>
   </div>
 
   <div class="ai-grid">
@@ -107,7 +107,7 @@
           <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
         </div>
         <div class="upload-text">Piga picha au chagua kutoka kwenye picha zako</div>
-        <div class="upload-hint">JPG, PNG, WEBP — hadi 5MB</div>
+        <div class="upload-hint">JPG, PNG, WEBP, hadi 5MB</div>
         <div class="upload-btn-row">
           <button type="button" id="btn-piga-picha" class="upload-btn upload-btn-primary">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
@@ -139,7 +139,7 @@
         <span class="crop-hint" onclick="setHint('Ndizi')">Ndizi</span>
         <span class="crop-hint" onclick="setHint('Maharage')">Maharage</span>
       </div>
-      <textarea class="context-input" id="context-input" placeholder="Mfano: Mahindi yangu — majani yanageuka njano, kuna madoa meusi. Mkoa wa Mbeya..."></textarea>
+      <textarea class="context-input" id="context-input" placeholder="Mfano: Mahindi yangu, majani yanageuka njano, kuna madoa meusi. Mkoa wa Mbeya..."></textarea>
       <button class="ai-submit" id="ai-submit-btn" onclick="analyzeImage()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Chunguza Zao Langu
@@ -156,7 +156,7 @@
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
         <div style="font-family:var(--font-display);font-weight:700;font-size:1rem">Daktari wa Zao</div>
-        <p style="font-size:0.85rem;max-width:230px;line-height:1.65">Pakia picha ya zao lako — AI itachambua na kutoa ushauri wa kitaalamu.</p>
+        <p style="font-size:0.85rem;max-width:230px;line-height:1.65">Pakia picha ya zao lako. AI itachambua na kutoa ushauri wa kitaalamu.</p>
         <div style="display:flex;flex-direction:column;gap:0.5rem;width:100%;max-width:240px;margin-top:0.5rem">
           <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Utambuzi wa magonjwa</div>
           <div style="display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text-muted)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-mid)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dawa na matibabu</div>
@@ -183,7 +183,7 @@
           <span class="result-crop-name" id="r-crop-detected"></span>
         </div>
         <div class="r-card" style="border-color:rgba(244,63,94,0.2)">
-          <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Utambuzi — Tatizo Lililoonekana</div>
+          <div class="r-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Utambuzi: Tatizo Lililoonekana</div>
           <div class="r-card-body" id="r-diagnosis"></div>
           <div class="tag-list" id="r-symptoms"></div>
         </div>
@@ -250,7 +250,7 @@ zone.addEventListener('drop',e=>{
 });
 function setHint(crop){
   const t=document.getElementById('context-input');
-  if(!t.value.startsWith(crop))t.value=crop+(t.value?' — '+t.value:'');
+  if(!t.value.startsWith(crop))t.value=crop+(t.value?': '+t.value:'');
 }
 function showState(name){
   document.getElementById('state-empty').style.display=name==='empty'?'flex':'none';

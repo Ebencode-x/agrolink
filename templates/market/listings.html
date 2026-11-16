@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Soko la Mazao — AgroLink Tanzania{% endblock %}
+{% block title %}Soko la Mazao | AgroLink Tanzania{% endblock %}
 {% block meta_description %}Tafuta na nunua mazao, mifugo na pembejeo Tanzania. Orodha za wakulima wa Tanzania kwenye AgroLink.{% endblock %}
-{% block og_title %}Soko la Mazao — AgroLink Tanzania{% endblock %}
+{% block og_title %}Soko la Mazao | AgroLink Tanzania{% endblock %}
 {% block og_description %}Tafuta mazao, mifugo na pembejeo kwa bei nzuri kutoka kwa wakulima wa Tanzania.{% endblock %}
 {% block jsonld %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "ItemList",
-  "name": "Orodha ya Mazao — AgroLink Tanzania",
+  "name": "Orodha ya Mazao | AgroLink Tanzania",
   "description": "Mazao, mifugo na pembejeo kutoka kwa wakulima wa Tanzania",
   "url": "https://agrolink-tanzania.onrender.com/listings",
   "itemListElement": [
@@ -19,7 +19,7 @@
       "item": {
         "@type": "Product",
         "name": "{{ listing.title | e }}",
-        "description": "{{ listing.crop_name | e }} — {{ listing.region | e }}",
+        "description": "{{ listing.crop_name | e }}, {{ listing.region | e }}",
         "offers": {
           "@type": "Offer",
           "price": "{{ listing.price_tzs }}",
@@ -36,7 +36,7 @@
 
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — Listings eBay style ── */
+  /* ── Forest & Harvest - Listings eBay style ── */
   *{box-sizing:border-box}
 
   .sl-wrap{max-width:1200px;margin:0 auto;padding:0 1rem 4rem}
@@ -674,7 +674,7 @@ async function deleteListing(id,btn){
 
 // ── Sponsor ───────────────────────────────────────────────────────────────────
 async function sponsorListing(id,btn){
-  if(!confirm('Shinikiza orodha hii juu kwa siku 7? (Mock — bila malipo ya kweli sasa)')) return;
+  if(!confirm('Shinikiza orodha hii juu kwa siku 7? (Mock: bila malipo ya kweli sasa)')) return;
   btn.disabled=true; btn.textContent='Inaendelea...';
   try{
     const res=await fetch('/api/listings/'+id+'/sponsor',{method:'POST'});
@@ -709,7 +709,7 @@ async function sponsorListing(id,btn){
   let _lid=null;
   window.openWasiliana=function(id,crop,seller){
     _lid=id;
-    document.getElementById('wasiliana-title').textContent=crop+' — '+seller;
+    document.getElementById('wasiliana-title').textContent=crop+' - '+seller;
     document.getElementById('wasiliana-sub').textContent='Tuma ujumbe kwa '+seller+' kuhusu bidhaa hii.';
     document.getElementById('wasiliana-msg').value='';
     document.getElementById('wasiliana-error').style.display='none';
