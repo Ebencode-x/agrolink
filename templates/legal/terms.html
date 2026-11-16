@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}Masharti na Vigezo — AgroLink{% endblock %}
+{% block title %}Masharti na Vigezo | AgroLink{% endblock %}
 
 {% block extra_head %}
 <style>
-  /* ── Forest & Harvest — Terms ── */
+  /* ── Forest & Harvest - Terms ── */
   .terms-hero{text-align:center;padding:3rem 1rem 2rem;background:var(--bg-page)}
   .terms-badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border-strong);color:var(--brand-mid);padding:0.4rem 1.1rem;border-radius:var(--radius-sm);font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.2rem}
   .terms-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);font-weight:800;color:var(--text-primary);margin-bottom:0.6rem}
@@ -40,7 +40,7 @@
   /* Lists */
   .terms-list{list-style:none;padding:0;margin:0.5rem 0;display:flex;flex-direction:column;gap:0.5rem}
   .terms-list li{color:var(--text-secondary);font-size:0.91rem;line-height:1.55;padding-left:1.4rem;position:relative}
-  .terms-list li::before{content:"✓";position:absolute;left:0;color:var(--success);font-weight:700}
+  .terms-list li::before{content:"";position:absolute;left:0;top:0.6em;width:6px;height:6px;border-radius:50%;background:var(--success)}
   .terms-list.danger li::before{content:"✕";color:var(--danger)}
 
   /* Warning box */

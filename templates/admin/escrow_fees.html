@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Escrow Fees — AgroLink Admin{% endblock %}
+{% block title %}Escrow Fees | AgroLink Admin{% endblock %}
 {% block content %}
 <div class="page-wrapper" style="background:var(--bg-subtle);min-height:100vh;padding:2rem clamp(1rem,4vw,2rem);">
 
@@ -7,7 +7,7 @@
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
     <div>
       <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--brand-dark);">Escrow Fees</h1>
-      <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2px;">Framework-ready — itawashwa baadaye kupitia env var</p>
+      <p style="color:var(--text-muted);font-size:0.85rem;margin-top:2px;">Framework-ready: itawashwa baadaye kupitia env var</p>
     </div>
     <a href="/admin" style="display:inline-flex;align-items:center;gap:6px;background:var(--brand-dark);color:var(--text-on-dark);padding:0.5rem 1.1rem;border-radius:var(--radius-sm);font-family:var(--font-display);font-weight:600;font-size:0.82rem;text-decoration:none;">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -19,12 +19,12 @@
   {% if fee_active %}
   <div style="background:#d1fae5;border:1.5px solid #6ee7b7;border-radius:var(--radius-sm);padding:0.85rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    <span style="font-family:var(--font-display);font-weight:700;color:#065f46;font-size:0.9rem;">Fees ZIMEWASHWA — {{ (fee_rate * 100)|round(1) }}% ya kila order</span>
+    <span style="font-family:var(--font-display);font-weight:700;color:#065f46;font-size:0.9rem;">Fees ZIMEWASHWA: {{ (fee_rate * 100)|round(1) }}% ya kila order</span>
   </div>
   {% else %}
   <div style="background:#fef3c7;border:1.5px solid #fcd34d;border-radius:var(--radius-sm);padding:0.85rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span style="font-family:var(--font-display);font-weight:700;color:#92400e;font-size:0.9rem;">Fees ZIMEZIMWA — weka <code>ESCROW_FEE_ACTIVE=true</code> Render kuwasha</span>
+    <span style="font-family:var(--font-display);font-weight:700;color:#92400e;font-size:0.9rem;">Fees ZIMEZIMWA: weka <code>ESCROW_FEE_ACTIVE=true</code> Render kuwasha</span>
   </div>
   {% endif %}
 
@@ -69,7 +69,7 @@
             <td style="padding:0.75rem 1rem;text-align:right;color:var(--text-main);">{{ "{:,}".format(fee.order_amount) }}</td>
             <td style="padding:0.75rem 1rem;text-align:right;color:var(--text-muted);">{{ (fee.fee_rate * 100)|round(1) }}%</td>
             <td style="padding:0.75rem 1rem;text-align:right;font-weight:700;color:{% if fee.fee_amount > 0 %}#059669{% else %}var(--text-muted){% endif %};">
-              {% if fee.fee_amount > 0 %}{{ "{:,}".format(fee.fee_amount) }}{% else %}—{% endif %}
+              {% if fee.fee_amount > 0 %}{{ "{:,}".format(fee.fee_amount) }}{% else %}-{% endif %}
             </td>
             <td style="padding:0.75rem 1rem;text-align:center;">
               {% if fee.status == "released" %}

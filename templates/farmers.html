@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Wakulima — AgroLink Tanzania{% endblock %}
+{% block title %}Wakulima | AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
   .farmers-hero{
@@ -121,7 +121,7 @@
     <h1 class="farmers-title">
       Tafuta Wakulima<br/><span class="accent">wa Tanzania</span>
     </h1>
-    <p class="farmers-sub">Unganika na wakulima kutoka mikoa yote — tafuta kwa jina au mkoa wao.</p>
+    <p class="farmers-sub">Unganika na wakulima kutoka mikoa yote. Tafuta kwa jina au mkoa wao.</p>
     <form method="GET" action="/farmers">
       <div class="search-bar">
         <i data-lucide="search" style="width:16px;height:16px;color:rgba(254,250,224,0.45);align-self:center;flex-shrink:0;margin-left:0.25rem"></i>
@@ -173,7 +173,7 @@
           </div>
           <div class="farmer-stat">
             <i data-lucide="calendar" style="width:13px;height:13px"></i>
-            {{ farmer.created_at.strftime("%b %Y") if farmer.created_at else "—" }}
+            {{ farmer.created_at.strftime("%b %Y") if farmer.created_at else "-" }}
           </div>
         </div>
       </div>
