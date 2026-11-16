@@ -464,7 +464,7 @@ class Message(db.Model):
     sender          = db.relationship("User", foreign_keys=[sender_id], lazy=True)
 
 class MessageDeletion(db.Model):
-    """'Futa kwangu' — mtumiaji anaficha ujumbe mmoja kutoka mwonekano wake pekee."""
+    """'Futa kwangu' - mtumiaji anaficha ujumbe mmoja kutoka mwonekano wake pekee."""
     __tablename__ = "message_deletions"
     id         = db.Column(db.Integer, primary_key=True)
     message_id = db.Column(db.Integer, db.ForeignKey("messages.id"), nullable=False)
@@ -473,7 +473,7 @@ class MessageDeletion(db.Model):
     __table_args__ = (db.UniqueConstraint("message_id", "user_id", name="uq_message_deletion"),)
 
 class ConversationClear(db.Model):
-    """'Futa Mazungumzo' — mtumiaji anaficha ujumbe wote uliotumwa kabla ya wakati fulani."""
+    """'Futa Mazungumzo' - mtumiaji anaficha ujumbe wote uliotumwa kabla ya wakati fulani."""
     __tablename__ = "conversation_clears"
     id              = db.Column(db.Integer, primary_key=True)
     conversation_id = db.Column(db.Integer, db.ForeignKey("conversations.id"), nullable=False)
@@ -552,7 +552,7 @@ class Order(db.Model):
     conversation    = db.relationship("Conversation", foreign_keys=[conversation_id], lazy=True)
 
 
-# ── EscrowFee (Sprint 8 — Framework-ready, off by default) ───────────────────
+# ── EscrowFee (Sprint 8 - Framework-ready, off by default) ───────────────────
 class EscrowFee(db.Model):
     __tablename__ = "escrow_fees"
     id             = db.Column(db.Integer, primary_key=True)
@@ -572,7 +572,7 @@ class EscrowFee(db.Model):
     seller         = db.relationship("User", foreign_keys=[seller_id], lazy=True)
 
     def calculate_fee(self):
-        """Hesabu fee — returns 0 kama is_active=False (framework-ready)."""
+        """Hesabu fee - returns 0 kama is_active=False (framework-ready)."""
         if not self.is_active:
             self.fee_amount = 0
             self.waived_reason = "Escrow fees not yet active"
@@ -725,7 +725,7 @@ def trust_badge_html(trust_level):
 
 # ── Phone Masking Helper ──────────────────────────────────────────────────────
 def mask_phone(phone):
-    """Server-side masking — namba halisi haifiki browser ya guest kamwe"""
+    """Server-side masking - namba halisi haifiki browser ya guest kamwe"""
     if not phone:
         return "***"
     p = str(phone).strip()
@@ -895,7 +895,7 @@ def require_phone_verified(f):
 def index():
     # Auth wall: guest anaona landing page tu
     if not current_user.is_authenticated:
-        # Preview listings 6 tu — bila contact/phone
+        # Preview listings 6 tu - bila contact/phone
         preview = (
             MarketListing.query
             .filter_by(is_available=True)
@@ -912,7 +912,7 @@ def index():
         .all()
     )
     weather = get_weather("Mbeya")
-    # Platform stats — live kutoka DB
+    # Platform stats - live kutoka DB
     from sqlalchemy import func, distinct
     stats = {
         "users": db.session.query(func.count(User.id)).scalar() or 0,
@@ -957,9 +957,9 @@ def login():
         phone = sanitize(data.get("phone", ""), max_length=20)
         password = data.get(
             "password", ""
-        )  # Usiisanitize nywila — chars special zinahitajika
+        )  # Usiisanitize nywila - chars special zinahitajika
 
-        # SECURITY FIX: generic error message — usitaje "phone" au "password" peke yake
+        # SECURITY FIX: generic error message - usitaje "phone" au "password" peke yake
         user = User.query.filter_by(phone=phone).first()
 
         if not user or not user.check_password(password):
@@ -1085,7 +1085,7 @@ def register_initiate():
 
     resp = {"message": "OTP imetumwa.", "phone": phone}
     if OTP_MOCK:
-        resp["otp_dev"] = otp_code   # Development only — ondoa production
+        resp["otp_dev"] = otp_code   # Development only - ondoa production
     return jsonify(resp), 200
 
 
@@ -1121,7 +1121,7 @@ def register_verify():
         remaining = 5 - record.attempts
         return jsonify({"error": f"OTP si sahihi. Majaribio {remaining} yamebaki."}), 400
 
-    # ── OTP sahihi — unda mtumiaji ───────────────────────────────────────────
+    # ── OTP sahihi - unda mtumiaji ───────────────────────────────────────────
     form = json.loads(record.form_data)
     if User.query.filter_by(phone=form["phone"]).first():
         return jsonify({"error": "Namba ya simu tayari imetumika."}), 409
@@ -1185,7 +1185,7 @@ def terms():
     return render_template("legal/terms.html")
 
 
-# ── SECURITY FIX: forgot-password inahitaji uthibitisho — siyo kubadilisha moja kwa moja
+# ── SECURITY FIX: forgot-password inahitaji uthibitisho - siyo kubadilisha moja kwa moja
 @app.route("/forgot-password", methods=["GET", "POST"])
 @limiter.limit("3 per hour")
 def forgot_password():
@@ -1223,7 +1223,7 @@ def forgot_password():
 
         user = User.query.filter_by(phone=phone).first()
 
-        # SECURITY: Generic message + constant-time check — prevent user enumeration
+        # SECURITY: Generic message + constant-time check - prevent user enumeration
         generic_ok = (
             jsonify({"message": "Kama taarifa ni sahihi, nywila imebadilishwa."}),
             200,
@@ -1232,7 +1232,7 @@ def forgot_password():
         if not user:
             return generic_ok
 
-        # Verify full name matches — second factor without OTP
+        # Verify full name matches - second factor without OTP
         if user.full_name.strip().lower() != full_name:
             return generic_ok
 
@@ -1606,7 +1606,7 @@ Kanuni: "is_crop" ni true tu kama picha inaonyesha mmea au zao halisi. Kama sio 
             )
             # Log non-200 responses for debugging
             if not resp.ok:
-                print(f"[Gemini Vision] attempt {attempt} — HTTP {resp.status_code}: {resp.text[:300]}")
+                print(f"[Gemini Vision] attempt {attempt}, HTTP {resp.status_code}: {resp.text[:300]}")
             if resp.status_code == 429:
                 wait = 2 ** attempt  # 2s, 4s, 8s
                 print(f"[Gemini Vision] rate-limited, retrying in {wait}s...")
@@ -1782,7 +1782,7 @@ def create_listing():
 @require_active_account
 @require_phone_verified
 def sponsor_listing(listing_id):
-    """Muuzaji anasponsor listing yake — mock payment, siku 7."""
+    """Muuzaji anasponsor listing yake - mock payment, siku 7."""
     listing = MarketListing.query.get_or_404(listing_id)
     if listing.seller_id != current_user.id and current_user.role != "admin":
         return jsonify({"error": "Huna ruhusa."}), 403
@@ -1975,7 +1975,7 @@ def fetch_wfp_price(crop_sw, region):
             "price_tzs_kg": round(avg_price),
             "market": ", ".join(market_names) or region,
             "date": latest_date,
-            "source": "AgroLink — Bei za Wakulima",
+            "source": "AgroLink, Bei za Wakulima",
             "count": len(prices),
         }
     except Exception as exc:
@@ -2487,16 +2487,16 @@ def build_static_prediction(crop_sw, region, month):
         "high" if crop_sw in ["mahindi", "mpunga", "nyanya", "korosho"] else "medium"
     )
     season_note = (
-        "mavuno makubwa — bei inashuka"
+        "mavuno makubwa, bei inashuka"
         if s_mod < 0.95
-        else "uhaba wa soko — bei inapanda"
+        else "uhaba wa soko, bei inapanda"
     )
     season_ctx = (
         f"Mwezi wa {month} ni wakati wa {season_note} kwa {crop_sw} katika {region}. "
         "Hali ya hewa na msimu wa kilimo vinaathiri sana ugavi na bei ya soko."
     )
     mkt_advice = (
-        f"Hii ni wakati mzuri wa kuuza {crop_sw} — bei ipo juu. Masoko ya {region} na Dar es Salaam "
+        f"Hii ni wakati mzuri wa kuuza {crop_sw}, bei ipo juu. Masoko ya {region} na Dar es Salaam "
         "yanatoa bei nzuri. Hakikisha ubora wa zao lako ili kupata bei ya juu zaidi."
         if s_mod >= 1.0
         else f"Bei ya {crop_sw} ipo chini kwa sasa kutokana na mavuno mengi. Subiri miezi 1-2 au hifadhi vizuri. "
@@ -2539,7 +2539,7 @@ def api_price_prediction():
     if not region or region not in TANZANIA_REGIONS:
         return jsonify({"error": "Taja mkoa sahihi wa Tanzania."}), 400
     if not month or month not in VALID_MONTHS:
-        return jsonify({"error": "Taja mwezi sahihi (Januari–Desemba)."}), 400
+        return jsonify({"error": "Taja mwezi sahihi (Januari-Desemba)."}), 400
 
     cache_key = f"{crop_sw}:{region.lower()}:{month.lower()}"
     cached = get_cached_prediction(cache_key)
@@ -2597,7 +2597,7 @@ CROP_KNOWLEDGE = {
         "magonjwa": ["late blight", "ugonjwa wa kutu", "virus ya nyanya"],
         "hifadhi": "Ziuze ndani ya siku 3-5. Usizihifadhi kwenye jokofu zikiwa kijani.",
         "bei_min": 800, "bei_max": 2500, "onyo_bei": 600,
-        "msimu": "Juni-Septemba (baridi — ubora bora)",
+        "msimu": "Juni-Septemba (baridi, ubora bora)",
         "soko": "Dar es Salaam, Zanzibar, Mombasa",
     },
     "viazi": {
@@ -2616,7 +2616,7 @@ CROP_KNOWLEDGE = {
     },
     "maharage": {
         "magonjwa": ["kutu ya maharage", "anthracnose", "mosaic virus"],
-        "hifadhi": "Kausha vizuri. Tumia majivu ya kuni kuchanganya — inazuia wadudu bila dawa.",
+        "hifadhi": "Kausha vizuri. Tumia majivu ya kuni kuchanganya, inazuia wadudu bila dawa.",
         "bei_min": 1200, "bei_max": 2800, "onyo_bei": 1000,
         "msimu": "Mei-Agosti",
         "soko": "Dar es Salaam, Nairobi, Kampala",
@@ -2625,7 +2625,7 @@ CROP_KNOWLEDGE = {
         "magonjwa": ["Panama disease", "sigatoka nyeusi", "bunchy top"],
         "hifadhi": "Zikata zikiwa bado kijani. Hifadhi mahali penye baridi.",
         "bei_min": 300, "bei_max": 800, "onyo_bei": 250,
-        "msimu": "Wakati wowote — mazao mwaka mzima",
+        "msimu": "Wakati wowote, mazao mwaka mzima",
         "soko": "Dar es Salaam, Zanzibar, Mombasa",
     },
     "kabichi": {
@@ -2639,7 +2639,7 @@ CROP_KNOWLEDGE = {
         "magonjwa": ["anthracnose", "bacterial spot", "virus ya pilipili"],
         "hifadhi": "Hifadhi joto 7-10C. Inadumu wiki 2-3.",
         "bei_min": 1500, "bei_max": 4000, "onyo_bei": 1200,
-        "msimu": "Mwaka mzima — baridi ni bora",
+        "msimu": "Mwaka mzima, baridi ni bora",
         "soko": "Dar es Salaam, Zanzibar, Mombasa",
     },
     "ufuta": {
@@ -2745,7 +2745,7 @@ def agrobot_chat():
 @limiter.limit("20 per hour")
 def listing_advice():
     """
-    Dummy bot ya AgroLink — inatumia CROP_KNOWLEDGE dictionary peke yake.
+    Dummy bot ya AgroLink, inatumia CROP_KNOWLEDGE dictionary peke yake.
     Hakuna API call, hakuna gharama, inajibu papo hapo kwa Kiswahili kamili.
     """
     data = request.get_json() or {}
@@ -2795,7 +2795,7 @@ def listing_advice():
             ),
             "hatua_haraka": (
                 f"Piga picha nzuri zaidi za {crop_raw} wako na uweke maelezo kamili "
-                f"kwenye orodha yako — orodha zenye picha nzuri zinapata wanunuzi "
+                f"kwenye orodha yako, orodha zenye picha nzuri zinapata wanunuzi "
                 f"mara tatu zaidi kuliko zile bila picha!"
             ),
             "alama": 70,
@@ -2822,7 +2822,7 @@ def listing_advice():
         ujumbe_bei = (
             f"Bei yako ya TZS {price_tzs:,.0f} kwa {unit} ni chini sana ya wastani wa soko. "
             f"Wakulima wengine wa {matched_key} wanauza kati ya TZS {bei_min:,} hadi "
-            f"TZS {bei_max:,} kwa kilo. Fikiria kuongeza bei yako ili usipoteze faida — "
+            f"TZS {bei_max:,} kwa kilo. Fikiria kuongeza bei yako ili usipoteze faida, "
             f"unaweza kupoteza hadi TZS {(onyo - price_per_kg) * quantity:,.0f} kwa orodha hii."
         )
         alama = 45
@@ -2831,7 +2831,7 @@ def listing_advice():
         ujumbe_bei = (
             f"Bei yako ya TZS {price_tzs:,.0f} kwa {unit} ni juu zaidi ya wastani wa soko. "
             f"Bei ya kawaida ya {matched_key} ni TZS {bei_min:,} hadi TZS {bei_max:,} kwa kilo. "
-            f"Bei ya juu inaweza kufukuza wanunuzi — fikiria kupunguza kidogo au "
+            f"Bei ya juu inaweza kufukuza wanunuzi, fikiria kupunguza kidogo au "
             f"elezea vizuri ubora wa pekee wa zao lako kwenye maelezo."
         )
         alama = 60
@@ -2839,7 +2839,7 @@ def listing_advice():
         hali_bei = "nzuri"
         ujumbe_bei = (
             f"Hongera! Bei yako ya TZS {price_tzs:,.0f} kwa {unit} iko vizuri sana "
-            f"ndani ya wastani wa soko la {matched_key} (TZS {bei_min:,}–{bei_max:,}/kg). "
+            f"ndani ya wastani wa soko la {matched_key} (TZS {bei_min:,}-{bei_max:,}/kg). "
             f"Una nafasi nzuri ya kupata wanunuzi haraka hasa ukiwa na picha nzuri "
             f"na maelezo kamili ya ubora wa zao lako."
         )
@@ -2848,7 +2848,7 @@ def listing_advice():
     # ── Ushauri wa kuhifadhi ──────────────────────────────────────────────────
     ushauri_hifadhi = (
         f"{crop_data['hifadhi']} "
-        f"Una kiasi cha {quantity:,.0f} {unit} — hakikisha hifadhi yako ina nafasi "
+        f"Una kiasi cha {quantity:,.0f} {unit}, hakikisha hifadhi yako ina nafasi "
         f"ya kutosha na hewa ya kutosha. Msimu bora wa kuuza {matched_key} ni "
         f"{crop_data['msimu']}."
     )
@@ -2865,26 +2865,26 @@ def listing_advice():
     # ── Soko bora ─────────────────────────────────────────────────────────────
     soko_bora = (
         f"Masoko bora ya {matched_key} sasa ni {crop_data['soko']}. "
-        f"{'Mkoa wako wa ' + region + ' una soko zuri — wasiliana na wanunuzi wa karibu kwanza.' if region else 'Wasiliana na wanunuzi wa mkoa mkubwa karibu nawe.'}"
+        f"{'Mkoa wako wa ' + region + ' una soko zuri, wasiliana na wanunuzi wa karibu kwanza.' if region else 'Wasiliana na wanunuzi wa mkoa mkubwa karibu nawe.'}"
     )
 
     # ── Hatua ya haraka ───────────────────────────────────────────────────────
     if hali_bei == "chini":
         hatua_haraka = (
             f"Haraka iwezekanavyo: ongeza bei yako hadi angalau TZS {onyo:,}/kg "
-            f"au elezea sababu ya bei hiyo kwenye maelezo (mfano: 'bei ya haraka — "
+            f"au elezea sababu ya bei hiyo kwenye maelezo (mfano: 'bei ya haraka, "
             f"lazima niuze leo'). Unaweza kubadilisha orodha yako kutoka dashboard."
         )
     elif hali_bei == "juu":
         hatua_haraka = (
-            f"Ongeza maelezo ya kina ya ubora wa {matched_key} wako — "
+            f"Ongeza maelezo ya kina ya ubora wa {matched_key} wako, "
             f"elezea jinsi ulivyolima, kama ni organic, au sifa nyingine za pekee "
             f"ili kuwashawishi wanunuzi bei yako ina thamani."
         )
     else:
         hatua_haraka = (
             f"Shiriki orodha yako kwa marafiki na vikundi vya WhatsApp vya kilimo "
-            f"vya {region or 'mkoa wako'} — orodha mpya zinaweza kupata wanunuzi "
+            f"vya {region or 'mkoa wako'}, orodha mpya zinaweza kupata wanunuzi "
             f"ndani ya masaa 24 za kwanza hasa ukiitangaza mwenyewe."
         )
 
@@ -2991,7 +2991,7 @@ def admin_suspend_user(user_id):
     # Simamisha akaunti
     user.is_active = False
 
-    # Ongeza kwenye banned list — email NA simu zote mbili
+    # Ongeza kwenye banned list - email NA simu zote mbili
     if user.email and not BannedEmail.query.filter_by(email=user.email).first():
         db.session.add(
             BannedEmail(
@@ -3019,7 +3019,7 @@ def admin_suspend_user(user_id):
 @login_required
 @require_admin
 def admin_unsuspend_user(user_id):
-    """Rudisha akaunti — futa kutoka blacklist pia."""
+    """Rudisha akaunti - futa kutoka blacklist pia."""
     user = User.query.get_or_404(user_id)
     user.is_active = True
 
@@ -3047,7 +3047,7 @@ def admin_delete_listing(listing_id):
 @login_required
 @require_admin
 def admin_deactivate_user(user_id):
-    """Zima akaunti (soft) — badala ya real DELETE ili kuepuka FK violation
+    """Zima akaunti (soft) - badala ya real DELETE ili kuepuka FK violation
     (messages, orders, conversations zinazomrejelea mtumiaji huyu)."""
     if user_id == current_user.id:
         return jsonify({"error": "Huwezi kujizima mwenyewe."}), 400
@@ -3215,7 +3215,7 @@ def server_error(e):
 # ── Init DB & Run ─────────────────────────────────────────────────────────────
 
 # ============================================================
-# SPRINT 9 — MARKET DATA DASHBOARD
+# SPRINT 9 - MARKET DATA DASHBOARD
 # ============================================================
 
 MARKET_CROPS = [
@@ -3389,7 +3389,7 @@ def market_data_submit():
             rec_date  = request.form.get("recorded_at", "")
 
             if not crop_name or price_tzs <= 0 or not region:
-                flash("Jaza taarifa zote sahihi — zao, bei, na mkoa.", "danger")
+                flash("Jaza taarifa zote sahihi, zao, bei, na mkoa.", "danger")
                 return redirect(url_for("market_data_submit"))
 
             from datetime import datetime as dt
@@ -3454,7 +3454,7 @@ def admin_run_hdx_import():
             import_hdx_prices.run_import()
         output = buf.getvalue()
         summary_lines = [l for l in output.strip().splitlines() if l.startswith(("CSV URL", "USD", "Imeingizwa", "Imerukwa"))]
-        summary = " | ".join(summary_lines) if summary_lines else "Hakuna summary — angalia output kamili"
+        summary = " | ".join(summary_lines) if summary_lines else "Hakuna summary, angalia output kamili"
         flash(f"HDX: {summary}", "success")
         app.logger.info(f"HDX IMPORT OUTPUT:\n{output}")
     except Exception as e:
@@ -3556,7 +3556,7 @@ if not DATABASE_URL:
 
 
 # ════════════════════════════════════════════════════════════════════════════
-# PHONE MASKING — Messaging API
+# PHONE MASKING - Messaging API
 # Buyers wanawasiliana na sellers bila kuona phone number
 # ════════════════════════════════════════════════════════════════════════════
 
@@ -3613,7 +3613,7 @@ def start_conversation():
 @login_required
 @require_active_account
 def get_messages(conv_id):
-    """Pata ujumbe wote wa mazungumzo — buyer au seller tu."""
+    """Pata ujumbe wote wa mazungumzo - buyer au seller tu."""
     conv = Conversation.query.get_or_404(conv_id)
     if current_user.id not in (conv.buyer_id, conv.seller_id):
         return jsonify({"error": "Hauruhusiwi."}), 403
@@ -3696,7 +3696,7 @@ def reply_message(conv_id):
 @login_required
 @require_active_account
 def delete_message(msg_id):
-    """Futa kwa Wote — sender tu, ndani ya dakika 10 (kama WhatsApp)."""
+    """Futa kwa Wote - sender tu, ndani ya dakika 10 (kama WhatsApp)."""
     msg = Message.query.get_or_404(msg_id)
     if msg.sender_id != current_user.id:
         return jsonify({"error": "Unaweza kufuta ujumbe wako tu."}), 403
@@ -3714,7 +3714,7 @@ def delete_message(msg_id):
 @login_required
 @require_active_account
 def delete_message_for_me(msg_id):
-    """Futa Kwangu — mshiriki yeyote wa mazungumzo anaficha ujumbe kwake pekee."""
+    """Futa Kwangu - mshiriki yeyote wa mazungumzo anaficha ujumbe kwake pekee."""
     msg = Message.query.get_or_404(msg_id)
     conv = msg.conversation
     if current_user.id not in (conv.buyer_id, conv.seller_id):
@@ -3731,7 +3731,7 @@ def delete_message_for_me(msg_id):
 @login_required
 @require_active_account
 def clear_conversation(conv_id):
-    """Futa Mazungumzo — mshiriki anaficha ujumbe wote uliopo sasa, kwake pekee."""
+    """Futa Mazungumzo - mshiriki anaficha ujumbe wote uliopo sasa, kwake pekee."""
     conv = Conversation.query.get_or_404(conv_id)
     if current_user.id not in (conv.buyer_id, conv.seller_id):
         return jsonify({"error": "Hauruhusiwi."}), 403
@@ -3751,7 +3751,7 @@ def clear_conversation(conv_id):
 @app.route("/api/notifications/unread-count", methods=["GET"])
 @login_required
 def notification_unread_count():
-    """Idadi ya ujumbe ambao haujasomwa — kwa nav badge."""
+    """Idadi ya ujumbe ambao haujasomwa - kwa nav badge."""
     count = Message.query.join(Conversation).filter(
         Message.is_read == False,
         Message.sender_id != current_user.id,
@@ -3893,7 +3893,7 @@ def order_create():
     db.session.add(order)
     db.session.commit()
 
-    # Sprint 8 — EscrowFee: tengeneza record automatically (is_active=False by default)
+    # Sprint 8 - EscrowFee: tengeneza record automatically (is_active=False by default)
     import os
     fee_active = os.environ.get("ESCROW_FEE_ACTIVE", "false").lower() == "true"
     fee_rate = float(os.environ.get("ESCROW_FEE_RATE", "0.025"))
@@ -3922,13 +3922,13 @@ def order_advance(order_id):
         return jsonify({"error": "Huna ruhusa"}), 403
     transition = VALID_TRANSITIONS.get(order.status)
     if not transition:
-        return jsonify({"error": f"Order iko {order.status.value} — haiwezi kuendelea"}), 409
-    # SECURITY FIX: ulinzi wa ziada (defense-in-depth) — hata kama
+        return jsonify({"error": f"Order iko {order.status.value}, haiwezi kuendelea"}), 409
+    # SECURITY FIX: ulinzi wa ziada (defense-in-depth) - hata kama
     # VALID_TRANSITIONS itabadilishwa kimakosa baadaye, mpito kwenda
     # 'paid' au 'completed' kupitia route hii UNAKATALIWA daima.
     if transition["next"] in PAYMENT_ONLY_TRANSITIONS:
         app.logger.warning(
-            f"SECURITY: jaribio la kupita malipo — user {current_user.id} "
+            f"SECURITY: jaribio la kupita malipo, user {current_user.id} "
             f"alijaribu /advance order {order.id} kutoka {order.status.value} "
             f"kwenda {transition['next'].value}"
         )
@@ -3952,7 +3952,7 @@ def order_cancel(order_id):
     if current_user.id not in (order.buyer_id, order.seller_id):
         return jsonify({"error": "Huna ruhusa"}), 403
     if order.status in (OrderStatus.paid, OrderStatus.completed):
-        return jsonify({"error": "Order imekamilika — haiwezi kufutwa"}), 409
+        return jsonify({"error": "Order imekamilika, haiwezi kufutwa"}), 409
     order.status = OrderStatus.cancelled
     db.session.commit()
     return jsonify({"success": True, "status": "cancelled"})
@@ -4018,7 +4018,7 @@ def my_conversations():
 @login_required
 @require_active_account
 def messages_inbox():
-    """Inbox — orodha ya mazungumzo yote."""
+    """Inbox - orodha ya mazungumzo yote."""
     return render_template("messages/inbox.html")
 
 @app.route("/messages/<int:conv_id>")
@@ -4063,7 +4063,7 @@ def require_buyer(f):
 @login_required
 @require_active_account
 def b2b_portal():
-    """B2B Buyer Portal — landing page."""
+    """B2B Buyer Portal - landing page."""
     if current_user.role not in ("buyer", "admin", "farmer"):
         return redirect(url_for("index"))
     # Bulk listings: zinazopatikana na quantity >= 100kg
@@ -4156,7 +4156,7 @@ def b2b_listings():
 @limiter.limit("20 per hour")
 def b2b_inquiry():
     """
-    Bulk inquiry — buyer anatuma ombi la kununua kiasi kikubwa.
+    Bulk inquiry, buyer anatuma ombi la kununua kiasi kikubwa.
     Inafungua Conversation na kutuma ujumbe wa kwanza wa kina.
     """
     data        = request.get_json() or {}
@@ -4195,7 +4195,7 @@ def b2b_inquiry():
         + "Tafadhali jibu hapa ili tuendelee na mazungumzo ya biashara."
     )
 
-    # Tumia masking system — anza au endelea na conversation
+    # Tumia masking system - anza au endelea na conversation
     conv = Conversation.query.filter_by(
         listing_id=listing_id, buyer_id=current_user.id
     ).first()
@@ -4228,7 +4228,7 @@ def b2b_inquiry():
 @login_required
 @require_active_account
 def b2b_dashboard_stats():
-    """Stats za buyer dashboard — mazungumzo, maombi, jumla."""
+    """Stats za buyer dashboard - mazungumzo, maombi, jumla."""
     if current_user.role not in ("buyer", "admin", "farmer"):
         return jsonify({"error": "Hauruhusiwi."}), 403
 
@@ -4258,7 +4258,7 @@ def b2b_dashboard_stats():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PAYMENT ROUTES — Sprint 1 (AzamPay Sandbox)
+# PAYMENT ROUTES - Sprint 1 (AzamPay Sandbox)
 # ══════════════════════════════════════════════════════════════════════════════
 import secrets
 from payment_service import get_payment_service, PaymentError
@@ -4292,7 +4292,7 @@ def payment_page(order_id):
 @login_required
 @require_active_account
 def payment_initiate(order_id):
-    """Anzisha malipo — tuma USSD push kwa simu ya mnunuzi."""
+    """Anzisha malipo - tuma USSD push kwa simu ya mnunuzi."""
     order = Order.query.get_or_404(order_id)
 
     if order.buyer_id != current_user.id:
@@ -4335,12 +4335,12 @@ def payment_initiate(order_id):
 @csrf.exempt
 def payment_callback():
     """
-    Payment provider callback — inaitwa na AzamPay/Selcom baada ya mnunuzi kulipa.
+    Payment provider callback, inaitwa na AzamPay/Selcom baada ya mnunuzi kulipa.
     Inabadilisha order status kuwa 'paid'.
 
     USALAMA:
       - Shared-secret token (?secret=XXXX) lazima ulingane na PAYMENT_CALLBACK_SECRET
-      - Idempotent — callback ile ile haiwezi kuprocesiwa mara mbili
+      - Idempotent, callback ile ile haiwezi kuprocesiwa mara mbili
       - Kila jaribio (likifaulu au la) linarekodiwa kwa audit (IP + matokeo)
     """
     client_ip = request.remote_addr
@@ -4351,14 +4351,14 @@ def payment_callback():
 
     if not expected_secret:
         app.logger.error(
-            "SECURITY: PAYMENT_CALLBACK_SECRET haijawekwa kwenye env — "
+            "SECURITY: PAYMENT_CALLBACK_SECRET haijawekwa kwenye env, "
             "callback endpoint haina ulinzi!"
         )
         return jsonify({"status": "error", "message": "Server misconfigured"}), 200
 
     if not secrets.compare_digest(provided_secret, expected_secret):
         app.logger.warning(
-            f"SECURITY: Callback ya kughushi kutoka IP={client_ip} — "
+            f"SECURITY: Callback ya kughushi kutoka IP={client_ip}, "
             f"secret token si sahihi. Imekataliwa."
         )
         return jsonify({"status": "error", "message": "Unauthorized"}), 200
@@ -4380,7 +4380,7 @@ def payment_callback():
                 )
                 return jsonify({"status": "ok"}), 200
 
-            # ── 2. Idempotency check — kuzuia kuprocesiwa mara mbili ──────
+            # ── 2. Idempotency check - kuzuia kuprocesiwa mara mbili ──────
             if escrow.status == EscrowStatus.held:
                 app.logger.info(
                     f"AUDIT: Callback duplicate kwa reference={reference} "
@@ -4398,19 +4398,19 @@ def payment_callback():
                 order.status = OrderStatus.paid
                 db.session.commit()
                 app.logger.info(
-                    f"AUDIT: Payment confirmed — order={order.id}, "
+                    f"AUDIT: Payment confirmed, order={order.id}, "
                     f"reference={reference}, IP={client_ip}"
                 )
         else:
             app.logger.warning(
-                f"AUDIT: Callback verification ilishindwa — "
+                f"AUDIT: Callback verification ilishindwa, "
                 f"payload={payload}, IP={client_ip}"
             )
 
         return jsonify({"status": "ok"}), 200
 
     except Exception as e:
-        app.logger.error(f"Payment callback error: {e} — IP={client_ip}")
+        app.logger.error(f"Payment callback error: {e}, IP={client_ip}")
         return jsonify({"status": "error"}), 200  # 200 daima kwa callbacks
 
 
@@ -4419,7 +4419,7 @@ def payment_callback():
 @require_active_account
 def payment_release(order_id):
     """
-    Toa pesa kwa mkulima — inaitwa mnunuzi akithibitisha kupokea bidhaa.
+    Toa pesa kwa mkulima, inaitwa mnunuzi akithibitisha kupokea bidhaa.
     Order status: paid → completed.
     """
     order = Order.query.get_or_404(order_id)
@@ -4454,7 +4454,7 @@ def payment_release(order_id):
             escrow.status = EscrowStatus.released
             order.status  = OrderStatus.completed
 
-            # Sprint 8 — release EscrowFee record wakati order imekamilika
+            # Sprint 8 - release EscrowFee record wakati order imekamilika
             fee_record = EscrowFee.query.filter_by(order_id=order.id).first()
             if fee_record:
                 fee_record.status = "released"
