@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Ingia — AgroLink Tanzania{% endblock %}
+{% block title %}Ingia | AgroLink Tanzania{% endblock %}
 {% block extra_head %}
 <style>
   .auth-layout{min-height:calc(100vh - 60px);display:grid;grid-template-columns:1fr 1fr;background:var(--bg-page)}
@@ -48,7 +48,7 @@
       <div>
         <div class="auth-stat-card"><div class="stat-icon-wrap green"><i data-lucide="users" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem;color:var(--text-on-dark)">10,000+</div><div style="font-size:0.75rem;color:rgba(254,250,224,0.45)">Wakulima Wamejiandikisha</div></div></div>
         <div class="auth-stat-card"><div class="stat-icon-wrap amber"><i data-lucide="trending-up" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem;color:var(--text-on-dark)">Bei za Moja kwa Moja</div><div style="font-size:0.75rem;color:rgba(254,250,224,0.45)">Masoko 25+ Tanzania</div></div></div>
-        <div class="auth-stat-card"><div class="stat-icon-wrap sky"><i data-lucide="cloud-sun" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem;color:var(--text-on-dark)">Hali ya Hewa ya Leo</div><div style="font-size:0.75rem;color:rgba(254,250,224,0.45)">Mji Wako — Wakati Halisi</div></div></div>
+        <div class="auth-stat-card"><div class="stat-icon-wrap sky"><i data-lucide="cloud-sun" style="width:18px;height:18px"></i></div><div><div style="font-family:var(--font-display);font-weight:800;font-size:1rem;color:var(--text-on-dark)">Hali ya Hewa ya Leo</div><div style="font-size:0.75rem;color:rgba(254,250,224,0.45)">Mji Wako, Wakati Halisi</div></div></div>
       </div>
     </div>
   </div>
@@ -90,7 +90,7 @@
         <div class="auth-divider">au</div>
         <div style="text-align:center;font-size:0.78rem;color:var(--text-muted);display:flex;align-items:center;justify-content:center;gap:6px">
           <i data-lucide="shield" style="width:13px;height:13px;color:var(--brand-mid)"></i>
-          Data yako inalindwa — Cisco Security Standards
+          Data yako inalindwa: Cisco Security Standards
         </div>
       </div>
       <p class="auth-switch">Huna akaunti? <a href="{{ url_for('register') }}">Jiunge bure hapa &rarr;</a></p>
@@ -129,7 +129,7 @@ document.getElementById('login-form').addEventListener('submit',async e=>{
     const res=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone,password})});
     const data=await res.json();
     if(res.ok){
-      document.getElementById('submit-text').textContent='Umeingia! ✓';
+      document.getElementById('submit-text').textContent='Umeingia!';
       const params=new URLSearchParams(window.location.search);
       const next=params.get('next');
       const safeNext=(next && next.startsWith('/') && !next.startsWith('//')) ? next : null;

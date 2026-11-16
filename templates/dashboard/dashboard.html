@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Dashboard — AgroLink Tanzania{% endblock %}
+{% block title %}Dashboard | AgroLink Tanzania{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -20,7 +20,7 @@
   .btn-primary-dash{display:inline-flex;align-items:center;gap:8px;background:var(--brand-dark);color:#fff;padding:0.72rem 1.3rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:600;text-decoration:none;transition:background var(--transition);white-space:nowrap}
   .btn-primary-dash:hover{background:var(--brand-mid)}
 
-  /* ===== Snapshot strip — clickable filters, eBay-Overview inspired ===== */
+  /* ===== Snapshot strip - clickable filters, eBay-Overview inspired ===== */
   .snapshot{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);margin-bottom:1.75rem;overflow:hidden}
   .snap-seg{padding:1rem 1.3rem;border-right:1px solid var(--border);cursor:pointer;background:none;text-align:left;font-family:inherit;transition:background var(--transition)}
   .snap-seg:last-child{border-right:none}
@@ -98,7 +98,7 @@
       </div>
     </div>
     <div class="dash-header-actions">
-      {# Notification bell — scaffold. Wire `unread_notifications` from the backend once
+      {# Notification bell - scaffold. Wire `unread_notifications` from the backend once
          a Notification model + route exists (planned: admin broadcast messages). #}
       <a href="#" class="bell-btn" title="Arifa">
         <i data-lucide="bell" style="width:19px;height:19px"></i>
@@ -196,7 +196,7 @@ async function deleteListing(id, btn){
   else{ alert(data.error); }
 }
 
-// Snapshot filter — click a segment to show only that status, no page reload
+// Snapshot filter - click a segment to show only that status, no page reload
 document.querySelectorAll('.snap-seg').forEach(seg => {
   seg.addEventListener('click', () => {
     const filter = seg.dataset.filter;
